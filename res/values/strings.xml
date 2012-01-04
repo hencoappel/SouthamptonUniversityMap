@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="menu_find">Find</string>
+    <string name="menu_preferences">Preferences</string>
+    <string name="menu_view">View</string>
+    <string name="menu_find_my_location">Find my Location</string>
+    <string name="app_name">Southampton University Map</string>
+    <string name="legal_message">Southampton University Map comes with ABSOLUTELY NO WARRANTY; do not rely on the data or functionality provided by this application. This is free software, and you are welcome to redistribute it under certain conditions; expand the Licence item above for more details.</string>
+    <string name="building_residential">Residential Building</string>
+    <string name="building_non_residential">Non-Residential Building</string>
+    <string name="pref_bus_stop">Bus Stops</string>
+    <string name="U1">U1</string>
+    <string name="U1N">U1N</string>
+    <string name="U2">U2</string>
+    <string name="U6">U6</string>
+    <string name="U9">U9</string>
+    <string name="menu_about">About</string>
+    <string name="menu_favourites">Favourites</string>
+
+    <!-- Preferences Messages -->
+    <string name="map_help_message">You can drag the map to move it, you can use pinch motions to zoom in and out, this can also be done with the buttons at the bottom of the screen. Taping the building markers will show you there full name, and tapping the bus stop markers will show the live times at that stop. Presing and holding a marker, will add the item to the favourites list.</string>
+    <string name="find_help_message">The Find screen allows you to search for buildings, bus stops and sites. You can search by description and id. If your location is known, the results will be sorted by distance from your current location.</string>
+    <string name="preferences_help_message">You can disable and enable the apps use of live bus times and gps positioning from the preferences screen.</string>
+    <string name="findmylocation_help_message">When you press the Find my Location button on the menu, the map view will move to your location, and zoom in.</string>
+    <string name="view_help_message">Use the options in the View dialog to enable and disable the map elements.</string>
+    <string name="about_help_message">The About screen displays the help messages and also the contact details of the developer. You also have the option of making a Bitcoin donation using the Donate button at the bottom. WARNING, the donation address is not private as it is hardcoded in to the app.</string>
+    <string name="favourites_help_message">The favourites dialog includes a list of buildings or bus stops marked as favourites, this is meant to allow for easier access to frequently used locations.</string>
+    <string name="licence_help_message">Southampton University Map App Copyright © 2011 Christopher Baines\n
+\n
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.\n
+\n
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.\n
+\n
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.</string>
+    <string name="credits_help_message">Software Design: Christopher Banines cbaines8@gmail.com Live Bus Data: provided under the Open Government License by the Southampton City Council ROMANSE office through the University of Southampton Open Data Service. Data: From the OpenStreetMap project, exported and used from the University of Southampton Open Data Service. Map Icons: From the "Map Icons Collection" (http://mapicons.nicolasmollet.com). Map Tiles: From the Mapnik project, through the OSMDroid libary. Database: Using the ORMLite libary.</string>
+    <string name="donate_button">Donate</string>
+    <string name="bitcoin_error_message">You appear to have no bitcoin client installed, or at least none that listen for bitcoin uri\'s. Either install such a client, or just send coins via any method from any device to the address below.</string>
+    <string name="preferences">Preferences</string>
+
+    <string-array name="uniLinkBusRoutes">
+        <item>U1</item>
+        <item>U1N</item>
+        <item>U2</item>
+        <item>U6</item>
+        <item>U9</item>
+    </string-array>
+    <string-array name="buildingTypes">
+        <item>Residential</item>
+        <item>Non-Residential</item>
+    </string-array>
+    <string-array name="utilityOverlays">
+        <item>Scale Bar</item>
+        <item>Compass</item>
+        <item>My Location</item>
+    </string-array>
+    <string-array name="preferencesHeadings">
+        <item>Bus Stops</item>
+        <item>Bus Routes</item>
+        <item>Buildings</item>
+        <item>Site Outlines</item>
+        <item>Other</item>
+    </string-array>
+
+    <string name="preferences_catagory_positioning">Positioning</string>
+    <string name="preferences_gps_enabled">GPS Enabled</string>
+    <string name="preferences_gps_disabled">GPS Disabled</string>
+    <string name="preferences_catagory_bus_times">Bus Times</string>
+    <string name="preferences_live_bus_times_enabled">Live Bus Times Enabled</string>
+    <string name="preferences_live_bus_times_disabled">Live Bus Times Disabled</string>
+    <string name="about_menu_instruction_text">Expand the items below to learn more about each feature of the application.</string>
+    <string name="bustimes_favourite_checkbox_label">Favourite</string>
+    <string name="donate_dialog_message">Loading bitcoin client</string>
+    <string name="donate_dialog_error_title">Error</string>
+
+</resources>

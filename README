@@ -1,0 +1,7 @@
+Southampton University Map
+
+To build, you must have avalible ormlite, osmdroid and slf4j-android. As jars, these would be:
+ormlite-android-4.30.jar
+ormlite-core-4.30.jar
+osmdroid-android-3.0.6.jar
+slf4j-android-1.5.8.jar

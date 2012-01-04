@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:orderingFromXml="true"
+        android:title="@string/preferences_catagory_positioning" >
+        <CheckBoxPreference
+            android:key="GPSEnabled"
+            android:summaryOff="@string/preferences_gps_disabled"
+            android:summaryOn="@string/preferences_gps_enabled"
+            android:title="GPS" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:orderingFromXml="true"
+        android:title="@string/preferences_catagory_bus_times" >
+        <CheckBoxPreference
+            android:key="liveBusTimesEnabled"
+            android:summaryOff="@string/preferences_live_bus_times_disabled"
+            android:summaryOn="@string/preferences_live_bus_times_enabled"
+            android:title="Live Bus Times" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
