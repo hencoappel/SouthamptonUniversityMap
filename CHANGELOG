@@ -1,0 +1,14 @@
+SouthamptonUniveristyMap (0.15)
+
+  * Fixed issue with bitcoin uri.
+  * Removed custom menu star, and replaced with android drawable.
+  * Moved and changed favourites dialog message text.
+
+ -- Christopher Baines <cbaines8@gmail.com>  Wed, 04 Jan 2012 22:10:45 +0000
+
+SouthamptonUniveristyMap (0.1)
+
+  * Initial release.
+
+ -- Christopher Baines <cbaines8@gmail.com>  Wed, 04 Jan 2012 22:10:45 +0000
+

@@ -1,16 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/menu_find" android:icon="@android:drawable/ic_menu_search"
-		android:title="@string/menu_find" />
-	<item android:id="@+id/menu_preferences" android:icon="@android:drawable/ic_menu_preferences"
-		android:title="@string/menu_preferences" />
-	<item android:id="@+id/menu_find_my_location" android:icon="@android:drawable/ic_menu_mylocation"
-		android:title="@string/menu_find_my_location"></item>
-	<item android:id="@+id/menu_view" android:icon="@android:drawable/ic_menu_more"
-		android:title="@string/menu_view" />
-	<item android:id="@+id/menu_about" android:icon="@android:drawable/ic_menu_info_details"
-		android:title="@string/menu_about" />
-	<item android:id="@+id/menu_favourites" android:icon="@drawable/ic_menu_star"
-		android:title="@string/menu_favourites" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_find"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="@string/menu_find"/>
+    <item
+        android:id="@+id/menu_preferences"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="@string/menu_preferences"/>
+    <item
+        android:id="@+id/menu_find_my_location"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:title="@string/menu_find_my_location">
+    </item>
+    <item
+        android:id="@+id/menu_view"
+        android:icon="@android:drawable/ic_menu_more"
+        android:title="@string/menu_view"/>
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="@string/menu_about"/>
+    <item
+        android:id="@+id/menu_favourites"
+        android:icon="@android:drawable/star_off"
+        android:title="@string/menu_favourites"/>
 
 </menu>

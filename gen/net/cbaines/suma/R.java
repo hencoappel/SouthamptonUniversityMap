@@ -21,12 +21,11 @@ public final class R {
         public static final int building_fav=0x7f020001;
         public static final int busstop=0x7f020002;
         public static final int busstop_fav=0x7f020003;
-        public static final int ic_menu_star=0x7f020004;
-        public static final int u1_back=0x7f020005;
-        public static final int u1n_back=0x7f020006;
-        public static final int u2_back=0x7f020007;
-        public static final int u6_back=0x7f020008;
-        public static final int u9_back=0x7f020009;
+        public static final int u1_back=0x7f020004;
+        public static final int u1n_back=0x7f020005;
+        public static final int u2_back=0x7f020006;
+        public static final int u6_back=0x7f020007;
+        public static final int u9_back=0x7f020008;
     }
     public static final class id {
         public static final int busStopID=0x7f09000c;
@@ -99,16 +98,17 @@ public final class R {
         public static final int U6=0x7f06000c;
         public static final int U9=0x7f06000d;
         public static final int about_help_message=0x7f060015;
-        public static final int about_menu_instruction_text=0x7f060022;
+        public static final int about_menu_instruction_text=0x7f060023;
         public static final int app_name=0x7f060004;
         public static final int bitcoin_error_message=0x7f06001a;
         public static final int building_non_residential=0x7f060007;
         public static final int building_residential=0x7f060006;
-        public static final int bustimes_favourite_checkbox_label=0x7f060023;
+        public static final int bustimes_favourite_checkbox_label=0x7f060024;
         public static final int credits_help_message=0x7f060018;
         public static final int donate_button=0x7f060019;
-        public static final int donate_dialog_error_title=0x7f060025;
-        public static final int donate_dialog_message=0x7f060024;
+        public static final int donate_dialog_error_title=0x7f060026;
+        public static final int donate_dialog_message=0x7f060025;
+        public static final int favourites_dialog_message=0x7f06001c;
         public static final int favourites_help_message=0x7f060016;
         public static final int find_help_message=0x7f060011;
         public static final int findmylocation_help_message=0x7f060013;
@@ -125,13 +125,13 @@ public final class R {
         public static final int menu_view=0x7f060002;
         public static final int pref_bus_stop=0x7f060008;
         public static final int preferences=0x7f06001b;
-        public static final int preferences_catagory_bus_times=0x7f06001f;
-        public static final int preferences_catagory_positioning=0x7f06001c;
-        public static final int preferences_gps_disabled=0x7f06001e;
-        public static final int preferences_gps_enabled=0x7f06001d;
+        public static final int preferences_catagory_bus_times=0x7f060020;
+        public static final int preferences_catagory_positioning=0x7f06001d;
+        public static final int preferences_gps_disabled=0x7f06001f;
+        public static final int preferences_gps_enabled=0x7f06001e;
         public static final int preferences_help_message=0x7f060012;
-        public static final int preferences_live_bus_times_disabled=0x7f060021;
-        public static final int preferences_live_bus_times_enabled=0x7f060020;
+        public static final int preferences_live_bus_times_disabled=0x7f060022;
+        public static final int preferences_live_bus_times_enabled=0x7f060021;
         public static final int view_help_message=0x7f060014;
     }
     public static final class xml {

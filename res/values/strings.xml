@@ -45,6 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="donate_button">Donate</string>
     <string name="bitcoin_error_message">You appear to have no bitcoin client installed, or at least none that listen for bitcoin uri\'s. Either install such a client, or just send coins via any method from any device to the address below.</string>
     <string name="preferences">Preferences</string>
+    <string name="favourites_dialog_message">No Favourite\'s. To add a building or bus stop to the favourites list, just press and hold it on the map.</string>
 
     <string-array name="uniLinkBusRoutes">
         <item>U1</item>

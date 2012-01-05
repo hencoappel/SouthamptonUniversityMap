@@ -81,7 +81,7 @@ public class FavouriteDialog extends Dialog {
 		Log.i(TAG, "Favourite dialog has no favourites, displaying message");
 		message.post(new Runnable() {
 		    public void run() {
-			message.setText("No Favourite's, to make some buildings or bus stops favourite, just tap and hold them on the map");
+			message.setText(R.string.favourites_dialog_message);
 			message.setVisibility(View.VISIBLE);
 		    }
 		});
