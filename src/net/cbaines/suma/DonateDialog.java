@@ -72,7 +72,7 @@ public class DonateDialog extends Dialog implements Runnable {
 	try {
 
 	    Intent donateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("bitcoin:" + bitcoinAddress
-		    + "&label=Southampton%20Uni%20Map%20App&message=Donation%20for%20the%20Southampton%20University%20Map%20App"));
+		    + "?label=Southampton%20Uni%20Map%20App&message=Donation%20for%20the%20Southampton%20University%20Map%20App"));
 	    context.startActivity(donateIntent);
 
 	} catch (ActivityNotFoundException e) {
