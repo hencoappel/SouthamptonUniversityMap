@@ -177,25 +177,27 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public boolean checkDataBase() {
 	Log.i(TAG, "Check database");
 
-	SQLiteDatabase checkDB = null;
+	/*
+	 * SQLiteDatabase checkDB = null;
+	 * 
+	 * try { String myPath = DATABASE_PATH + DATABASE_NAME; checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY); } catch
+	 * (SQLiteException e) {
+	 * 
+	 * // database does't exist yet.
+	 * 
+	 * }
+	 * 
+	 * if (checkDB != null) {
+	 * 
+	 * checkDB.close();
+	 * 
+	 * }
+	 * 
+	 * Log.i(TAG, "Finished checking database"); return checkDB != null ? true : false;
+	 */
 
-	try {
-	    String myPath = DATABASE_PATH + DATABASE_NAME;
-	    checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
-	} catch (SQLiteException e) {
-
-	    // database does't exist yet.
-
-	}
-
-	if (checkDB != null) {
-
-	    checkDB.close();
-
-	}
-
-	Log.i(TAG, "Finished checking database");
-	return checkDB != null ? true : false;
+	File dbFile = new File(DATABASE_PATH + DATABASE_NAME);
+	return dbFile.exists();
     }
 
     /**

@@ -216,9 +216,10 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	Log.i(TAG, "Begining loading databases " + (System.currentTimeMillis() - startTime));
 
 	DatabaseHelper helper = getHelper();
-	Log.i(TAG, "Got the helper");
+	Log.i(TAG, "Got the helper at " + (System.currentTimeMillis() - startTime));
 
 	boolean dbExist = helper.checkDataBase();
+	Log.i(TAG, "Finished checking the database at " + (System.currentTimeMillis() - startTime));
 
 	if (dbExist) {
 	    // do nothing - database already exist
@@ -330,11 +331,6 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			e.printStackTrace();
 		    }
 
-		    SharedPreferences mainPrefs = getPreferences(0);
-		    if (mainPrefs.getBoolean("first_run", true)) {
-			Log.i(TAG, "Changing button in intro");
-		    }
-
 		    Log.i(TAG, "Finished loading databases " + (System.currentTimeMillis() - startTime));
 
 		} catch (SQLException e1) {
@@ -345,75 +341,16 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	}
 
 	try {
-	    setupActivityPrefs();
+	    showOverlays();
 	} catch (SQLException e) {
 	    e.printStackTrace();
 	}
 
-	createOverlays();
 	Log.i(TAG, "Finished seting in motion the creation of the overlays " + (System.currentTimeMillis() - startTime));
-
     }
 
-    private void setupActivityPrefs() throws SQLException {
-	Log.i(TAG, "Begining setting up preferences");
-
-	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-	int size = (int) getHelper().getSiteDao().countOf();
-	ArrayList<Site> sites = new ArrayList<Site>(size);
-
-	try {
-	    sites.addAll(getHelper().getSiteDao().queryForAll());
-	} catch (SQLException e) {
-	    e.printStackTrace();
-	}
-	siteNames = new String[size];
-	for (int i = 0; i < size; i++) {
-	    siteNames[i] = sites.get(i).name;
-	}
-
-	SharedPreferences activityPrefs = getPreferences(0);
-	Editor editor = activityPrefs.edit();
-
-	for (int heading = 0; heading < groupHeadings.length; heading++) {
-	    if (heading == 0 || heading == 1) {
-		for (int child = 0; child < busRoutes.length; child++) {
-		    if (!activityPrefs.contains(groupHeadings[heading] + ":" + busRoutes[child])) {
-			editor.putBoolean(groupHeadings[heading] + ":" + busRoutes[child], true);
-		    }
-		}
-	    } else if (heading == 2) {
-		for (int child = 0; child < buildingTypes.length; child++) {
-		    if (!activityPrefs.contains(groupHeadings[heading] + ":" + buildingTypes[child])) {
-			editor.putBoolean(groupHeadings[heading] + ":" + buildingTypes[child], true);
-		    }
-		}
-	    } else if (heading == 3) {
-		for (int child = 0; child < sites.size(); child++) {
-		    if (!activityPrefs.contains(groupHeadings[heading] + ":" + sites.get(child))) {
-			editor.putBoolean(groupHeadings[heading] + ":" + sites.get(child), true);
-		    }
-		}
-	    } else if (heading == 4) {
-		for (int child = 0; child < other.length; child++) {
-		    if (!activityPrefs.contains(groupHeadings[heading] + ":" + other[child])) {
-			editor.putBoolean(groupHeadings[heading] + ":" + other[child], true);
-		    }
-		}
-	    }
-	}
-
-	editor.commit();
-
-	activityPrefs.registerOnSharedPreferenceChangeListener(this);
-	sharedPrefs.registerOnSharedPreferenceChangeListener(this);
-
-	Log.i(TAG, "Finished setting up preferences");
-    }
-
-    private void createOverlays() {
-	Log.i(TAG, "Began creating overlays at " + (System.currentTimeMillis() - startTime));
+    private void showOverlays() throws SQLException {
+	Log.i(TAG, "Began showing overlays at " + (System.currentTimeMillis() - startTime));
 
 	if (pastOverlays != null) {
 	    Log.i(TAG, "Able to recover some/all of the overlays from a previous activity");
@@ -421,83 +358,97 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    Log.i(TAG, "Unable to recover overlays");
 	}
 
-	final OverlayRankComparator comparator = new OverlayRankComparator(getPreferences(0));
 	final SharedPreferences activityPrefs = getPreferences(0);
 
-	Thread utilityOverlayCreation = new Thread(new Runnable() {
+	showUtilityOverlays();
+
+	showBusStopOverlay();
+
+	if (activityPrefs.getBoolean("Buildings:Residential", false) || activityPrefs.getBoolean("Buildings:Non-Residential", false)) {
+	    // The argument currently dosent matter for this method.
+	    showBuildingOverlay(true);
+
+	}
+
+	Log.i(TAG, "Begining to show the route overlays at " + (System.currentTimeMillis() - startTime));
+	routeOverlays = new HashMap<BusRoute, PathOverlay>(5);
+	Dao<BusRoute, Integer> busRouteDao = getHelper().getBusRouteDao();
+	for (Iterator<BusRoute> routeIter = busRouteDao.iterator(); routeIter.hasNext();) {
+	    BusRoute route = routeIter.next();
+	    if (activityPrefs.getBoolean("Bus Routes:" + route.code, false)) {
+		showRouteOverlay(route);
+	    }
+	}
+	Log.i(TAG, "Finished loading routes " + (System.currentTimeMillis() - startTime));
+
+	Log.i(TAG, "Begining to show the site overlays at " + (System.currentTimeMillis() - startTime));
+	try {
+	    Dao<Site, String> siteDao = getHelper().getSiteDao();
+	    siteOverlays = new HashMap<Site, PathOverlay>((int) siteDao.countOf());
+
+	    for (Site site : siteDao) {
+		if (activityPrefs.getBoolean("Sites:" + site.name, false)) {
+		    showSiteOverlay(site);
+		}
+	    }
+	} catch (SQLException e) {
+	    e.printStackTrace();
+	}
+	Log.i(TAG, "Finished showing the site overlays " + (System.currentTimeMillis() - startTime));
+
+    }
+
+    private void showUtilityOverlays() {
+	new Thread(new Runnable() {
 	    public void run() {
-		Log.i(TAG, "Begining the creation of the utility overlays");
+		Log.i(TAG, "Begining showing the utility overlays " + (System.currentTimeMillis() - startTime));
 
-		if (pastOverlays != null) {
-		    scaleBarOverlay = (ScaleBarOverlay) pastOverlays.get("Other:Scale Bar");
+		final SharedPreferences activityPrefs = getPreferences(0);
+		final OverlayRankComparator comparator = new OverlayRankComparator(getPreferences(0));
 
-		    if (scaleBarOverlay != null && myLocationOverlay != null) {
-			overlays.put("Other:Scale Bar", scaleBarOverlay);
+		if (scaleBarOverlay != null) {
+		    Log.v(TAG, "ScaleBarOverlay is already created");
+		} else {
+		    if (pastOverlays != null && (scaleBarOverlay = (ScaleBarOverlay) pastOverlays.get("Other:Scale Bar")) != null) {
 			Log.i(TAG, "Finished restoring utility overlays " + (System.currentTimeMillis() - startTime));
-			return;
+		    } else {
+			scaleBarOverlay = new ScaleBarOverlay(instance);
 		    }
+
+		    overlays.put("Other:Scale Bar", scaleBarOverlay);
+
+		    synchronized (mapView.getOverlays()) {
+			mapView.getOverlays().add(scaleBarOverlay);
+			mapView.getOverlays().add(myLocationOverlay);
+			Collections.sort(mapView.getOverlays(), comparator);
+		    }
+
 		}
 
-		scaleBarOverlay = new ScaleBarOverlay(instance);
 		scaleBarOverlay.setEnabled(activityPrefs.getBoolean("Other:Scale Bar", true));
 
-		overlays.put("Other:Scale Bar", scaleBarOverlay);
+		mapView.postInvalidate();
 
-		Log.i(TAG, "Finished creating utility overlays " + (System.currentTimeMillis() - startTime));
-
+		Log.i(TAG, "Finished showing utility overlays " + (System.currentTimeMillis() - startTime));
 	    }
-	});
+	}).start();
+    }
 
-	utilityOverlayCreation.start();
-
-	Runnable utilityOverlayApplication = new Runnable() {
+    private void showRouteOverlay(final BusRoute route) {
+	new Thread(new Runnable() {
 	    public void run() {
-		Log.i(TAG, "Begining the application of the utility overlays");
+		Log.i(TAG, "Begining showing route " + route.code + " overlay at " + (System.currentTimeMillis() - startTime));
 
-		mapView.getOverlays().add(scaleBarOverlay);
+		final SharedPreferences activityPrefs = getPreferences(0);
+		final OverlayRankComparator comparator = new OverlayRankComparator(getPreferences(0));
 
-		mapView.getOverlays().add(myLocationOverlay);
-
-		Log.v(TAG, "Applyed the utility overlays, now sorting them");
-
-		Collections.sort(mapView.getOverlays(), comparator);
-
-		Log.v(TAG, "Finished sorting the utility overlays them, now applying them");
-
-		mapView.invalidate();
-
-		Log.i(TAG, "Finished loading utility overlays " + (System.currentTimeMillis() - startTime));
-
-	    }
-	};
-
-	Thread routeOverlayCreation = new Thread(new Runnable() {
-	    public void run() {
-
-		try {
-		    Log.i(TAG, "Begining to create the route overlays");
-
-		    SharedPreferences mainPrefs = getPreferences(0);
-
-		    routeOverlays = new HashMap<BusRoute, PathOverlay>(5);
-
-		    Dao<BusRoute, Integer> busRouteDao = getHelper().getBusRouteDao();
-
-		    for (Iterator<BusRoute> routeIter = busRouteDao.iterator(); routeIter.hasNext();) {
-			BusRoute route = routeIter.next();
-
-			Log.v(TAG, "Looking at route " + route.code);
-
-			if (pastOverlays != null) {
-			    PathOverlay routeOverlay = (PathOverlay) pastOverlays.get("Bus Routes:" + route.code);
-			    if (routeOverlay != null) {
-				Log.i(TAG, "Restored " + route.code + " route overlay");
-				routeOverlays.put(route, routeOverlay);
-				overlays.put("Bus Routes:" + route.code, routeOverlay);
-				continue;
-			    }
-			}
-
+		PathOverlay routeOverlay;
+		if ((routeOverlay = routeOverlays.get(route)) != null) {
+		    Log.v(TAG, route.code + " route overlay already existed");
+		} else {
+		    if (pastOverlays != null && (routeOverlay = (PathOverlay) pastOverlays.get("Bus Routes:" + route.code)) != null) {
+			Log.v(TAG, "Restored " + route.code + " route overlay");
+		    } else {
 			InputStream resource = null;
 			int colour = 0;
 			if (route.code.equals("U1")) {
@@ -510,7 +461,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			    routeOverlayU1E.getPaint().setAlpha(145);
 			    routeOverlayU1E.getPaint().setStrokeWidth(12);
 			    routeOverlayU1E.getPaint().setPathEffect(new DashPathEffect(new float[] { 20, 16 }, 0));
-			    routeOverlayU1E.setEnabled(mainPrefs.getBoolean("Bus Routes:" + route.code, true));
+			    routeOverlayU1E.setEnabled(activityPrefs.getBoolean("Bus Routes:" + route.code, true));
 
 			    routeOverlays.put(new BusRoute(1000, "U1E", "U1e Route Label"), routeOverlayU1E);
 			    overlays.put("Bus Routes:" + route.code + "E", routeOverlayU1E);
@@ -527,290 +478,218 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			    resource = getResources().openRawResource(R.raw.u9);
 			    colour = U9;
 			} else {
-			    continue;
+			    Log.w(TAG, "Wierd route " + route);
 			}
 
-			PathOverlay routeOverlay = DataManager.getRoutePath(resource, colour, mResourceProxy);
+			routeOverlay = DataManager.getRoutePath(resource, colour, mResourceProxy);
 
-			Log.i(TAG, "Path overlay has " + routeOverlay.getNumberOfPoints() + " points");
+			Log.v(TAG, "Path overlay has " + routeOverlay.getNumberOfPoints() + " points");
 
 			routeOverlay.getPaint().setAntiAlias(true);
 			routeOverlay.getPaint().setAlpha(145);
 			routeOverlay.getPaint().setStrokeWidth(12);
-			routeOverlay.setEnabled(mainPrefs.getBoolean("Bus Routes:" + route.code, true));
-
-			routeOverlays.put(route, routeOverlay);
-			overlays.put("Bus Routes:" + route.code, routeOverlay);
-
 		    }
 
-		    Log.i(TAG, "Finished loading routes " + (System.currentTimeMillis() - startTime));
+		    routeOverlays.put(route, routeOverlay);
+		    overlays.put("Bus Routes:" + route.code, routeOverlay);
 
-		} catch (SQLException e) {
-		    e.printStackTrace();
-		}
-	    }
-	});
+		    synchronized (mapView.getOverlays()) {
+			mapView.getOverlays().add(routeOverlay);
+			Collections.sort(mapView.getOverlays(), comparator);
+		    }
 
-	routeOverlayCreation.start();
-
-	Runnable routeOverlayApplication = new Runnable() {
-	    public void run() {
-		Log.i(TAG, "Begining applying the route overlays, number of route overlays = " + routeOverlays.size());
-
-		for (PathOverlay routeOverlay : routeOverlays.values()) {
-		    Log.v(TAG, "Added route overlay");
-		    mapView.getOverlays().add(routeOverlay);
 		}
 
-		Log.v(TAG, "Added the route overlays, now sorting them");
+		routeOverlay.setEnabled(activityPrefs.getBoolean("Bus Routes:" + route.code, true));
+		if (route.code.equals("U1")) {
+		    overlays.get("Bus Routes:U1E").setEnabled(activityPrefs.getBoolean("Bus Routes:U1", true));
+		}
 
-		Collections.sort(mapView.getOverlays(), comparator);
+		mapView.postInvalidate();
 
-		Log.v(TAG, "Finished sorting the route overlays them, now applying them");
-
-		mapView.invalidate();
-
-		Log.i(TAG, "Finished loading route overlays " + (System.currentTimeMillis() - startTime));
+		Log.i(TAG, "Finished showing route " + route.code + " overlay at " + (System.currentTimeMillis() - startTime));
 	    }
-	};
+	}).start();
+    }
 
-	Thread siteOverlayCreation = new Thread(new Runnable() {
+    private void showSiteOverlay(final Site site) {
+
+	new Thread(new Runnable() {
 	    public void run() {
-		Log.i(TAG, "Begining the creation of the site overlays");
+		Log.i(TAG, "Begining showing site " + site.name + " overlay at " + (System.currentTimeMillis() - startTime));
 
-		SharedPreferences mainPrefs = getPreferences(0);
+		final SharedPreferences activityPrefs = getPreferences(0);
+		final OverlayRankComparator comparator = new OverlayRankComparator(getPreferences(0));
 
-		try {
+		PathOverlay siteOverlay;
+		if ((siteOverlay = siteOverlays.get(site)) != null) {
 
-		    Dao<Site, String> siteDao = getHelper().getSiteDao();
-		    siteOverlays = new HashMap<Site, PathOverlay>((int) siteDao.countOf());
+		} else {
+		    if (pastOverlays != null && (siteOverlay = (PathOverlay) pastOverlays.get("Site Outlines:" + site.name)) != null) {
+			Log.i(TAG, "Restored " + site.name + " site overlay");
+		    } else {
 
-		    for (Site site : siteDao) {
-
-			if (pastOverlays != null) {
-			    PathOverlay overlay = (PathOverlay) pastOverlays.get("Site Outlines:" + site.name);
-			    if (overlay != null) {
-				Log.i(TAG, "Restored " + site.name + " site overlay");
-				siteOverlays.put(site, overlay);
-				overlays.put("Site Outlines:" + site.name, overlay);
-				continue;
-			    }
-			}
-
-			PathOverlay overlay = new PathOverlay(Color.BLUE, instance);
-			Paint paint = overlay.getPaint();
+			siteOverlay = new PathOverlay(Color.BLUE, instance);
+			Paint paint = siteOverlay.getPaint();
 			paint.setAntiAlias(true);
 			paint.setStrokeWidth(1.5f);
 			for (int i = 0; i < site.outline.points.length; i++) {
-			    overlay.addPoint(site.outline.points[i]);
+			    siteOverlay.addPoint(site.outline.points[i]);
 			}
-			overlay.addPoint(site.outline.points[0]);
+			siteOverlay.addPoint(site.outline.points[0]);
 
-			overlay.setEnabled(mainPrefs.getBoolean("Site Outlines:" + site.name, true));
-
-			siteOverlays.put(site, overlay);
-			overlays.put("Site Outlines:" + site.name, overlay);
-		    }
-		} catch (SQLException e) {
-		    e.printStackTrace();
-		}
-
-		Log.i(TAG, "Finished creating site overlays " + (System.currentTimeMillis() - startTime));
-
-	    }
-	});
-
-	siteOverlayCreation.start();
-
-	Runnable siteOverlayApplication = new Runnable() {
-	    public void run() {
-		Log.i(TAG, "Begining applying the site overlays, number of site overlays = " + siteOverlays.size());
-
-		for (PathOverlay siteOverlay : siteOverlays.values()) {
-		    Log.d(TAG, "Added site overlay");
-		    mapView.getOverlays().add(siteOverlay);
-		}
-
-		Log.v(TAG, "Added the site overlays, now sorting them");
-
-		Collections.sort(mapView.getOverlays(), comparator);
-
-		Log.v(TAG, "Finished sorting the site overlays them, now applying them");
-
-		mapView.invalidate();
-
-		Log.i(TAG, "Finished loading site overlays " + (System.currentTimeMillis() - startTime));
-	    }
-	};
-
-	Thread buildingOverlayCreation = new Thread(new Runnable() {
-	    public void run() {
-		Log.i(TAG, "Begining the creation of the building overlays");
-		try {
-		    if (pastOverlays != null) {
-			residentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Residential");
-			nonResidentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Non-Residential");
-			if (residentialBuildingOverlay != null && nonResidentialBuildingOverlay != null) {
-			    overlays.put("Buildings:" + buildingTypes[0], residentialBuildingOverlay);
-			    overlays.put("Buildings:" + buildingTypes[1], nonResidentialBuildingOverlay);
-
-			    Log.i(TAG, "Restored building overlays");
-			    return;
-			}
 		    }
 
-		    SharedPreferences mainPrefs = getPreferences(0);
+		    siteOverlays.put(site, siteOverlay);
+		    overlays.put("Site Outlines:" + site.name, siteOverlay);
 
-		    ArrayList<Building> residentialBuildings = new ArrayList<Building>();
-		    ArrayList<Building> nonResidentialBuildings = new ArrayList<Building>();
+		    Log.v(TAG, "Applyed the site overlay, now sorting them");
 
-		    Dao<Building, String> buildingDao = getHelper().getBuildingDao();
+		    synchronized (mapView.getOverlays()) {
+			mapView.getOverlays().add(siteOverlay);
+			Collections.sort(mapView.getOverlays(), comparator);
+		    }
+		}
 
-		    for (Building building : buildingDao) {
-			// Log.v(TAG, "Looking at building " + building.id);
-			if (building.residential == true) {
-			    // Log.v(TAG, "Its residential");
-			    if (building.favourite) {
-				// Log.v(TAG, "Its residential and a favourite");
-				residentialBuildings.add(building);
-			    } else {
-				// Log.v(TAG, "Its residential and not a favourite");
-				residentialBuildings.add(0, building);
-			    }
-			} else {
-			    if (building.favourite) {
-				// Log.v(TAG, "Its not residential and a favourite");
-				nonResidentialBuildings.add(building);
-			    } else {
-				// Log.v(TAG, "Its not residential and not a favourite");
-				nonResidentialBuildings.add(0, building);
+		siteOverlay.setEnabled(activityPrefs.getBoolean("Site Outlines:" + site.name, true));
+
+		mapView.postInvalidate();
+
+		Log.i(TAG, "Finished showing site " + site.name + " overlay at " + (System.currentTimeMillis() - startTime));
+	    }
+	}).start();
+    }
+
+    private void showBuildingOverlay(boolean residential) {
+	new Thread(new Runnable() {
+	    public void run() {
+		Log.i(TAG, "Begining showing building overlays at " + (System.currentTimeMillis() - startTime));
+
+		final SharedPreferences activityPrefs = getPreferences(0);
+		final OverlayRankComparator comparator = new OverlayRankComparator(getPreferences(0));
+
+		if (residentialBuildingOverlay != null) {
+
+		} else {
+		    try {
+			Log.v(TAG, "Begining the creation of the building overlays");
+
+			if (pastOverlays != null) {
+			    residentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Residential");
+			    nonResidentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Non-Residential");
+			    if (residentialBuildingOverlay != null && nonResidentialBuildingOverlay != null) {
+				overlays.put("Buildings:" + buildingTypes[0], residentialBuildingOverlay);
+				overlays.put("Buildings:" + buildingTypes[1], nonResidentialBuildingOverlay);
+
+				Log.i(TAG, "Restored building overlays");
+				return;
 			    }
 			}
+
+			ArrayList<Building> residentialBuildings = new ArrayList<Building>();
+			ArrayList<Building> nonResidentialBuildings = new ArrayList<Building>();
+
+			Dao<Building, String> buildingDao;
+
+			buildingDao = getHelper().getBuildingDao();
+
+			for (Building building : buildingDao) {
+			    // Log.v(TAG, "Looking at building " + building.id);
+			    if (building.residential == true) {
+				// Log.v(TAG, "Its residential");
+				if (building.favourite) {
+				    // Log.v(TAG, "Its residential and a favourite");
+				    residentialBuildings.add(building);
+				} else {
+				    // Log.v(TAG, "Its residential and not a favourite");
+				    residentialBuildings.add(0, building);
+				}
+			    } else {
+				if (building.favourite) {
+				    // Log.v(TAG, "Its not residential and a favourite");
+				    nonResidentialBuildings.add(building);
+				} else {
+				    // Log.v(TAG, "Its not residential and not a favourite");
+				    nonResidentialBuildings.add(0, building);
+				}
+			    }
+			}
+
+			residentialBuildingOverlay = new BuildingNumOverlay(instance, residentialBuildings);
+			nonResidentialBuildingOverlay = new BuildingNumOverlay(instance, nonResidentialBuildings);
+
+			overlays.put("Buildings:" + buildingTypes[0], residentialBuildingOverlay);
+			overlays.put("Buildings:" + buildingTypes[1], nonResidentialBuildingOverlay);
+
+			Log.v(TAG, "Applyed the site overlay, now sorting them");
+
+			synchronized (mapView.getOverlays()) {
+			    mapView.getOverlays().add(residentialBuildingOverlay);
+			    mapView.getOverlays().add(nonResidentialBuildingOverlay);
+			    Collections.sort(mapView.getOverlays(), comparator);
+			}
+
+		    } catch (SQLException e) {
+			e.printStackTrace();
 		    }
-
-		    residentialBuildingOverlay = new BuildingNumOverlay(instance, residentialBuildings);
-		    nonResidentialBuildingOverlay = new BuildingNumOverlay(instance, nonResidentialBuildings);
-
-		    residentialBuildingOverlay.setEnabled(mainPrefs.getBoolean("Buildings:Residential", false));
-		    nonResidentialBuildingOverlay.setEnabled(mainPrefs.getBoolean("Buildings:Non-Residential", false));
-
-		    overlays.put("Buildings:" + buildingTypes[0], residentialBuildingOverlay);
-		    overlays.put("Buildings:" + buildingTypes[1], nonResidentialBuildingOverlay);
-
-		    Log.i(TAG, "Finished creating building overlays " + (System.currentTimeMillis() - startTime));
-		} catch (SQLException e) {
-		    e.printStackTrace();
 		}
 
+		residentialBuildingOverlay.setEnabled(activityPrefs.getBoolean("Buildings:Residential", false));
+		nonResidentialBuildingOverlay.setEnabled(activityPrefs.getBoolean("Buildings:Non-Residential", false));
+
+		mapView.postInvalidate();
+
+		Log.i(TAG, "Finished showing building overlays at " + (System.currentTimeMillis() - startTime));
 	    }
-	});
+	}).start();
+    }
 
-	buildingOverlayCreation.start();
-
-	Runnable buildingOverlayApplication = new Runnable() {
+    private void showBusStopOverlay() {
+	new Thread(new Runnable() {
 	    public void run() {
-		Log.i(TAG, "Begining applying the building overlays");
+		Log.i(TAG, "Begining showing bus stop overlays at " + (System.currentTimeMillis() - startTime));
 
-		mapView.getOverlays().add(residentialBuildingOverlay);
-		mapView.getOverlays().add(nonResidentialBuildingOverlay);
+		final SharedPreferences activityPrefs = getPreferences(0);
+		final OverlayRankComparator comparator = new OverlayRankComparator(getPreferences(0));
 
-		Log.v(TAG, "Added the building overlays, now sorting them");
+		if (busStopOverlay != null) {
 
-		Collections.sort(mapView.getOverlays(), comparator);
-
-		Log.v(TAG, "Finished sorting the building overlays, now applying them");
-
-		mapView.invalidate();
-
-		Log.i(TAG, "Finished loading building overlays " + (System.currentTimeMillis() - startTime));
-	    }
-	};
-
-	Thread busStopOverlayCreation = new Thread(new Runnable() {
-
-	    public void run() {
-		Log.i(TAG, "Begining the creation of the bus stop overlay");
-
-		if (pastOverlays != null) {
-		    busStopOverlay = (BusStopOverlay) pastOverlays.get("BusStops");
-		    if (busStopOverlay != null) {
-			overlays.put("BusStops", busStopOverlay);
-
+		} else {
+		    if (pastOverlays != null && (busStopOverlay = (BusStopOverlay) pastOverlays.get("BusStops")) != null) {
 			Log.i(TAG, "Restored bus stop overlays");
-			return;
+		    } else {
+			try {
+			    busStopOverlay = new BusStopOverlay(instance);
+			} catch (SQLException e) {
+			    e.printStackTrace();
+			}
 		    }
-		}
-
-		try {
-		    SharedPreferences mainPrefs = getPreferences(0);
-
-		    busStopOverlay = new BusStopOverlay(instance);
-		    busStopOverlay.setRoutes(0, mainPrefs.getBoolean("Bus Stops:U1", false));
-		    busStopOverlay.setRoutes(1, mainPrefs.getBoolean("Bus Stops:U1N", false));
-		    busStopOverlay.setRoutes(2, mainPrefs.getBoolean("Bus Stops:U2", false));
-		    busStopOverlay.setRoutes(3, mainPrefs.getBoolean("Bus Stops:U6", false));
-		    busStopOverlay.setRoutes(4, mainPrefs.getBoolean("Bus Stops:U9", false));
 
 		    overlays.put("BusStops", busStopOverlay);
-		} catch (SQLException e) {
-		    e.printStackTrace();
+
+		    Log.v(TAG, "Applyed the site overlay, now sorting them");
+
+		    synchronized (mapView.getOverlays()) {
+			mapView.getOverlays().add(busStopOverlay);
+			Collections.sort(mapView.getOverlays(), comparator);
+		    }
 		}
 
+		Log.i(TAG, "Begining the creation of the bus stop overlay");
+
+		busStopOverlay.setRoutes(0, activityPrefs.getBoolean("Bus Stops:U1", false));
+		busStopOverlay.setRoutes(1, activityPrefs.getBoolean("Bus Stops:U1N", false));
+		busStopOverlay.setRoutes(2, activityPrefs.getBoolean("Bus Stops:U2", false));
+		busStopOverlay.setRoutes(3, activityPrefs.getBoolean("Bus Stops:U6", false));
+		busStopOverlay.setRoutes(4, activityPrefs.getBoolean("Bus Stops:U9", false));
+
 		Log.i(TAG, "Finished creating the bus stops overlay " + (System.currentTimeMillis() - startTime));
+
+		mapView.postInvalidate();
+
+		Log.i(TAG, "Finished showing bus stop overlays at " + (System.currentTimeMillis() - startTime));
 	    }
-	});
-
-	busStopOverlayCreation.start();
-
-	Runnable busStopOverlayApplication = new Runnable() {
-	    public void run() {
-		Log.i(TAG, "Begining applying the bus stop overlay");
-
-		mapView.getOverlays().add(busStopOverlay);
-
-		Log.v(TAG, "Added the bus stop overlay, now sorting them");
-
-		Collections.sort(mapView.getOverlays(), comparator);
-
-		Log.v(TAG, "Finished sorting the bus stop overlay, now applying them");
-
-		mapView.invalidate();
-
-		Log.i(TAG, "Finished loading bus stop overlay " + (System.currentTimeMillis() - startTime));
-	    }
-	};
-
-	while (utilityOverlayCreation != null || routeOverlayCreation != null || siteOverlayCreation != null || buildingOverlayCreation != null
-		|| busStopOverlayCreation != null) {
-	    if (utilityOverlayCreation != null && !utilityOverlayCreation.isAlive()) {
-		mapView.post(utilityOverlayApplication);
-		utilityOverlayCreation = null;
-	    }
-
-	    if (routeOverlayCreation != null && !routeOverlayCreation.isAlive()) {
-		mapView.post(routeOverlayApplication);
-		routeOverlayCreation = null;
-	    }
-
-	    if (siteOverlayCreation != null && !siteOverlayCreation.isAlive()) {
-		mapView.post(siteOverlayApplication);
-		siteOverlayCreation = null;
-	    }
-
-	    if (buildingOverlayCreation != null && !buildingOverlayCreation.isAlive()) {
-		mapView.post(buildingOverlayApplication);
-		buildingOverlayCreation = null;
-	    }
-
-	    if (busStopOverlayCreation != null && !busStopOverlayCreation.isAlive()) {
-		mapView.post(busStopOverlayApplication);
-		busStopOverlayCreation = null;
-	    }
-
-	    Thread.yield();
-	}
-
+	}).start();
     }
 
     @Override
@@ -1132,38 +1011,31 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	} else if (key.equals("liveBusTimesEnabled")) {
 	    // Noting to do here atm
 	} else if (key.contains("Bus Stops")) {
-	    busStopOverlay.setRoutes(0, prefs.getBoolean("Bus Stops:U1", false));
-	    busStopOverlay.setRoutes(1, prefs.getBoolean("Bus Stops:U1N", false));
-	    busStopOverlay.setRoutes(2, prefs.getBoolean("Bus Stops:U2", false));
-	    busStopOverlay.setRoutes(3, prefs.getBoolean("Bus Stops:U6", false));
-	    busStopOverlay.setRoutes(4, prefs.getBoolean("Bus Stops:U9", false));
+	    showBusStopOverlay();
 	} else if (key.contains("Bus Routes")) {
 	    for (BusRoute route : routeOverlays.keySet()) {
 		Log.v(TAG, route.code + " " + key.split(":")[1]);
 		if (route.code.equals(key.split(":")[1])) {
-		    routeOverlays.get(route).setEnabled(prefs.getBoolean(key, false));
-		    if (route.code.equals("U1")) {
-			overlays.get("Bus Routes:" + route.code + "E").setEnabled(prefs.getBoolean(key, false));
-		    }
+		    showRouteOverlay(route);
 		}
 	    }
 	} else if (key.contains("Buildings")) {
 	    if (key.equals("Buildings:Non-Residential")) {
-		nonResidentialBuildingOverlay.setEnabled(prefs.getBoolean(key, false));
+		showBuildingOverlay(false);
 	    } else if (key.equals("Buildings:Residential")) {
-		residentialBuildingOverlay.setEnabled(prefs.getBoolean(key, false));
+		showBuildingOverlay(true);
 	    } else {
 		Log.e(TAG, "Wierd building preferences key " + key);
 	    }
 	} else if (key.contains("Site Outlines")) {
 	    for (Site site : siteOverlays.keySet()) {
 		if (site.name.equals(key.split(":")[1])) {
-		    siteOverlays.get(site).setEnabled(prefs.getBoolean(key, false));
+		    showSiteOverlay(site);
 		}
 	    }
 	} else if (key.contains("Other")) {
 	    if (key.contains("Scale Bar")) {
-		scaleBarOverlay.setEnabled(prefs.getBoolean("Other:Scale Bar", false));
+		showUtilityOverlays();
 	    } else if (key.contains("Compass")) {
 		if (prefs.getBoolean("Other:Compass", false)) {
 		    myLocationOverlay.enableCompass();
@@ -1214,6 +1086,24 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    epView.setAdapter(mAdapter);
 	    epView.setOnChildClickListener(this);
 
+	    int size;
+	    try {
+		size = (int) getHelper().getSiteDao().countOf();
+
+		ArrayList<Site> sites = new ArrayList<Site>(size);
+
+		try {
+		    sites.addAll(getHelper().getSiteDao().queryForAll());
+		} catch (SQLException e) {
+		    e.printStackTrace();
+		}
+		siteNames = new String[size];
+		for (int i = 0; i < size; i++) {
+		    siteNames[i] = sites.get(i).name;
+		}
+	    } catch (SQLException e1) {
+		e1.printStackTrace();
+	    }
 	}
 
 	public void setOnItemClickListener(OnChildClickListener onChildClickListener) {
