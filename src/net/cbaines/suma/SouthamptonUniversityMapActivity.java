@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
@@ -91,12 +90,18 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
     private HashMap<String, Overlay> pastOverlays;
 
     private ScaleBarOverlay scaleBarOverlay;
+    private final boolean SCALE_BAR_OVERLAY_ENABLED_BY_DEFAULT = true;
     private MyLocationOverlay myLocationOverlay;
     private BuildingNumOverlay residentialBuildingOverlay;
+    private final boolean NON_RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
     private BuildingNumOverlay nonResidentialBuildingOverlay;
+    private final boolean RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
     private BusStopOverlay busStopOverlay;
-    private HashMap<Site, PathOverlay> siteOverlays;
-    private HashMap<BusRoute, PathOverlay> routeOverlays;
+    private final boolean BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT = true;
+    private HashMap<Site, PathOverlay> siteOverlays = new HashMap<Site, PathOverlay>(21);
+    private final boolean SITE_OVERLAY_ENABLED_BY_DEFAULT = false;
+    private HashMap<BusRoute, PathOverlay> routeOverlays = new HashMap<BusRoute, PathOverlay>(5);
+    private final boolean ROUTE_OVERLAY_ENABLED_BY_DEFAULT = true;
 
     private String[] busRoutes;
     private String[] buildingTypes;
@@ -118,27 +123,12 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 	instance = this;
 
-	final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-	final SharedPreferences activityPrefs = getPreferences(0);
-
-	if (!sharedPrefs.contains("GPSEnabled")) {
-	    sharedPrefs.edit().putBoolean("GPSEnabled", true).commit();
-	}
-	if (!sharedPrefs.contains("liveBusTimesEnabled")) {
-	    sharedPrefs.edit().putBoolean("liveBusTimesEnabled", true).commit();
-	}
-
-	Log.i(TAG, "GPS Enabled " + sharedPrefs.getBoolean("GPSEnabled", false));
-	Log.i(TAG, "Live Bus Times Enabled " + sharedPrefs.getBoolean("liveBusTimesEnabled", false));
+	Thread databaseThread = new Thread(this); // Start the database thread
+	databaseThread.start();
 
 	setContentView(R.layout.main);
 
 	Log.i(TAG, "Finished setting content view " + (System.currentTimeMillis() - startTime));
-
-	busRoutes = getResources().getStringArray(R.array.uniLinkBusRoutes);
-	buildingTypes = getResources().getStringArray(R.array.buildingTypes);
-	other = getResources().getStringArray(R.array.utilityOverlays);
-	groupHeadings = getResources().getStringArray(R.array.preferencesHeadings);
 
 	mapView = (MapView) this.findViewById(R.id.mapview);
 	mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -147,11 +137,26 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 	pastOverlays = (HashMap<String, Overlay>) getLastNonConfigurationInstance();
 
-	Log.i(TAG, "Instantiating myLocationOverlay");
 	// SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE); This code in the following constructor causes problems in
 	// some emulators, disable there sensors to fix.
 	myLocationOverlay = new MyLocationOverlay(instance, mapView);
-	Log.i(TAG, "Finished instantiating myLocationOverlay");
+
+	while (databaseThread.isAlive()) {
+	    Thread.yield();
+	}
+
+	new Thread(new Runnable() {
+	    public void run() {
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+		try {
+		    showOverlays();
+		} catch (SQLException e) {
+		    e.printStackTrace();
+		}
+	    }
+	}).start();
+
+	Log.i(TAG, "Started loading thread " + (System.currentTimeMillis() - startTime));
 
 	mapController = mapView.getController();
 	mResourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
@@ -164,11 +169,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	mapController.setZoom(15);
 	mapController.setCenter(userLocation);
 
-	Editor editor = activityPrefs.edit();
-	editor.putBoolean("first_run", false);
-	editor.commit();
-
-	new Thread(this).start();
+	Log.i(TAG, "Finished onCreate " + (System.currentTimeMillis() - startTime));
     }
 
     public void onResume() {
@@ -189,6 +190,9 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    } else {
 		myLocationOverlay.disableMyLocation();
 	    }
+
+	    sharedPrefs.registerOnSharedPreferenceChangeListener(this);
+	    activityPrefs.registerOnSharedPreferenceChangeListener(this);
 	}
     }
 
@@ -211,9 +215,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
     }
 
     public void run() {
-	Log.i(TAG, "Begining loading the map overlay stuff " + (System.currentTimeMillis() - startTime));
-
-	Log.i(TAG, "Begining loading databases " + (System.currentTimeMillis() - startTime));
+	Log.i(TAG, "Begining loading database " + (System.currentTimeMillis() - startTime));
 
 	DatabaseHelper helper = getHelper();
 	Log.i(TAG, "Got the helper at " + (System.currentTimeMillis() - startTime));
@@ -319,18 +321,6 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			Thread.yield();
 		    }
 
-		    try {
-			siteNames = new String[(int) siteDao.countOf()];
-
-			int i = 0;
-			for (Site site : siteDao) {
-			    siteNames[i] = site.name;
-			    i++;
-			}
-		    } catch (SQLException e) {
-			e.printStackTrace();
-		    }
-
 		    Log.i(TAG, "Finished loading databases " + (System.currentTimeMillis() - startTime));
 
 		} catch (SQLException e1) {
@@ -340,13 +330,33 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 	}
 
+	Log.i(TAG, "Begining setting up the static values " + (System.currentTimeMillis() - startTime));
+
+	int size;
 	try {
-	    showOverlays();
-	} catch (SQLException e) {
-	    e.printStackTrace();
+	    size = (int) getHelper().getSiteDao().countOf();
+
+	    ArrayList<Site> sites = new ArrayList<Site>(size);
+
+	    try {
+		sites.addAll(getHelper().getSiteDao().queryForAll());
+	    } catch (SQLException e) {
+		e.printStackTrace();
+	    }
+	    siteNames = new String[size];
+	    for (int i = 0; i < size; i++) {
+		siteNames[i] = sites.get(i).name;
+	    }
+	} catch (SQLException e1) {
+	    e1.printStackTrace();
 	}
 
-	Log.i(TAG, "Finished seting in motion the creation of the overlays " + (System.currentTimeMillis() - startTime));
+	busRoutes = getResources().getStringArray(R.array.uniLinkBusRoutes);
+	buildingTypes = getResources().getStringArray(R.array.buildingTypes);
+	other = getResources().getStringArray(R.array.utilityOverlays);
+	groupHeadings = getResources().getStringArray(R.array.preferencesHeadings);
+
+	Log.i(TAG, "Finished the database thread " + (System.currentTimeMillis() - startTime));
     }
 
     private void showOverlays() throws SQLException {
@@ -362,32 +372,33 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 	showUtilityOverlays();
 
-	showBusStopOverlay();
+	for (int i = 0; i < busRoutes.length; i++) {
+	    if (activityPrefs.getBoolean(groupHeadings[1] + ":" + busRoutes[i], true)) {
+		showBusStopOverlay();
+		break;
+	    }
+	}
 
-	if (activityPrefs.getBoolean("Buildings:Residential", false) || activityPrefs.getBoolean("Buildings:Non-Residential", false)) {
+	if (activityPrefs.getBoolean("Buildings:Residential", true) || activityPrefs.getBoolean("Buildings:Non-Residential", true)) {
 	    // The argument currently dosent matter for this method.
 	    showBuildingOverlay(true);
 
 	}
 
 	Log.i(TAG, "Begining to show the route overlays at " + (System.currentTimeMillis() - startTime));
-	routeOverlays = new HashMap<BusRoute, PathOverlay>(5);
-	Dao<BusRoute, Integer> busRouteDao = getHelper().getBusRouteDao();
-	for (Iterator<BusRoute> routeIter = busRouteDao.iterator(); routeIter.hasNext();) {
-	    BusRoute route = routeIter.next();
-	    if (activityPrefs.getBoolean("Bus Routes:" + route.code, false)) {
-		showRouteOverlay(route);
+	for (BusRoute busRoute : getHelper().getBusRouteDao()) {
+	    Log.v(TAG, "Looking at showing " + busRoute.code + " route overlay");
+	    if (activityPrefs.getBoolean("Bus Routes:" + busRoute.code, ROUTE_OVERLAY_ENABLED_BY_DEFAULT)) {
+		showRouteOverlay(busRoute);
 	    }
 	}
 	Log.i(TAG, "Finished loading routes " + (System.currentTimeMillis() - startTime));
 
 	Log.i(TAG, "Begining to show the site overlays at " + (System.currentTimeMillis() - startTime));
 	try {
-	    Dao<Site, String> siteDao = getHelper().getSiteDao();
-	    siteOverlays = new HashMap<Site, PathOverlay>((int) siteDao.countOf());
-
-	    for (Site site : siteDao) {
-		if (activityPrefs.getBoolean("Sites:" + site.name, false)) {
+	    for (Site site : getHelper().getSiteDao()) {
+		Log.v(TAG, "Looking at  showing " + site.name + " site overlay");
+		if (activityPrefs.getBoolean("Sites:" + site.name, SITE_OVERLAY_ENABLED_BY_DEFAULT)) {
 		    showSiteOverlay(site);
 		}
 	    }
@@ -396,6 +407,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	}
 	Log.i(TAG, "Finished showing the site overlays " + (System.currentTimeMillis() - startTime));
 
+	Log.i(TAG, "Finished showing all the overlays " + (System.currentTimeMillis() - startTime));
     }
 
     private void showUtilityOverlays() {
@@ -425,7 +437,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 		}
 
-		scaleBarOverlay.setEnabled(activityPrefs.getBoolean("Other:Scale Bar", true));
+		scaleBarOverlay.setEnabled(activityPrefs.getBoolean("Other:Scale Bar", SCALE_BAR_OVERLAY_ENABLED_BY_DEFAULT));
 
 		mapView.postInvalidate();
 
@@ -500,9 +512,9 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 		}
 
-		routeOverlay.setEnabled(activityPrefs.getBoolean("Bus Routes:" + route.code, true));
+		routeOverlay.setEnabled(activityPrefs.getBoolean("Bus Routes:" + route.code, ROUTE_OVERLAY_ENABLED_BY_DEFAULT));
 		if (route.code.equals("U1")) {
-		    overlays.get("Bus Routes:U1E").setEnabled(activityPrefs.getBoolean("Bus Routes:U1", true));
+		    overlays.get("Bus Routes:U1E").setEnabled(activityPrefs.getBoolean("Bus Routes:U1", ROUTE_OVERLAY_ENABLED_BY_DEFAULT));
 		}
 
 		mapView.postInvalidate();
@@ -551,7 +563,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		    }
 		}
 
-		siteOverlay.setEnabled(activityPrefs.getBoolean("Site Outlines:" + site.name, true));
+		siteOverlay.setEnabled(activityPrefs.getBoolean("Site Outlines:" + site.name, SITE_OVERLAY_ENABLED_BY_DEFAULT));
 
 		mapView.postInvalidate();
 
@@ -578,8 +590,8 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			    residentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Residential");
 			    nonResidentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Non-Residential");
 			    if (residentialBuildingOverlay != null && nonResidentialBuildingOverlay != null) {
-				overlays.put("Buildings:" + buildingTypes[0], residentialBuildingOverlay);
-				overlays.put("Buildings:" + buildingTypes[1], nonResidentialBuildingOverlay);
+				overlays.put("Buildings:Residential", residentialBuildingOverlay);
+				overlays.put("Buildings:-Non-Residential", nonResidentialBuildingOverlay);
 
 				Log.i(TAG, "Restored building overlays");
 				return;
@@ -618,8 +630,8 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			residentialBuildingOverlay = new BuildingNumOverlay(instance, residentialBuildings);
 			nonResidentialBuildingOverlay = new BuildingNumOverlay(instance, nonResidentialBuildings);
 
-			overlays.put("Buildings:" + buildingTypes[0], residentialBuildingOverlay);
-			overlays.put("Buildings:" + buildingTypes[1], nonResidentialBuildingOverlay);
+			overlays.put("Buildings:Residential", residentialBuildingOverlay);
+			overlays.put("Buildings:Non-Residential", nonResidentialBuildingOverlay);
 
 			Log.v(TAG, "Applyed the site overlay, now sorting them");
 
@@ -634,8 +646,9 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		    }
 		}
 
-		residentialBuildingOverlay.setEnabled(activityPrefs.getBoolean("Buildings:Residential", false));
-		nonResidentialBuildingOverlay.setEnabled(activityPrefs.getBoolean("Buildings:Non-Residential", false));
+		residentialBuildingOverlay.setEnabled(activityPrefs.getBoolean("Buildings:Residential", RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT));
+		nonResidentialBuildingOverlay.setEnabled(activityPrefs.getBoolean("Buildings:Non-Residential",
+			NON_RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT));
 
 		mapView.postInvalidate();
 
@@ -675,15 +688,11 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		    }
 		}
 
-		Log.i(TAG, "Begining the creation of the bus stop overlay");
-
-		busStopOverlay.setRoutes(0, activityPrefs.getBoolean("Bus Stops:U1", false));
-		busStopOverlay.setRoutes(1, activityPrefs.getBoolean("Bus Stops:U1N", false));
-		busStopOverlay.setRoutes(2, activityPrefs.getBoolean("Bus Stops:U2", false));
-		busStopOverlay.setRoutes(3, activityPrefs.getBoolean("Bus Stops:U6", false));
-		busStopOverlay.setRoutes(4, activityPrefs.getBoolean("Bus Stops:U9", false));
-
-		Log.i(TAG, "Finished creating the bus stops overlay " + (System.currentTimeMillis() - startTime));
+		busStopOverlay.setRoutes(0, activityPrefs.getBoolean("Bus Stops:U1", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(1, activityPrefs.getBoolean("Bus Stops:U1N", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(2, activityPrefs.getBoolean("Bus Stops:U2", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(3, activityPrefs.getBoolean("Bus Stops:U6", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(4, activityPrefs.getBoolean("Bus Stops:U9", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
 
 		mapView.postInvalidate();
 
@@ -1013,11 +1022,15 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	} else if (key.contains("Bus Stops")) {
 	    showBusStopOverlay();
 	} else if (key.contains("Bus Routes")) {
-	    for (BusRoute route : routeOverlays.keySet()) {
-		Log.v(TAG, route.code + " " + key.split(":")[1]);
-		if (route.code.equals(key.split(":")[1])) {
-		    showRouteOverlay(route);
+	    try {
+		for (BusRoute route : getHelper().getBusRouteDao()) {
+		    Log.v(TAG, route.code + " " + key.split(":")[1]);
+		    if (route.code.equals(key.split(":")[1])) {
+			showRouteOverlay(route);
+		    }
 		}
+	    } catch (SQLException e) {
+		e.printStackTrace();
 	    }
 	} else if (key.contains("Buildings")) {
 	    if (key.equals("Buildings:Non-Residential")) {
@@ -1028,10 +1041,14 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		Log.e(TAG, "Wierd building preferences key " + key);
 	    }
 	} else if (key.contains("Site Outlines")) {
-	    for (Site site : siteOverlays.keySet()) {
-		if (site.name.equals(key.split(":")[1])) {
-		    showSiteOverlay(site);
+	    try {
+		for (Site site : getHelper().getSiteDao()) {
+		    if (site.name.equals(key.split(":")[1])) {
+			showSiteOverlay(site);
+		    }
 		}
+	    } catch (SQLException e) {
+		e.printStackTrace();
 	    }
 	} else if (key.contains("Other")) {
 	    if (key.contains("Scale Bar")) {
@@ -1086,24 +1103,6 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    epView.setAdapter(mAdapter);
 	    epView.setOnChildClickListener(this);
 
-	    int size;
-	    try {
-		size = (int) getHelper().getSiteDao().countOf();
-
-		ArrayList<Site> sites = new ArrayList<Site>(size);
-
-		try {
-		    sites.addAll(getHelper().getSiteDao().queryForAll());
-		} catch (SQLException e) {
-		    e.printStackTrace();
-		}
-		siteNames = new String[size];
-		for (int i = 0; i < size; i++) {
-		    siteNames[i] = sites.get(i).name;
-		}
-	    } catch (SQLException e1) {
-		e1.printStackTrace();
-	    }
 	}
 
 	public void setOnItemClickListener(OnChildClickListener onChildClickListener) {
@@ -1195,15 +1194,23 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		cb.setClickable(false);
 		cb.setFocusable(false);
 		SharedPreferences activityPrefs = getPreferences(0);
-
-		if (groupPosition == 0 || groupPosition == 1) {
-		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + busRoutes[childPosition], true));
+		if (groupPosition == 0) {
+		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + busRoutes[childPosition], BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		} else if (groupPosition == 1) {
+		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + busRoutes[childPosition], ROUTE_OVERLAY_ENABLED_BY_DEFAULT));
 		} else if (groupPosition == 2) {
-		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + buildingTypes[childPosition], true));
+		    if (childPosition == 0) {
+			cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + buildingTypes[childPosition],
+				RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT));
+		    } else {
+			cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + buildingTypes[childPosition],
+				NON_RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT));
+		    }
 		} else if (groupPosition == 3) {
-		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + siteNames[childPosition], true));
+		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + siteNames[childPosition], SITE_OVERLAY_ENABLED_BY_DEFAULT));
 		} else if (groupPosition == 4) {
-		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + other[childPosition], true));
+		    // TODO Default value below is not right
+		    cb.setChecked(activityPrefs.getBoolean(groupHeadings[groupPosition] + ":" + other[childPosition], SCALE_BAR_OVERLAY_ENABLED_BY_DEFAULT)); // right
 		}
 		return v;
 	    }

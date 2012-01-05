@@ -20,8 +20,8 @@
 package net.cbaines.suma;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
@@ -45,7 +45,7 @@ import com.j256.ormlite.dao.Dao;
 
 public class BusStopOverlay extends Overlay implements RouteColorConstants {
 
-    private ArrayList<BusStop> busStops;
+    private List<BusStop> busStops;
 
     private final Point mCurScreenCoords = new Point();
     private final Point mTouchScreenPoint = new Point();
@@ -70,6 +70,7 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 
     public BusStopOverlay(Context context) throws SQLException {
 	super(context);
+	final long startTime = System.currentTimeMillis();
 
 	this.context = context;
 
@@ -83,8 +84,9 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 	paint.setStyle(Style.FILL);
 	paint.setStrokeWidth(6);
 
-	busStops = new ArrayList<BusStop>((int) busStopDao.countOf());
-	busStops.addAll(busStopDao.queryForAll());
+	Log.i(TAG, "Begining to load bus stops in to overlay " + (System.currentTimeMillis() - startTime));
+	busStops = busStopDao.queryForAll();
+	Log.i(TAG, "Finished loading bus stops in to overlay " + (System.currentTimeMillis() - startTime));
     }
 
     void setRoutes(int route, boolean visible) {
