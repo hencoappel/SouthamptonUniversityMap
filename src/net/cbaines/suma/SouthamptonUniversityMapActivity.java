@@ -460,6 +460,10 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		} else {
 		    if (pastOverlays != null && (routeOverlay = (PathOverlay) pastOverlays.get("Bus Routes:" + route.code)) != null) {
 			Log.v(TAG, "Restored " + route.code + " route overlay");
+			if (route.code.equals("U1")) {
+			    PathOverlay routeOverlayU1E = (PathOverlay) pastOverlays.get("Bus Routes:U1E");
+			    overlays.put("Bus Routes:U1E", routeOverlayU1E);
+			}
 		    } else {
 			InputStream resource = null;
 			int colour = 0;
@@ -583,66 +587,61 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		if (residentialBuildingOverlay != null) {
 
 		} else {
-		    try {
-			Log.v(TAG, "Begining the creation of the building overlays");
+		    if (pastOverlays != null && (residentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Residential")) != null) {
+			nonResidentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Non-Residential");
 
-			if (pastOverlays != null) {
-			    residentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Residential");
-			    nonResidentialBuildingOverlay = (BuildingNumOverlay) pastOverlays.get("Buildings:Non-Residential");
-			    if (residentialBuildingOverlay != null && nonResidentialBuildingOverlay != null) {
-				overlays.put("Buildings:Residential", residentialBuildingOverlay);
-				overlays.put("Buildings:-Non-Residential", nonResidentialBuildingOverlay);
+			Log.i(TAG, "Restored building overlays");
+		    } else {
+			try {
 
-				Log.i(TAG, "Restored building overlays");
-				return;
-			    }
-			}
+			    Log.v(TAG, "Begining the creation of the building overlays");
 
-			ArrayList<Building> residentialBuildings = new ArrayList<Building>();
-			ArrayList<Building> nonResidentialBuildings = new ArrayList<Building>();
+			    ArrayList<Building> residentialBuildings = new ArrayList<Building>();
+			    ArrayList<Building> nonResidentialBuildings = new ArrayList<Building>();
 
-			Dao<Building, String> buildingDao;
+			    Dao<Building, String> buildingDao;
 
-			buildingDao = getHelper().getBuildingDao();
+			    buildingDao = getHelper().getBuildingDao();
 
-			for (Building building : buildingDao) {
-			    // Log.v(TAG, "Looking at building " + building.id);
-			    if (building.residential == true) {
-				// Log.v(TAG, "Its residential");
-				if (building.favourite) {
-				    // Log.v(TAG, "Its residential and a favourite");
-				    residentialBuildings.add(building);
+			    for (Building building : buildingDao) {
+				// Log.v(TAG, "Looking at building " + building.id);
+				if (building.residential == true) {
+				    // Log.v(TAG, "Its residential");
+				    if (building.favourite) {
+					// Log.v(TAG, "Its residential and a favourite");
+					residentialBuildings.add(building);
+				    } else {
+					// Log.v(TAG, "Its residential and not a favourite");
+					residentialBuildings.add(0, building);
+				    }
 				} else {
-				    // Log.v(TAG, "Its residential and not a favourite");
-				    residentialBuildings.add(0, building);
-				}
-			    } else {
-				if (building.favourite) {
-				    // Log.v(TAG, "Its not residential and a favourite");
-				    nonResidentialBuildings.add(building);
-				} else {
-				    // Log.v(TAG, "Its not residential and not a favourite");
-				    nonResidentialBuildings.add(0, building);
+				    if (building.favourite) {
+					// Log.v(TAG, "Its not residential and a favourite");
+					nonResidentialBuildings.add(building);
+				    } else {
+					// Log.v(TAG, "Its not residential and not a favourite");
+					nonResidentialBuildings.add(0, building);
+				    }
 				}
 			    }
+
+			    residentialBuildingOverlay = new BuildingNumOverlay(instance, residentialBuildings);
+			    nonResidentialBuildingOverlay = new BuildingNumOverlay(instance, nonResidentialBuildings);
+
+			    Log.v(TAG, "Applyed the site overlay, now sorting them");
+
+			} catch (SQLException e) {
+			    e.printStackTrace();
 			}
+		    }
 
-			residentialBuildingOverlay = new BuildingNumOverlay(instance, residentialBuildings);
-			nonResidentialBuildingOverlay = new BuildingNumOverlay(instance, nonResidentialBuildings);
+		    overlays.put("Buildings:Residential", residentialBuildingOverlay);
+		    overlays.put("Buildings:Non-Residential", nonResidentialBuildingOverlay);
 
-			overlays.put("Buildings:Residential", residentialBuildingOverlay);
-			overlays.put("Buildings:Non-Residential", nonResidentialBuildingOverlay);
-
-			Log.v(TAG, "Applyed the site overlay, now sorting them");
-
-			synchronized (mapView.getOverlays()) {
-			    mapView.getOverlays().add(residentialBuildingOverlay);
-			    mapView.getOverlays().add(nonResidentialBuildingOverlay);
-			    Collections.sort(mapView.getOverlays(), comparator);
-			}
-
-		    } catch (SQLException e) {
-			e.printStackTrace();
+		    synchronized (mapView.getOverlays()) {
+			mapView.getOverlays().add(residentialBuildingOverlay);
+			mapView.getOverlays().add(nonResidentialBuildingOverlay);
+			Collections.sort(mapView.getOverlays(), comparator);
 		    }
 		}
 
