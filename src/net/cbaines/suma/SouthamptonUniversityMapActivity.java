@@ -190,6 +190,14 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    } else {
 		myLocationOverlay.disableMyLocation();
 	    }
+	    
+	    if (!sharedPrefs.contains("GPSEnabled")) {
+		sharedPrefs.edit().putBoolean("GPSEnabled", true).commit();
+	    }
+	    
+	    if (!sharedPrefs.contains("liveBusTimesEnabled")) {
+		sharedPrefs.edit().putBoolean("liveBusTimesEnabled", true).commit();
+	    }
 
 	    sharedPrefs.registerOnSharedPreferenceChangeListener(this);
 	    activityPrefs.registerOnSharedPreferenceChangeListener(this);
