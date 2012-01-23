@@ -75,4 +75,50 @@ public class Stop {
 	    return (String) DateUtils.getRelativeTimeSpanString(arivalTime.getTime(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
 	}
     }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((arivalTime == null) ? 0 : arivalTime.hashCode());
+	result = prime * result + ((bus == null) ? 0 : bus.hashCode());
+	result = prime * result + ((busStop == null) ? 0 : busStop.hashCode());
+	result = prime * result + id;
+	return result;
+    }
+
+    @Override
+    public String toString() {
+	return "Stop [id=" + id + ", bus=" + bus + ", busStop=" + busStop + ", arivalTime=" + arivalTime + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	Stop other = (Stop) obj;
+	if (arivalTime == null) {
+	    if (other.arivalTime != null)
+		return false;
+	} else if (!arivalTime.equals(other.arivalTime))
+	    return false;
+	if (bus == null) {
+	    if (other.bus != null)
+		return false;
+	} else if (!bus.equals(other.bus))
+	    return false;
+	if (busStop == null) {
+	    if (other.busStop != null)
+		return false;
+	} else if (!busStop.equals(other.busStop))
+	    return false;
+	if (id != other.id)
+	    return false;
+	return true;
+    }
+
 }

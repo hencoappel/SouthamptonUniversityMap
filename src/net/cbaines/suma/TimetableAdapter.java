@@ -20,18 +20,26 @@
 package net.cbaines.suma;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 
 public class TimetableAdapter extends BaseAdapter {
 
     private final Context context;
-    private final Timetable timetable;
+    private Timetable timetable;
+    private final Animation a;
+    private boolean[] changed;
+
+    private static final String TAG = "TimetableAdapter";
 
     public TimetableAdapter(Context context, Timetable timetable) {
 	this.context = context;
 	this.timetable = timetable;
+	this.a = AnimationUtils.loadAnimation(context, R.anim.updated_stop_view);
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -41,6 +49,10 @@ public class TimetableAdapter extends BaseAdapter {
 	} else {
 	    stopView = (StopView) convertView;
 	    stopView.setStop(timetable.get(position));
+	}
+
+	if (changed == null || changed[position]) {
+	    stopView.startAnimation(a);
 	}
 
 	return stopView;
@@ -56,5 +68,22 @@ public class TimetableAdapter extends BaseAdapter {
 
     public long getItemId(int position) {
 	return position;
+    }
+
+    public void updateTimetable(Timetable newTimetable) {
+	Log.v(TAG, "Old timetable " + timetable);
+	Log.v(TAG, "Adaptor loading new timetable");
+	changed = new boolean[newTimetable.size()];
+	for (int i = 0; i < newTimetable.size(); i++) {
+	    if (!timetable.contains(newTimetable.get(i), true)) {
+		changed[i] = true;
+		Log.i(TAG, "Old timetable does not contain: " + newTimetable.get(i));
+	    } else {
+		Log.i(TAG, "Old timetable contains: " + newTimetable.get(i));
+		changed[i] = false;
+	    }
+	}
+	timetable = newTimetable;
+	this.notifyDataSetChanged();
     }
 }

@@ -28,4 +28,31 @@ public class Timetable extends ArrayList<Stop> {
      */
     private static final long serialVersionUID = -9021303378059511643L;
 
+    public String toString() {
+	StringBuilder sb = new StringBuilder();
+	for (Stop stop : this) {
+	    sb.append(stop + "\n");
+	}
+	return sb.toString();
+    }
+
+    public boolean contains(Stop otherStop, boolean toTheMinute) {
+	if (toTheMinute) {
+	    for (Stop stop : this) {
+		if (otherStop.bus != null && stop.bus != null && otherStop.bus.equals(stop.bus)) {
+		    if (Math.abs(otherStop.arivalTime.getTime() - stop.arivalTime.getTime()) < 60000) {
+			return true;
+		    }
+		} else if (otherStop.busStop.equals(stop.busStop)) {
+		    if (Math.abs(otherStop.arivalTime.getTime() - stop.arivalTime.getTime()) < 60000) {
+			return true;
+		    }
+		}
+	    }
+	    return false;
+	} else {
+	    return this.contains(otherStop);
+	}
+    }
+
 }

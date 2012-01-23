@@ -332,7 +332,7 @@ public class FindActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 
 	    BusStop busStop = (BusStop) poi;
 
-	    Intent i = new Intent(FindActivity.this, BusTimeActivity.class);
+	    Intent i = new Intent(FindActivity.this, BusStopActivity.class);
 	    i.putExtra("busStopID", busStop.id);
 	    i.putExtra("busStopName", busStop.description);
 	    startActivityForResult(i, 0);

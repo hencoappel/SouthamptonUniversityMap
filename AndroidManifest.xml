@@ -27,7 +27,7 @@
         </activity>
         <activity android:name="FindActivity" >
         </activity>
-        <activity android:name="BusTimeActivity" >
+        <activity android:name=".BusStopActivity" >
         </activity>
         <activity android:name="AboutActivity" >
         </activity>

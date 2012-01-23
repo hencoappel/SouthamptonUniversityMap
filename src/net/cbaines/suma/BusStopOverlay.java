@@ -201,7 +201,7 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 	} else {
 	    Log.i(TAG, "Pressed " + busStop.id);
 
-	    Intent i = new Intent(context, BusTimeActivity.class);
+	    Intent i = new Intent(context, BusStopActivity.class);
 	    i.putExtra("busStopID", busStop.id);
 	    i.putExtra("busStopName", busStop.description);
 	    ((Activity) context).startActivityForResult(i, 0);

@@ -951,7 +951,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 		    Log.i(TAG, "Pressed " + busStop.id);
 
-		    Intent i = new Intent(this, BusTimeActivity.class);
+		    Intent i = new Intent(this, BusStopActivity.class);
 		    i.putExtra("busStopID", busStop.id);
 		    i.putExtra("busStopName", busStop.description);
 		    startActivityForResult(i, 0);

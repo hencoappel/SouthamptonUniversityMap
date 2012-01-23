@@ -21,8 +21,11 @@ package net.cbaines.suma;
 
 import java.sql.SQLException;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -40,7 +43,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 
-public class BusTimeActivity extends OrmLiteBaseActivity<DatabaseHelper> implements Runnable, OnCheckedChangeListener {
+public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> implements OnCheckedChangeListener {
 
     final static String TAG = "BusTimeActivity";
 
@@ -54,22 +57,29 @@ public class BusTimeActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     private ProgressBar progBar;
     private LinearLayout busTimeContentLayout;
 
-    private TimetableAdapter adapter;
+    protected Timetable timetable;
 
-    private String busStopID;
+    protected String busStopID;
     private String busStopName;
 
     private Dao<BusStop, String> busStopDao;
 
     private BusStop busStop;
 
-    private Thread timetableThread;
+    private GetTimetableTask timetableTask;
+
+    private Context instance;
+
+    private Handler mHandler;
+    private Runnable refreshData;
 
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.bustimes);
 
-	DatabaseHelper helper = getHelper();
+	final DatabaseHelper helper = getHelper();
+
+	instance = this;
 
 	busStopID = getIntent().getExtras().getString("busStopID");
 	busStopName = getIntent().getExtras().getString("busStopName");
@@ -153,12 +163,37 @@ public class BusTimeActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 	busName.setText(busStopName);
 	busID.setText(busStopID);
+    }
+
+    public void onResume() {
+	super.onResume();
 
 	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 	if (sharedPrefs.getBoolean("liveBusTimesEnabled", false)) {
-	    timetableThread = new Thread(this);
-	    timetableThread.start();
+	    Log.i(TAG, "Live Times enabled");
+	    timetable = (Timetable) getLastNonConfigurationInstance();
+
+	    refreshData = new Runnable() {
+		@Override
+		public void run() {
+		    timetableTask = new GetTimetableTask();
+		    timetableTask.execute(busStopID);
+		    mHandler.postDelayed(refreshData, 20000);
+		}
+	    };
+
+	    mHandler = new Handler();
+
+	    if (timetable == null) {
+		Log.i(TAG, "No Previous timetable");
+		mHandler.post(refreshData);
+	    } else {
+		Log.i(TAG, "Displaying previous timetable");
+		displayTimetable(timetable);
+	    }
+
 	} else {
+	    Log.i(TAG, "Live Times Disabled");
 	    progBar.setVisibility(View.GONE);
 	    busStopMessage.setText("Live bus times disabled");
 	    busStopMessage.setVisibility(View.VISIBLE);
@@ -166,12 +201,17 @@ public class BusTimeActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
     }
 
-    public void finish() {
-	Log.i(TAG, "Stopping BusTimeActivity thread");
-	if (timetableThread != null) { // Could happen if live bus times are disabled
-	    timetableThread.interrupt();
+    public void onPause() {
+	if (mHandler != null) { // BusTimes are enabled
+	    mHandler.removeCallbacks(refreshData);
+	    timetableTask.cancel(true);
+	    Log.i(TAG, "Stoping refreshing timetable data");
 	}
 
+	super.onPause();
+    }
+
+    public void finish() {
 	if (dataChanged) {
 	    getIntent().putExtra("busStopChanged", busStopID);
 	}
@@ -179,60 +219,6 @@ public class BusTimeActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	setResult(RESULT_OK, getIntent());
 
 	super.finish();
-    }
-
-    public void run() {
-	while (true) {
-	    try {
-		Timetable timetable = DataManager.getTimetable(this, busStopID, true);
-
-		Log.i(TAG, "Got timetable for " + busStopID);
-		if (timetable == null) {
-		    Log.i(TAG, "Its null");
-		    busTimeList.post(new Runnable() {
-			public void run() {
-			    progBar.setVisibility(View.GONE);
-			    busStopMessage.setText("Error fetching bus times");
-			    busStopMessage.setVisibility(View.VISIBLE);
-			}
-		    });
-		} else {
-		    Log.i(TAG, "It contains " + timetable.size() + " stops");
-
-		    if (timetable.size() == 0) {
-			busTimeList.post(new Runnable() {
-			    public void run() {
-				progBar.setVisibility(View.GONE);
-				busStopMessage.setText("No Busses");
-				busStopMessage.setVisibility(View.VISIBLE);
-			    }
-			});
-		    } else {
-
-			adapter = new TimetableAdapter(this, timetable);
-
-			busTimeList.post(new Runnable() {
-			    public void run() {
-				progBar.setVisibility(View.GONE);
-				busStopMessage.setVisibility(View.GONE);
-				busTimeList.setAdapter(adapter);
-				busTimeContentLayout.setGravity(Gravity.TOP);
-			    }
-			});
-		    }
-		}
-
-	    } catch (SQLException e1) {
-		e1.printStackTrace();
-	    }
-
-	    try {
-		Thread.sleep(20000);
-	    } catch (InterruptedException e) {
-		Log.i(TAG, "Bus stop activity thread stoped");
-		break;
-	    }
-	}
     }
 
     public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
@@ -244,4 +230,57 @@ public class BusTimeActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	    e.printStackTrace();
 	}
     }
+
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+	return timetable;
+    }
+
+    private class GetTimetableTask extends AsyncTask<String, Integer, Timetable> {
+	protected Timetable doInBackground(String... activity) {
+	    Timetable newTimetable = null;
+	    try {
+		newTimetable = DataManager.getTimetable(instance, busStopID, true);
+	    } catch (SQLException e) {
+		e.printStackTrace();
+	    }
+	    return newTimetable;
+	}
+
+	protected void onPostExecute(Timetable newTimetable) {
+	    Log.i(TAG, "Got timetable for " + busStopID);
+	    if (newTimetable == null) {
+		Log.i(TAG, "Its null");
+
+		progBar.setVisibility(View.GONE);
+		busStopMessage.setText("Error fetching bus times");
+		busStopMessage.setVisibility(View.VISIBLE);
+	    } else {
+		timetable = newTimetable;
+		displayTimetable(timetable);
+	    }
+	}
+    }
+
+    private void displayTimetable(Timetable timetable) {
+	Log.i(TAG, "It contains " + timetable.size() + " stops");
+
+	if (timetable.size() == 0) {
+	    progBar.setVisibility(View.GONE);
+	    busStopMessage.setText("No Busses");
+	    busStopMessage.setVisibility(View.VISIBLE);
+	} else {
+	    progBar.setVisibility(View.GONE);
+	    busStopMessage.setVisibility(View.GONE);
+	    TimetableAdapter adapter;
+	    if ((adapter = (TimetableAdapter) busTimeList.getAdapter()) != null) {
+		adapter.updateTimetable(timetable);
+	    } else {
+		adapter = new TimetableAdapter(this, timetable);
+		busTimeList.setAdapter(adapter);
+	    }
+	    busTimeContentLayout.setGravity(Gravity.TOP);
+	}
+    }
+
 }
