@@ -60,6 +60,8 @@ public class FavouriteDialog extends Dialog {
 	favouriteItems = new ArrayList<POI>();
 
 	listItems = (ListView) findViewById(R.id.favouriteListItems);
+
+	refresh();
     }
 
     public void refresh() {

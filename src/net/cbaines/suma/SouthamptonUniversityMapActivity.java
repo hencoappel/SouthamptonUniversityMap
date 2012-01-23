@@ -29,6 +29,7 @@ import java.util.HashMap;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.tileprovider.MapTileProviderArray;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -190,11 +191,11 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    } else {
 		myLocationOverlay.disableMyLocation();
 	    }
-	    
+
 	    if (!sharedPrefs.contains("GPSEnabled")) {
 		sharedPrefs.edit().putBoolean("GPSEnabled", true).commit();
 	    }
-	    
+
 	    if (!sharedPrefs.contains("liveBusTimesEnabled")) {
 		sharedPrefs.edit().putBoolean("liveBusTimesEnabled", true).commit();
 	    }
@@ -766,9 +767,11 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    return false;
 	case R.id.menu_favourites:
 	    Log.i(TAG, "Showing favourite dialog");
+	    boolean refreshNeeded = favDialog != null;
 	    showDialog(FAVOURITE_DIALOG_ID);
 	    if (favDialog != null) {
-		favDialog.refresh();
+		if (refreshNeeded)
+		    favDialog.refresh();
 	    } else {
 		Log.e(TAG, "Very wierd, just tried to launch the favourite's dialog, but its null?");
 	    }
