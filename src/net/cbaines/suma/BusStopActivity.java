@@ -22,8 +22,14 @@ package net.cbaines.suma;
 import java.sql.SQLException;
 import java.util.Iterator;
 
+import org.osmdroid.util.GeoPoint;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +38,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -260,6 +267,10 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     }
 
     private class GetTimetableTask extends AsyncTask<String, Integer, Timetable> {
+	protected void onPreExecute() {
+	    progBar.setVisibility(View.VISIBLE);
+	}
+
 	protected Timetable doInBackground(String... activity) {
 	    Timetable newTimetable = null;
 	    try {
@@ -279,6 +290,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		busStopMessage.setText("Error fetching bus times");
 		busStopMessage.setVisibility(View.VISIBLE);
 	    } else {
+		progBar.setVisibility(View.GONE);
 		timetable = newTimetable;
 		displayTimetable(timetable);
 	    }
@@ -292,13 +304,38 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	// Handle item selection
+	switch (item.getItemId()) {
+	case R.id.menu_previous_stop:
+	    break;
+	case R.id.menu_next_stop:
+	    break;
+	case R.id.menu_refresh_stop:
+	    if (mHandler != null) { // BusTimes are enabled
+		mHandler.removeCallbacks(refreshData);
+		timetableTask.cancel(true);
+		Log.i(TAG, "Stoping refreshing timetable data");
+
+		mHandler.post(refreshData);
+	    } else {
+		// TODO: Toast here...
+	    }
+	    break;
+	default:
+	    Log.e(TAG, "No known menu option selected");
+	    return super.onOptionsItemSelected(item);
+	}
+	return true;
+    }
+
     private void displayTimetable(Timetable timetable) {
 	Timetable timetableToDisplay = (Timetable) timetable.clone();
 
 	Log.i(TAG, "It contains " + timetableToDisplay.size() + " stops");
 
 	if (timetable.size() == 0) {
-	    progBar.setVisibility(View.GONE);
 	    busStopMessage.setText("No Busses");
 	    busStopMessage.setVisibility(View.VISIBLE);
 	    busTimeContentLayout.setGravity(Gravity.CENTER);
@@ -332,13 +369,11 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 	    if (timetableToDisplay.size() == 0) {
 		busTimeContentLayout.setGravity(Gravity.CENTER);
-		progBar.setVisibility(View.GONE);
 		busStopMessage.setText("No Busses (With the current enabled routes)");
 		busStopMessage.setVisibility(View.VISIBLE);
 		busTimeList.setVisibility(View.GONE);
 	    } else {
 		busTimeList.setVisibility(View.VISIBLE);
-		progBar.setVisibility(View.GONE);
 		busStopMessage.setVisibility(View.GONE);
 		TimetableAdapter adapter;
 		if ((adapter = (TimetableAdapter) busTimeList.getAdapter()) != null) {
