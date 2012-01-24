@@ -48,10 +48,10 @@ public class BusRoute {
     private static final String TAG = "BusRoute";
 
     @DatabaseField(id = true)
-    int id;
+    public int id;
 
     @DatabaseField
-    String code;
+    public String code;
 
     @DatabaseField
     String label;
@@ -59,7 +59,7 @@ public class BusRoute {
     BusRoute() {
     }
 
-    BusRoute(Integer id, String code, String label) {
+    public BusRoute(Integer id, String code, String label) {
 	this.id = id.intValue();
 	this.code = code;
 	this.label = label;
@@ -181,6 +181,28 @@ public class BusRoute {
 	    e.printStackTrace();
 	    return null;
 	}
+    }
+
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + id;
+	return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	BusRoute other = (BusRoute) obj;
+	if (id != other.id)
+	    return false;
+	return true;
     }
 
 }

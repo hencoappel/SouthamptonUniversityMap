@@ -22,6 +22,7 @@ package net.cbaines.suma;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+
 import android.app.Dialog;
 import android.content.Context;
 import android.util.Log;

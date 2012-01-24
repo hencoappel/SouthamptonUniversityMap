@@ -20,6 +20,7 @@
 package net.cbaines.suma;
 
 import java.sql.SQLException;
+import java.text.DateFormat;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -78,12 +79,11 @@ public class StopView extends LinearLayout implements OnClickListener {
 	    busDao.refresh(stop.bus);
 
 	    if (stop.bus != null) {
-		onClickMessage = "Bus " + stop.bus.toString();
+		onClickMessage = "Bus " + stop.bus.toString() + " at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
 	    } else {
-		onClickMessage = "Unidentified bus";
+		onClickMessage = "Unidentified bus at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
 	    }
 	} catch (SQLException e) {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
 

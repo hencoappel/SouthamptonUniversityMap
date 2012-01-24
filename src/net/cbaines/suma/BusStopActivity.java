@@ -20,6 +20,7 @@
 package net.cbaines.suma;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -29,6 +30,8 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -73,6 +76,12 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     private Handler mHandler;
     private Runnable refreshData;
 
+    private CheckBox U1RouteRadioButton;
+    private CheckBox U1NRouteRadioButton;
+    private CheckBox U2RouteRadioButton;
+    private CheckBox U6RouteRadioButton;
+    private CheckBox U9RouteRadioButton;
+
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.bustimes);
@@ -84,11 +93,17 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	busStopID = getIntent().getExtras().getString("busStopID");
 	busStopName = getIntent().getExtras().getString("busStopName");
 
-	TextView U1RouteTextView = (TextView) findViewById(R.id.busStopU1);
-	TextView U1NRouteTextView = (TextView) findViewById(R.id.busStopU1N);
-	TextView U2RouteTextView = (TextView) findViewById(R.id.busStopU2);
-	TextView U6RouteTextView = (TextView) findViewById(R.id.busStopU6);
-	TextView U9RouteTextView = (TextView) findViewById(R.id.busStopU9);
+	U1RouteRadioButton = (CheckBox) findViewById(R.id.radio_u1);
+	U1NRouteRadioButton = (CheckBox) findViewById(R.id.radio_u1n);
+	U2RouteRadioButton = (CheckBox) findViewById(R.id.radio_u2);
+	U6RouteRadioButton = (CheckBox) findViewById(R.id.radio_u6);
+	U9RouteRadioButton = (CheckBox) findViewById(R.id.radio_u9);
+
+	U1RouteRadioButton.setOnCheckedChangeListener(this);
+	U1NRouteRadioButton.setOnCheckedChangeListener(this);
+	U2RouteRadioButton.setOnCheckedChangeListener(this);
+	U6RouteRadioButton.setOnCheckedChangeListener(this);
+	U9RouteRadioButton.setOnCheckedChangeListener(this);
 
 	try {
 	    Dao<BusRoute, Integer> busRouteDao = helper.getBusRouteDao();
@@ -105,33 +120,33 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 		if (route.code.equals("U1")) {
 		    if (count != 0) {
-			U1RouteTextView.setVisibility(View.VISIBLE);
+			U1RouteRadioButton.setVisibility(View.VISIBLE);
 		    } else {
-			U1RouteTextView.setVisibility(View.GONE);
+			U1RouteRadioButton.setVisibility(View.GONE);
 		    }
 		} else if (route.code.equals("U1N")) {
 		    if (count != 0) {
-			U1NRouteTextView.setVisibility(View.VISIBLE);
+			U1NRouteRadioButton.setVisibility(View.VISIBLE);
 		    } else {
-			U1NRouteTextView.setVisibility(View.GONE);
+			U1NRouteRadioButton.setVisibility(View.GONE);
 		    }
 		} else if (route.code.equals("U2")) {
 		    if (count != 0) {
-			U2RouteTextView.setVisibility(View.VISIBLE);
+			U2RouteRadioButton.setVisibility(View.VISIBLE);
 		    } else {
-			U2RouteTextView.setVisibility(View.GONE);
+			U2RouteRadioButton.setVisibility(View.GONE);
 		    }
 		} else if (route.code.equals("U6")) {
 		    if (count != 0) {
-			U6RouteTextView.setVisibility(View.VISIBLE);
+			U6RouteRadioButton.setVisibility(View.VISIBLE);
 		    } else {
-			U6RouteTextView.setVisibility(View.GONE);
+			U6RouteRadioButton.setVisibility(View.GONE);
 		    }
 		} else if (route.code.equals("U9")) {
 		    if (count != 0) {
-			U9RouteTextView.setVisibility(View.VISIBLE);
+			U9RouteRadioButton.setVisibility(View.VISIBLE);
 		    } else {
-			U9RouteTextView.setVisibility(View.GONE);
+			U9RouteRadioButton.setVisibility(View.GONE);
 		    }
 		} else {
 		    Log.e(TAG, "Error unknown route " + route.code);
@@ -221,13 +236,21 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	super.finish();
     }
 
-    public void onCheckedChanged(CompoundButton arg0, boolean arg1) {
-	busStop.favourite = arg1;
-	try {
-	    busStopDao.update(busStop);
-	    dataChanged = true;
-	} catch (SQLException e) {
-	    e.printStackTrace();
+    public void onCheckedChanged(CompoundButton button, boolean checked) {
+	if (button.equals(busFavourite)) {
+	    busStop.favourite = checked;
+	    try {
+		busStopDao.update(busStop);
+		dataChanged = true;
+	    } catch (SQLException e) {
+		e.printStackTrace();
+	    }
+	} else {
+
+	    Log.i(TAG, "Route radio button made " + checked);
+
+	    displayTimetable(timetable);
+
 	}
     }
 
@@ -262,25 +285,70 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	}
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+	MenuInflater inflater = getMenuInflater();
+	inflater.inflate(R.menu.stop_menu, menu);
+	return true;
+    }
+
     private void displayTimetable(Timetable timetable) {
-	Log.i(TAG, "It contains " + timetable.size() + " stops");
+	Timetable timetableToDisplay = (Timetable) timetable.clone();
+
+	Log.i(TAG, "It contains " + timetableToDisplay.size() + " stops");
 
 	if (timetable.size() == 0) {
 	    progBar.setVisibility(View.GONE);
 	    busStopMessage.setText("No Busses");
 	    busStopMessage.setVisibility(View.VISIBLE);
+	    busTimeContentLayout.setGravity(Gravity.CENTER);
 	} else {
-	    progBar.setVisibility(View.GONE);
-	    busStopMessage.setVisibility(View.GONE);
-	    TimetableAdapter adapter;
-	    if ((adapter = (TimetableAdapter) busTimeList.getAdapter()) != null) {
-		adapter.updateTimetable(timetable);
-	    } else {
-		adapter = new TimetableAdapter(this, timetable);
-		busTimeList.setAdapter(adapter);
+
+	    for (Iterator<Stop> stopIter = timetableToDisplay.iterator(); stopIter.hasNext();) {
+		Stop stop = stopIter.next();
+		Log.i(TAG, "Begin filtering, looking at " + stop + " with route " + stop.route.code);
+		if (stop.route.code.equals("U1")) {
+		    if (!U1RouteRadioButton.isChecked()) {
+			stopIter.remove();
+		    }
+		} else if (stop.route.code.equals("U1N")) {
+		    if (!U1NRouteRadioButton.isChecked()) {
+			stopIter.remove();
+		    }
+		} else if (stop.route.code.equals("U2")) {
+		    if (!U2RouteRadioButton.isChecked()) {
+			stopIter.remove();
+		    }
+		} else if (stop.route.code.equals("U6")) {
+		    if (!U6RouteRadioButton.isChecked()) {
+			stopIter.remove();
+		    }
+		} else if (stop.route.code.equals("U9")) {
+		    if (!U9RouteRadioButton.isChecked()) {
+			stopIter.remove();
+		    }
+		}
 	    }
-	    busTimeContentLayout.setGravity(Gravity.TOP);
+
+	    if (timetableToDisplay.size() == 0) {
+		busTimeContentLayout.setGravity(Gravity.CENTER);
+		progBar.setVisibility(View.GONE);
+		busStopMessage.setText("No Busses (With the current enabled routes)");
+		busStopMessage.setVisibility(View.VISIBLE);
+		busTimeList.setVisibility(View.GONE);
+	    } else {
+		busTimeList.setVisibility(View.VISIBLE);
+		progBar.setVisibility(View.GONE);
+		busStopMessage.setVisibility(View.GONE);
+		TimetableAdapter adapter;
+		if ((adapter = (TimetableAdapter) busTimeList.getAdapter()) != null) {
+		    adapter.updateTimetable(timetableToDisplay);
+		} else {
+		    adapter = new TimetableAdapter(this, timetableToDisplay);
+		    busTimeList.setAdapter(adapter);
+		}
+		busTimeContentLayout.setGravity(Gravity.TOP);
+	    }
 	}
     }
-
 }

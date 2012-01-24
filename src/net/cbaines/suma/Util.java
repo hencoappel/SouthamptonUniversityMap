@@ -21,6 +21,7 @@ package net.cbaines.suma;
 
 import java.util.ArrayList;
 
+
 import org.osmdroid.util.GeoPoint;
 
 import android.location.Location;

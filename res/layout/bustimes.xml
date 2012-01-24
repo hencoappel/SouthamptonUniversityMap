@@ -17,56 +17,65 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/busStopU1"
+        <CheckBox
+            android:id="@+id/radio_u1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp"
-            android:background="@drawable/u1_back"
+            android:background="@drawable/u1_radio_button"
+            android:button="@drawable/empty"
+            android:checked="true"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="@string/U1"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#FFFFFF" />
 
-        <TextView
-            android:id="@+id/busStopU1N"
+        <CheckBox
+            android:id="@+id/radio_u1n"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/u1n_back"
+            android:background="@drawable/u1n_radio_button"
+            android:button="@drawable/empty"
+            android:checked="true"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="@string/U1N"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#FFFFFF" />
 
-        <TextView
-            android:id="@+id/busStopU2"
+        <CheckBox
+            android:id="@+id/radio_u2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/u2_back"
+            android:background="@drawable/u2_radio_button"
+            android:button="@drawable/empty"
+            android:checked="true"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="@string/U2"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#FFFFFF" />
 
-        <TextView
-            android:id="@+id/busStopU6"
+        <CheckBox
+            android:id="@+id/radio_u6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/u6_back"
+            android:background="@drawable/u6_radio_button"
+            android:button="@drawable/empty"
+            android:checked="true"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="@string/U6"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="#FFFFFF" />
 
-        <TextView
-            android:id="@+id/busStopU9"
+        <CheckBox
+            android:id="@+id/radio_u9"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/u9_back"
+            android:background="@drawable/u9_radio_button"
+            android:button="@drawable/empty"
+            android:checked="true"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text="@string/U9"
@@ -86,7 +95,6 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
     </LinearLayout>
 
     <LinearLayout

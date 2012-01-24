@@ -12,8 +12,7 @@
     <item
         android:id="@+id/menu_find_my_location"
         android:icon="@android:drawable/ic_menu_mylocation"
-        android:title="@string/menu_find_my_location">
-    </item>
+        android:title="@string/menu_find_my_location"/>
     <item
         android:id="@+id/menu_view"
         android:icon="@android:drawable/ic_menu_more"

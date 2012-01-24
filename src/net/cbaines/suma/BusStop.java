@@ -37,9 +37,9 @@ public class BusStop extends POI {
 
     // Used to speed up accessing the relevent uni link routes for a bus stop, if == 0, this is not a uni link stop
     @DatabaseField(canBeNull = false)
-    byte routes;
+    public byte routes;
 
-    BusStop(String location, String description, String bay, GeoPoint point) {
+    public BusStop(String location, String description, String bay, GeoPoint point) {
 	this.id = location;
 	this.description = description;
 	this.bay = bay;

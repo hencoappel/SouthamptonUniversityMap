@@ -81,5 +81,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="bustimes_favourite_checkbox_label">Favourite</string>
     <string name="donate_dialog_message">Loading bitcoin client</string>
     <string name="donate_dialog_error_title">Error</string>
+    <string name="menu_previous_stop">Previous</string>
+    <string name="menu_next_stop">Next</string>
+    <string name="menu_refresh_stop">Refresh</string>
 
 </resources>

@@ -19,20 +19,10 @@
 
 package net.cbaines.suma;
 
-import java.util.ArrayList;
+import com.j256.ormlite.android.apptools.OrmLiteConfigUtil;
 
-
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.overlay.OverlayItem;
-
-public class RouteOverlayItem extends OverlayItem {
-
-    ArrayList<? extends POI> route;
-
-    public RouteOverlayItem(String aTitle, String aDescription, ArrayList<? extends POI> route) {
-	super(aTitle, aDescription, new GeoPoint(0, 0));
-	this.route = route;
-
+public class DatabaseConfigUtil extends OrmLiteConfigUtil {
+    public static void main(String[] args) throws Exception {
+	writeConfigFile("ormlite_config.txt");
     }
-
 }

@@ -33,28 +33,30 @@ public class Stop {
     int id;
 
     @DatabaseField(canBeNull = false)
-    String name;
+    public String name;
 
     @DatabaseField(canBeNull = false, foreign = true)
     BusStop destStop;
 
     @DatabaseField(canBeNull = true, foreign = true)
-    Bus bus;
+    public Bus bus;
 
     @DatabaseField(canBeNull = false, foreign = true)
-    BusStop busStop;
+    public BusStop busStop;
 
     @DatabaseField(canBeNull = false)
-    Date arivalTime;
+    public Date arivalTime;
 
     @DatabaseField(canBeNull = false)
     Date timeOfFetch;
+
+    BusRoute route;
 
     Stop() {
 
     }
 
-    Stop(String name, BusStop busStop, BusStop dest, Bus bus, Date arivalTime, Date timeOfFetch) {
+    public Stop(String name, BusStop busStop, BusStop dest, Bus bus, Date arivalTime, Date timeOfFetch) {
 	this.name = name;
 	this.busStop = busStop;
 	this.destStop = dest;
@@ -63,7 +65,7 @@ public class Stop {
 	this.timeOfFetch = timeOfFetch;
     }
 
-    Stop(String name, BusStop busStop, BusStop dest, Date arivalTime, Date timeOfFetch) {
+    public Stop(String name, BusStop busStop, BusStop dest, Date arivalTime, Date timeOfFetch) {
 	this(name, busStop, dest, null, arivalTime, timeOfFetch);
     }
 

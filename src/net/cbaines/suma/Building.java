@@ -34,7 +34,7 @@ public class Building extends POI {
     @DatabaseField(canBeNull = false)
     public String name;
     @DatabaseField(canBeNull = false)
-    boolean residential;
+    public boolean residential;
     @DatabaseField(dataType = DataType.SERIALIZABLE, canBeNull = true)
     Polygon outline;
 
@@ -46,7 +46,7 @@ public class Building extends POI {
 	this.type = POI.BUILDING;
     }
 
-    Building(String id, GeoPoint point, boolean residential, String name) {
+    public Building(String id, GeoPoint point, boolean residential, String name) {
 	this(id, point, residential, name, null);
     }
 

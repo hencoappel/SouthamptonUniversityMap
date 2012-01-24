@@ -26,7 +26,7 @@ import com.j256.ormlite.table.DatabaseTable;
 public class Bus {
 
     @DatabaseField(id = true)
-    int id;
+    public int id;
 
     @DatabaseField(canBeNull = true, foreign = true)
     Stop lastKnownStop;
@@ -46,7 +46,7 @@ public class Bus {
 	this.lastKnownStop = lastKnownStop;
     }
 
-    Bus(int id, BusRoute lastKnownRoute) {
+    public Bus(int id, BusRoute lastKnownRoute) {
 	this(id, lastKnownRoute, null);
     }
 

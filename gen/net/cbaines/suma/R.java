@@ -24,11 +24,22 @@ public final class R {
         public static final int building_fav=0x7f020001;
         public static final int busstop=0x7f020002;
         public static final int busstop_fav=0x7f020003;
-        public static final int u1_back=0x7f020004;
-        public static final int u1n_back=0x7f020005;
-        public static final int u2_back=0x7f020006;
-        public static final int u6_back=0x7f020007;
-        public static final int u9_back=0x7f020008;
+        public static final int empty=0x7f020004;
+        public static final int u1_back=0x7f020005;
+        public static final int u1_back_selected=0x7f020006;
+        public static final int u1_radio_button=0x7f020007;
+        public static final int u1n_back=0x7f020008;
+        public static final int u1n_back_selected=0x7f020009;
+        public static final int u1n_radio_button=0x7f02000a;
+        public static final int u2_back=0x7f02000b;
+        public static final int u2_back_selected=0x7f02000c;
+        public static final int u2_radio_button=0x7f02000d;
+        public static final int u6_back=0x7f02000e;
+        public static final int u6_back_selected=0x7f02000f;
+        public static final int u6_radio_button=0x7f020010;
+        public static final int u9_back=0x7f020011;
+        public static final int u9_back_selected=0x7f020012;
+        public static final int u9_radio_button=0x7f020013;
     }
     public static final class id {
         public static final int busStopID=0x7f0a000c;
@@ -36,11 +47,6 @@ public final class R {
         public static final int busStopMessage=0x7f0a000e;
         public static final int busStopName=0x7f0a0004;
         public static final int busStopTimes=0x7f0a0010;
-        public static final int busStopU1=0x7f0a0006;
-        public static final int busStopU1N=0x7f0a0007;
-        public static final int busStopU2=0x7f0a0008;
-        public static final int busStopU6=0x7f0a0009;
-        public static final int busStopU9=0x7f0a000a;
         public static final int busTimeContentLayout=0x7f0a000d;
         public static final int check1=0x7f0a0020;
         public static final int childname=0x7f0a001f;
@@ -65,8 +71,16 @@ public final class R {
         public static final int menu_favourites=0x7f0a0027;
         public static final int menu_find=0x7f0a0022;
         public static final int menu_find_my_location=0x7f0a0024;
+        public static final int menu_next_stop=0x7f0a002a;
         public static final int menu_preferences=0x7f0a0023;
+        public static final int menu_previous_stop=0x7f0a0028;
+        public static final int menu_refresh_stop=0x7f0a0029;
         public static final int menu_view=0x7f0a0025;
+        public static final int radio_u1=0x7f0a0006;
+        public static final int radio_u1n=0x7f0a0007;
+        public static final int radio_u2=0x7f0a0008;
+        public static final int radio_u6=0x7f0a0009;
+        public static final int radio_u9=0x7f0a000a;
         public static final int searchBar=0x7f0a001a;
         public static final int textView1=0x7f0a0000;
         public static final int textView2=0x7f0a0001;
@@ -85,14 +99,16 @@ public final class R {
     }
     public static final class menu {
         public static final int map_menu=0x7f090000;
+        public static final int stop_menu=0x7f090001;
     }
     public static final class raw {
-        public static final int u1=0x7f060000;
-        public static final int u1e=0x7f060001;
-        public static final int u1n=0x7f060002;
-        public static final int u2=0x7f060003;
-        public static final int u6=0x7f060004;
-        public static final int u9=0x7f060005;
+        public static final int ormlite_config=0x7f060000;
+        public static final int u1=0x7f060001;
+        public static final int u1e=0x7f060002;
+        public static final int u1n=0x7f060003;
+        public static final int u2=0x7f060004;
+        public static final int u6=0x7f060005;
+        public static final int u9=0x7f060006;
     }
     public static final class string {
         public static final int U1=0x7f070009;
@@ -124,7 +140,10 @@ public final class R {
         public static final int menu_favourites=0x7f07000f;
         public static final int menu_find=0x7f070000;
         public static final int menu_find_my_location=0x7f070003;
+        public static final int menu_next_stop=0x7f070028;
         public static final int menu_preferences=0x7f070001;
+        public static final int menu_previous_stop=0x7f070027;
+        public static final int menu_refresh_stop=0x7f070029;
         public static final int menu_view=0x7f070002;
         public static final int pref_bus_stop=0x7f070008;
         public static final int preferences=0x7f07001b;

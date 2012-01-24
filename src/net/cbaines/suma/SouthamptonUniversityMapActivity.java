@@ -27,9 +27,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 
+
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
-import org.osmdroid.tileprovider.MapTileProviderArray;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -714,7 +714,6 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.map_menu, menu);
 	return true;
-
     }
 
     @Override

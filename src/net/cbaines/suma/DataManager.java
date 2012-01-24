@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -517,6 +518,7 @@ public class DataManager {
 		Date now = new Date(System.currentTimeMillis());
 
 		stop = new Stop(stopObj.getString("name"), busStop, destStop, bus, calender.getTime(), now);
+		stop.route = route;
 
 		/*
 		 * if (bus.lastKnownStop != null) { stopDao.delete(bus.lastKnownStop); // TODO Crude, might delete useful data
@@ -540,6 +542,7 @@ public class DataManager {
 	    } else {
 
 		stop = new Stop(stopObj.getString("name"), busStop, destStop, calender.getTime(), new Date(System.currentTimeMillis()));
+		stop.route = route;
 
 	    }
 

@@ -51,7 +51,7 @@ public abstract class POI {
     @DatabaseField(canBeNull = false)
     public boolean favourite; // This field is not assessed by equals
 
-    int distTo = -1; // Used by the comparator to store distances, then later by the gui to display them.
+    public int distTo = -1; // Used by the comparator to store distances, then later by the gui to display them.
 
     public String type;
 

@@ -21,6 +21,7 @@ package net.cbaines.suma;
 
 import java.util.Comparator;
 
+
 public class StringDistanceComparator implements Comparator<POI> {
     private String userString;
 

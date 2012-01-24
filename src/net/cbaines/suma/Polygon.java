@@ -29,13 +29,13 @@ public class Polygon implements Serializable {
      */
     private static final long serialVersionUID = 3029139596630651715L;
 
-    final GeoPoint[] points;
+    public final GeoPoint[] points;
 
     Polygon() {
 	points = null;
     }
 
-    Polygon(GeoPoint[] points) {
+    public Polygon(GeoPoint[] points) {
 	this.points = points;
     }
 

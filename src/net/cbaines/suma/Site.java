@@ -27,17 +27,17 @@ import com.j256.ormlite.table.DatabaseTable;
 
 @DatabaseTable(tableName = "sites")
 public class Site extends POI {
-    
+
     public static final String NAME_FIELD_NAME = "name";
     public static final String OUTLINE_FIELD_NAME = "outline";
 
     @DatabaseField(canBeNull = false)
-    String name;
+    public String name;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE, canBeNull = true)
-    Polygon outline;
+    public Polygon outline;
 
-    Site(String id, String name, GeoPoint point, Polygon outline) {
+    public Site(String id, String name, GeoPoint point, Polygon outline) {
 	super(id, point);
 	this.name = name;
 	this.outline = outline;

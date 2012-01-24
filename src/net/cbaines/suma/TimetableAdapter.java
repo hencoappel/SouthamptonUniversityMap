@@ -43,6 +43,8 @@ public class TimetableAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
+	Log.i(TAG, "Returning stop " + position + " " + timetable.get(position));
+
 	StopView stopView;
 	if (convertView == null) {
 	    stopView = new StopView(context, timetable.get(position));
@@ -52,7 +54,9 @@ public class TimetableAdapter extends BaseAdapter {
 	}
 
 	if (changed == null || changed[position]) {
+	    a.reset();
 	    stopView.startAnimation(a);
+	    Log.i(TAG, "Animating it");
 	}
 
 	return stopView;
