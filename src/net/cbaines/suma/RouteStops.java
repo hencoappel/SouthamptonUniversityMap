@@ -47,7 +47,6 @@ public class RouteStops {
     BusRoute route;
 
     RouteStops() {
-	// for ormlite
     }
 
     public RouteStops(BusStop stop, BusRoute route, int sequence) {

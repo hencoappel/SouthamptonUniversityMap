@@ -75,7 +75,7 @@ import com.j256.ormlite.dao.Dao;
 public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<DatabaseHelper> implements MapViewConstants, Runnable, RouteColorConstants,
 	OnChildClickListener, OnItemClickListener, OnItemLongClickListener, OnSharedPreferenceChangeListener {
 
-    private boolean useBundledDatabase = true;
+    private boolean useBundledDatabase = false;
 
     private MapView mapView;
     private MapController mapController;
@@ -694,17 +694,13 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			Collections.sort(mapView.getOverlays(), comparator);
 		    }
 		}
-		try {
-		    Dao<BusRoute, Integer> busRouteDao = getHelper().getBusRouteDao();
 
-		    busStopOverlay.setRoutes(busRouteDao.queryForId(326), activityPrefs.getBoolean("Bus Stops:U1", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
-		    busStopOverlay.setRoutes(busRouteDao.queryForId(468), activityPrefs.getBoolean("Bus Stops:U1N", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
-		    busStopOverlay.setRoutes(busRouteDao.queryForId(329), activityPrefs.getBoolean("Bus Stops:U2", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
-		    busStopOverlay.setRoutes(busRouteDao.queryForId(327), activityPrefs.getBoolean("Bus Stops:U6", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
-		    busStopOverlay.setRoutes(busRouteDao.queryForId(354), activityPrefs.getBoolean("Bus Stops:U9", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
-		} catch (SQLException e) {
-		    e.printStackTrace();
-		}
+		busStopOverlay.setRoutes(0, activityPrefs.getBoolean("Bus Stops:U1", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(1, activityPrefs.getBoolean("Bus Stops:U1N", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(2, activityPrefs.getBoolean("Bus Stops:U2", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(3, activityPrefs.getBoolean("Bus Stops:U6", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+		busStopOverlay.setRoutes(4, activityPrefs.getBoolean("Bus Stops:U9", BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT));
+
 		mapView.postInvalidate();
 
 		Log.i(TAG, "Finished showing bus stop overlays at " + (System.currentTimeMillis() - startTime));

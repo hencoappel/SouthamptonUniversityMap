@@ -51,7 +51,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<RouteStops, Integer> routeStopsDao = null;
     private Dao<Site, String> siteDao = null;
     private Dao<Bus, Integer> busDao = null;
-    private Dao<Stop, Integer> stopDao = null;
+    private Dao<Direction, Integer> directionDao = null;
 
     private Context context;
 
@@ -71,7 +71,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	    TableUtils.createTable(connectionSource, RouteStops.class);
 	    TableUtils.createTable(connectionSource, Site.class);
 	    TableUtils.createTable(connectionSource, Bus.class);
-	    TableUtils.createTable(connectionSource, Stop.class);
+	    TableUtils.createTable(connectionSource, Direction.class);
 	} catch (SQLException e) {
 	    Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 	    throw new RuntimeException(e);
@@ -82,18 +82,10 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, ConnectionSource connectionSource, int oldVersion, int newVersion) {
 	try {
 	    Log.i(DatabaseHelper.class.getName(), "onUpgrade");
-	    TableUtils.dropTable(connectionSource, Building.class, true);
-	    TableUtils.dropTable(connectionSource, BusStop.class, true);
-	    TableUtils.dropTable(connectionSource, BusRoute.class, true);
-	    TableUtils.dropTable(connectionSource, RouteStops.class, true);
-	    TableUtils.dropTable(connectionSource, Site.class, true);
-	    TableUtils.dropTable(connectionSource, Bus.class, true);
-	    TableUtils.dropTable(connectionSource, Stop.class, true);
-	    // after we drop the old databases, we create the new ones
-	    onCreate(database, connectionSource);
-	} catch (SQLException e) {
-	    Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
-	    throw new RuntimeException(e);
+	    copyDataBase();
+
+	} catch (IOException e) {
+	    e.printStackTrace();
 	}
 
     }
@@ -151,21 +143,21 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     /**
      * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached value.
      */
-    public Dao<Bus, Integer> getBusDao() throws SQLException {
-	if (busDao == null) {
-	    busDao = getDao(Bus.class);
+    public Dao<Direction, Integer> getDirectionDao() throws SQLException {
+	if (directionDao == null) {
+	    directionDao = getDao(Direction.class);
 	}
-	return busDao;
+	return directionDao;
     }
 
     /**
      * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached value.
      */
-    public Dao<Stop, Integer> getStopDao() throws SQLException {
-	if (stopDao == null) {
-	    stopDao = getDao(Stop.class);
+    public Dao<Bus, Integer> getBusDao() throws SQLException {
+	if (busDao == null) {
+	    busDao = getDao(Bus.class);
 	}
-	return stopDao;
+	return busDao;
     }
 
     /**
@@ -275,6 +267,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	routeStopsDao = null;
 	siteDao = null;
 	busDao = null;
-	stopDao = null;
+	directionDao = null;
     }
 }

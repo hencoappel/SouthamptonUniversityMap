@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -206,10 +205,12 @@ public class DataManager {
 	Dao<BusStop, String> busStopDao = helper.getBusStopDao();
 	Dao<BusRoute, Integer> busRouteDao = helper.getBusRouteDao();
 	Dao<RouteStops, Integer> routeStopsDao = helper.getRouteStopsDao();
+	Dao<Direction, Integer> directionDao = helper.getDirectionDao();
 
 	TableUtils.clearTable(helper.getConnectionSource(), BusStop.class);
 	TableUtils.clearTable(helper.getConnectionSource(), BusRoute.class);
 	TableUtils.clearTable(helper.getConnectionSource(), RouteStops.class);
+	TableUtils.clearTable(helper.getConnectionSource(), Direction.class);
 
 	Log.i(TAG, "Loading busstops from csv");
 
@@ -272,6 +273,14 @@ public class DataManager {
 	    e.printStackTrace();
 	}
 
+	directionDao.create(new Direction("A", busRouteDao.queryForId(326)));
+	directionDao.create(new Direction("C", busRouteDao.queryForId(326)));
+	directionDao.create(new Direction("E", busRouteDao.queryForId(326)));
+	directionDao.create(new Direction("B", busRouteDao.queryForId(329)));
+	directionDao.create(new Direction("C", busRouteDao.queryForId(329)));
+	directionDao.create(new Direction("C", busRouteDao.queryForId(327)));
+	directionDao.create(new Direction("H", busRouteDao.queryForId(327)));
+
 	Log.i(TAG, "Finished loading routes, now loading routestops");
 
 	inputStream = context.getAssets().open("routestops.csv");
@@ -306,7 +315,17 @@ public class DataManager {
 
 		routeStopsDao.create(new RouteStops(stop, route, sequence));
 
-		stop.routes.add(route);
+		if (route.id == 326) { // U1
+		    stop.routes = (byte) (stop.routes | 1);
+		} else if (route.id == 468) { // U1N
+		    stop.routes = (byte) (stop.routes | (1 << 1));
+		} else if (route.id == 329) { // U2
+		    stop.routes = (byte) (stop.routes | (1 << 2));
+		} else if (route.id == 327) { // U6
+		    stop.routes = (byte) (stop.routes | (1 << 3));
+		} else if (route.id == 354) { // U9
+		    stop.routes = (byte) (stop.routes | (1 << 4));
+		}
 
 		Log.v(TAG, "Stop routes " + stop.routes);
 		busStopDao.update(stop);
@@ -414,8 +433,6 @@ public class DataManager {
 	    busDao = helper.getBusDao();
 	if (busStopDao == null)
 	    busStopDao = helper.getBusStopDao();
-	if (stopDao == null)
-	    stopDao = helper.getStopDao();
 
 	try {
 	    String time = stopObj.getString("time");
@@ -459,7 +476,7 @@ public class DataManager {
 		}
 
 		for (Direction possibleDir : route.directions) {
-		    if (name.charAt(3) == possibleDir.direction.charAt(0)) {
+		    if (name.charAt(2) == possibleDir.direction.charAt(0)) {
 			dir = possibleDir;
 			break;
 		    }
@@ -545,8 +562,6 @@ public class DataManager {
 	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
 	if (busRoutes == null)
 	    busRoutes = helper.getBusRouteDao();
-	if (stopDao == null)
-	    stopDao = helper.getStopDao();
 	if (busStopDao == null)
 	    busStopDao = helper.getBusStopDao();
 

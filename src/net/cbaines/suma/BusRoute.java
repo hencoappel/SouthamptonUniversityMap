@@ -20,7 +20,7 @@
 package net.cbaines.suma;
 
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
@@ -59,7 +59,7 @@ public class BusRoute {
     String label;
 
     @ForeignCollectionField(eager = false)
-    HashSet<Direction> directions;
+    Collection<Direction> directions;
 
     BusRoute() {
     }
