@@ -68,7 +68,7 @@ public class StopView extends LinearLayout implements OnClickListener {
 
 	// Log.i(TAG, "Time of arival " + stop.arivalTime);
 
-	name.setText(stop.name);
+	name.setText(stop.bus.getName());
 	time.setText(stop.getTimeToArival());
 
 	DatabaseHelper helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);

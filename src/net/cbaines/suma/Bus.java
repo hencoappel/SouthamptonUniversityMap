@@ -22,43 +22,90 @@ package net.cbaines.suma;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
+/**
+ * Represents a bus
+ * 
+ * @author Christopher Baines <cbaines8@gmail.com>
+ * 
+ */
 @DatabaseTable(tableName = "buses")
 public class Bus {
 
-    @DatabaseField(id = true)
-    public int id;
+    final static String ID_FIELD_NAME = "id";
+    final static String ROUTE_FIELD_NAME = "route";
+    final static String DIRECTION_FIELD_NAME = "direction";
 
-    @DatabaseField(canBeNull = true, foreign = true)
-    Stop lastKnownStop;
+    @DatabaseField(generatedId = true)
+    int gid;
 
-    @DatabaseField(canBeNull = true, foreign = true)
-    Stop firstKnownStop;
+    /**
+     * The identification number of the bus.
+     */
+    @DatabaseField(canBeNull = true)
+    String id;
 
+    /**
+     * The route the bus is travelling.
+     */
     @DatabaseField(canBeNull = false, foreign = true)
-    BusRoute lastKnownRoute;
+    BusRoute route;
+
+    /**
+     * The direction which the bus is travelling.
+     */
+    @DatabaseField(canBeNull = true, foreign = true)
+    Direction direction;
+
+    /**
+     * The destination the bus is travelling towards.
+     */
+    @DatabaseField(canBeNull = false, foreign = true)
+    BusStop destination;
 
     Bus() {
     }
 
-    Bus(int id, BusRoute lastKnownRoute, Stop lastKnownStop) {
+    /**
+     * Create a bus.
+     * 
+     * @param id
+     *            The identification number of the bus.
+     * @param route
+     *            The route the bus is travelling.
+     * @param dir
+     *            The direction which the bus is travelling.
+     */
+    Bus(String id, BusRoute route, Direction dir) {
 	this.id = id;
-	this.lastKnownRoute = lastKnownRoute;
-	this.lastKnownStop = lastKnownStop;
+	this.route = route;
+	this.direction = dir;
     }
 
-    public Bus(int id, BusRoute lastKnownRoute) {
-	this(id, lastKnownRoute, null);
+    /**
+     * Create a bus.
+     * 
+     * @param id
+     *            The identification number of the bus.
+     * @param route
+     *            The route the bus is travelling.
+     */
+    Bus(String id, BusRoute route) {
+	this(id, route, null);
     }
 
     public String toString() {
-	return String.valueOf(id);
+	return String.valueOf(id + " (" + route.code + direction + ")");
+    }
+
+    String getName() {
+	return route.code + direction;
     }
 
     @Override
     public int hashCode() {
 	final int prime = 31;
 	int result = 1;
-	result = prime * result + id;
+	result = prime * result + gid;
 	return result;
     }
 

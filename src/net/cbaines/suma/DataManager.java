@@ -306,17 +306,8 @@ public class DataManager {
 
 		routeStopsDao.create(new RouteStops(stop, route, sequence));
 
-		if (route.id == 326) { // U1
-		    stop.routes = (byte) (stop.routes | 1);
-		} else if (route.id == 468) { // U1N
-		    stop.routes = (byte) (stop.routes | (1 << 1));
-		} else if (route.id == 329) { // U2
-		    stop.routes = (byte) (stop.routes | (1 << 2));
-		} else if (route.id == 327) { // U6
-		    stop.routes = (byte) (stop.routes | (1 << 3));
-		} else if (route.id == 354) { // U9
-		    stop.routes = (byte) (stop.routes | (1 << 4));
-		}
+		stop.routes.add(route);
+
 		Log.v(TAG, "Stop routes " + stop.routes);
 		busStopDao.update(stop);
 
@@ -426,16 +417,13 @@ public class DataManager {
 	if (stopDao == null)
 	    stopDao = helper.getStopDao();
 
-	// Log.i(TAG, "Stop " + stopObj);
-
 	try {
 	    String time = stopObj.getString("time");
 
 	    GregorianCalendar calender = new GregorianCalendar();
-
 	    if (!time.equals("Due")) {
 
-		Log.i(TAG, "Time: " + time + " current time " + calender.getTime());
+		Log.v(TAG, "Time: " + time + " current time " + calender.getTime());
 
 		if (time.contains(":")) {
 		    String[] minAndHour = time.split(":");
@@ -446,29 +434,40 @@ public class DataManager {
 		    calender.add(Calendar.MINUTE, Integer.parseInt(time.substring(0, time.length() - 1)));
 		}
 
-		Log.i(TAG, "Date: " + calender.getTime());
-
+		Log.v(TAG, "Date: " + calender.getTime());
 	    }
-
-	    Stop stop;
 
 	    String name = stopObj.getString("name");
 
 	    BusRoute route;
+	    Direction dir = null;
 
 	    if (name.equals("U1N")) {
 		route = busRoutes.queryForId(468);
-	    } else if (name.startsWith("U1")) {
-		route = busRoutes.queryForId(326);
-	    } else if (name.startsWith("U2")) {
-		route = busRoutes.queryForId(329);
-	    } else if (name.startsWith("U6")) {
-		route = busRoutes.queryForId(327);
 	    } else if (name.startsWith("U9")) {
 		route = busRoutes.queryForId(354);
 	    } else {
-		Log.e(TAG, "Error selecting route for " + name);
-		return null;
+		if (name.startsWith("U1")) {
+		    route = busRoutes.queryForId(326);
+		} else if (name.startsWith("U2")) {
+		    route = busRoutes.queryForId(329);
+		} else if (name.startsWith("U6")) {
+		    route = busRoutes.queryForId(327);
+		} else {
+		    Log.e(TAG, "Error detecting route " + name);
+		    return null;
+		}
+
+		for (Direction possibleDir : route.directions) {
+		    if (name.charAt(3) == possibleDir.direction.charAt(0)) {
+			dir = possibleDir;
+			break;
+		    }
+		}
+		if (dir.direction.length() == 0) {
+		    Log.e(TAG, "Error detecting direction for " + name);
+		    return null;
+		}
 	    }
 
 	    String destString = stopObj.getString("dest");
@@ -499,52 +498,36 @@ public class DataManager {
 		return null;
 	    }
 
+	    Date now = new Date(System.currentTimeMillis());
+
+	    String busID = null;
+	    Stop stop;
+	    Bus bus;
 	    if (stopObj.has("vehicle")) {
+		busID = stopObj.getString("vehicle");
 
-		int vehicle = Integer.parseInt(stopObj.getString("vehicle"));
-		// Log.i(TAG, "Looking at vehicle " + vehicle + " (" + stopObj.getString("vehicle") + ")");
-		Bus bus = busDao.queryForId(vehicle);
+		QueryBuilder<Bus, Integer> busQueryBuilder = busDao.queryBuilder();
+		busQueryBuilder.where().eq(Bus.ID_FIELD_NAME, busID);
+		PreparedQuery<Bus> busPreparedQuery = busQueryBuilder.prepare();
+
+		bus = busDao.queryForFirst(busPreparedQuery);
+
 		if (bus == null) {
-		    // Log.i(TAG, "Cant find vehicle, creating");
-
-		    // for (Bus gotBus : busDao) {
-		    // Log.i(TAG, "Currently have bus " + gotBus.id);
-		    // }
-
-		    bus = new Bus(vehicle, route);
-		    busDao.create(bus);
+		    bus = new Bus(busID, route, dir);
+		    bus.destination = destStop;
+		} else {
+		    bus.destination = destStop;
+		    bus.route = route;
+		    bus.direction = dir;
 		}
 
-		Date now = new Date(System.currentTimeMillis());
-
-		stop = new Stop(stopObj.getString("name"), busStop, destStop, bus, calender.getTime(), now);
-		stop.route = route;
-
-		/*
-		 * if (bus.lastKnownStop != null) { stopDao.delete(bus.lastKnownStop); // TODO Crude, might delete useful data
-		 * 
-		 * if (bus.lastKnownStop.arivalTime == null) { Log.e(TAG, " bus.lastKnownStop.arivalTime is null"); } else if (stop.arivalTime == null) {
-		 * Log.e(TAG, " stop.arivalTime is null"); }
-		 * 
-		 * if (bus.lastKnownStop.arivalTime.before(stop.arivalTime) && bus.lastKnownStop.arivalTime.after(now)) { bus.lastKnownStop = stop;
-		 * 
-		 * if (bus.firstKnownStop == null) { bus.firstKnownStop = stop;
-		 * 
-		 * } else if (!bus.firstKnownStop.busStop.equals(stop.busStop)) { stopDao.delete(bus.firstKnownStop); // TODO Crude, might delete useful data
-		 * 
-		 * bus.firstKnownStop = stop; }
-		 * 
-		 * } }
-		 */
-
-		// busDao.update(bus);
-
 	    } else {
-
-		stop = new Stop(stopObj.getString("name"), busStop, destStop, calender.getTime(), new Date(System.currentTimeMillis()));
-		stop.route = route;
-
+		bus = new Bus(null, route, dir);
 	    }
+
+	    busDao.update(bus);
+
+	    stop = new Stop(bus, busStop, calender.getTime(), now);
 
 	    return stop;
 
@@ -553,62 +536,6 @@ public class DataManager {
 	    Log.e(TAG, "Error parsing stop " + stopObj, e);
 	    return null;
 	}
-
-    }
-
-    public static boolean updateStop(BusStop busStop, boolean onlyUniLink) {
-	String file = getFileFromServer(busStopUrl + busStop.id + ".json");
-
-	try {
-	    JSONObject data = new JSONObject(file);
-
-	    JSONArray stopsArray = data.getJSONArray("stops");
-
-	    // Log.i(TAG, "Number of entries " + data.length());
-
-	    // Log.i(TAG, "Stops: " + data.getJSONArray("stops"));
-
-	    for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
-		JSONObject stopObj = stopsArray.getJSONObject(stopNum);
-
-		if (onlyUniLink && !stopObj.getString("name").startsWith("U")) {
-		    continue;
-		}
-
-		Stop stop = getStop(context, stopObj, busStop);
-
-		if (stop == null) {
-		    Log.w(TAG, "Null stop, skiping");
-		    continue;
-		}
-
-		if (stop.bus != null) {
-		    Log.i(TAG, "Found stop for " + stop.bus.id + " at " + stop.busStop.id + " at " + stop.arivalTime);
-		} else {
-		    if (stop.name == null) {
-			Log.e(TAG, "Null name");
-		    } else if (stop.busStop == null) {
-			Log.e(TAG, "Null busStop");
-		    } else if (stop.arivalTime == null) {
-			Log.e(TAG, "Null arivalTime");
-		    }
-		    Log.i(TAG, "Found stop for a unidentified " + stop.name + " at " + stop.busStop.id + " at " + stop.arivalTime);
-		}
-
-		// stopDao.create(stop);
-	    }
-	} catch (JSONException ex) {
-	    Log.e(TAG, "", ex);
-
-	    return false;
-	} catch (SQLException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-
-	    return false;
-	}
-
-	return false;
 
     }
 
@@ -655,11 +582,7 @@ public class DataManager {
 		    continue;
 		}
 
-		if (stop.bus != null) {
-		    Log.i(TAG, "Found stop for " + stop.bus.id + " at " + stop.busStop.id + " at " + stop.arivalTime);
-		} else {
-		    Log.i(TAG, "Found stop for a unidentified " + stop.name + " at " + stop.busStop.id + " at " + stop.arivalTime);
-		}
+		Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
 
 		timetable.add(stop);
 	    }

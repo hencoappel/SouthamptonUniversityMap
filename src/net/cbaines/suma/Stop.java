@@ -23,54 +23,64 @@ import java.util.Date;
 
 import android.text.format.DateUtils;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
-
-@DatabaseTable(tableName = "stops")
+/**
+ * Stop represents a Bus stopping at a time at a BusStop.
+ * 
+ * @author Christopher Baines <cbaines8@gmail.com>
+ * 
+ */
 public class Stop {
 
-    @DatabaseField(generatedId = true)
+    public static final String ID_FIELD_NAME = "id";
+    public static final String BUS_FIELD_NAME = "bus";
+    public static final String BUS_STOP_FIELD_NAME = "busStop";
+    public static final String ARIVAL_TIME_FIELD_NAME = "arivalTime";
+    public static final String FETCH_TIME_FIELD_NAME = "timeOfFetch";
+
+    /**
+     * A generated id for the bus
+     */
     int id;
 
-    @DatabaseField(canBeNull = false)
-    public String name;
+    /**
+     * The Bus stopping at the stop
+     */
+    Bus bus;
 
-    @DatabaseField(canBeNull = false, foreign = true)
-    BusStop destStop;
+    /**
+     * The busStop that the bus is stopping at
+     */
+    BusStop busStop;
 
-    @DatabaseField(canBeNull = true, foreign = true)
-    public Bus bus;
+    /**
+     * The time that the bus is estimated to arrive
+     */
+    Date arivalTime;
 
-    @DatabaseField(canBeNull = false, foreign = true)
-    public BusStop busStop;
-
-    @DatabaseField(canBeNull = false)
-    public Date arivalTime;
-
-    @DatabaseField(canBeNull = false)
+    /**
+     * The time this data was fetched from the server
+     */
     Date timeOfFetch;
 
-    BusRoute route;
-
-    Stop() {
-
-    }
-
-    public Stop(String name, BusStop busStop, BusStop dest, Bus bus, Date arivalTime, Date timeOfFetch) {
-	this.name = name;
+    /**
+     * 
+     * @param bus
+     * @param busStop
+     * @param arivalTime
+     * @param timeOfFetch
+     */
+    public Stop(Bus bus, BusStop busStop, Date arivalTime, Date timeOfFetch) {
 	this.busStop = busStop;
-	this.destStop = dest;
 	this.bus = bus;
 	this.arivalTime = arivalTime;
 	this.timeOfFetch = timeOfFetch;
     }
 
-    public Stop(String name, BusStop busStop, BusStop dest, Date arivalTime, Date timeOfFetch) {
-	this(name, busStop, dest, null, arivalTime, timeOfFetch);
-    }
-
+    /**
+     * 
+     * @return
+     */
     public String getTimeToArival() {
-
 	if (arivalTime.getTime() - System.currentTimeMillis() <= 60000) {
 	    return "Due";
 	} else {
@@ -89,12 +99,16 @@ public class Stop {
 	return result;
     }
 
+    /**
+     * A printout of the stop data for debugging
+     */
     @Override
     public String toString() {
-	return "Stop [id=" + id + ", bus=" + bus + ", busStop=" + busStop + ", arivalTime=" + arivalTime + "]";
+	return "Stop [bus=" + bus + ", busStop=" + busStop + ", arivalTime=" + arivalTime + "]";
     }
 
     @Override
+    // TODO: If this is used, the paramaters need to be checked?
     public boolean equals(Object obj) {
 	if (this == obj)
 	    return true;

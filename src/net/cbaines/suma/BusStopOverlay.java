@@ -21,8 +21,9 @@ package net.cbaines.suma;
 
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-
 
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
@@ -67,7 +68,7 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 
     private float userScale = 1f;
 
-    private boolean[] routes = new boolean[5];
+    private HashMap<BusRoute, Boolean> routes = new HashMap<BusRoute, Boolean>();
 
     public BusStopOverlay(Context context) throws SQLException {
 	super(context);
@@ -90,8 +91,8 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 	Log.i(TAG, "Finished loading bus stops in to overlay " + (System.currentTimeMillis() - startTime));
     }
 
-    void setRoutes(int route, boolean visible) {
-	routes[route] = visible;
+    void setRoutes(BusRoute route, boolean visible) {
+	routes.put(route, visible);
     }
 
     @Override
@@ -118,21 +119,15 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 	for (int stopNum = 0; stopNum < busStops.size(); stopNum++) {
 	    BusStop stop = busStops.get(stopNum);
 
-	    final byte stopRoutes = stop.routes;
 	    byte routeNum = 0;
-	    boolean drawing = false;
 
-	    for (int i = 0; i < 5; i++) {
-		if ((stopRoutes & (1 << i)) != 0) {
-		    routeNum++;
-		    if (routes[i]) {
-			drawing = true;
-		    }
+	    for (Iterator<BusRoute> busRouteIter = stop.routes.iterator(); busRouteIter.hasNext();) {
+		BusRoute route = busRouteIter.next();
+		if (routes.get(route)) {
+		    break;
 		}
-	    }
-
-	    if (!drawing)
 		continue;
+	    }
 
 	    int yOfsetPerMarker = (int) (10 * scale);
 	    int markerYSize = (int) (8 * scale);
@@ -159,35 +154,33 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 		yOfsetPerMarker = (int) (8 * scale);
 	    }
 
-	    for (int i = 0; i < 5; i++) {
-		if ((stopRoutes & (1 << i)) != 0) {
+	    for (BusRoute route : stop.routes) {
 
-		    // Log.i(TAG, "Route " + route + " is " + routes.get(route));
+		// Log.i(TAG, "Route " + route + " is " + routes.get(route));
 
-		    // Log.i(TAG, "Index is " + busRoutes.indexOf(route) + " busRoutes " + busRoutes);
+		// Log.i(TAG, "Index is " + busRoutes.indexOf(route) + " busRoutes " + busRoutes);
 
-		    if (i == 0) {
-			paint.setColor(U1);
-		    } else if (i == 1) {
-			paint.setColor(U1N);
-		    } else if (i == 2) {
-			paint.setColor(U2);
-		    } else if (i == 3) {
-			paint.setColor(U6);
-		    } else if (i == 4) {
-			paint.setColor(U9);
-		    } else {
-			Log.e(TAG, "Unknown route code");
-		    }
-
-		    canvas.drawRect(rectLeft, mCurScreenCoords.y + ((yOfsetPerMarker * makersPlaced) - (45 * scale)), rectRight, mCurScreenCoords.y
-			    + (yOfsetPerMarker * makersPlaced) - ((45 * scale) - markerYSize), paint);
-
-		    makersPlaced++;
+		if (route.code.equals("U1")) {
+		    paint.setColor(U1);
+		} else if (route.code.equals("U1N")) {
+		    paint.setColor(U1N);
+		} else if (route.code.equals("U2")) {
+		    paint.setColor(U2);
+		} else if (route.code.equals("U6")) {
+		    paint.setColor(U6);
+		} else if (route.code.equals("U9")) {
+		    paint.setColor(U9);
+		} else {
+		    Log.e(TAG, "Unknown route code");
 		}
-	    }
 
+		canvas.drawRect(rectLeft, mCurScreenCoords.y + ((yOfsetPerMarker * makersPlaced) - (45 * scale)), rectRight, mCurScreenCoords.y
+			+ (yOfsetPerMarker * makersPlaced) - ((45 * scale) - markerYSize), paint);
+
+		makersPlaced++;
+	    }
 	}
+
     }
 
     @Override
@@ -291,17 +284,13 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 	    pj.toPixels(busStop.point, mItemPoint);
 
 	    if (marker.getBounds().contains(mTouchScreenPoint.x - mItemPoint.x, mTouchScreenPoint.y - mItemPoint.y)) {
-		boolean drawing = false;
-		for (int route = 0; route < 5; route++) {
-		    if ((busStop.routes & (1 << route)) != 0) {
-			if (routes[route]) {
-			    drawing = true;
-			    break;
-			}
+		for (Iterator<BusRoute> busRouteIter = busStop.routes.iterator(); busRouteIter.hasNext();) {
+		    BusRoute route = busRouteIter.next();
+		    if (routes.get(route)) {
+			break;
 		    }
-		}
-		if (!drawing)
 		    continue;
+		}
 
 		return busStop;
 	    }

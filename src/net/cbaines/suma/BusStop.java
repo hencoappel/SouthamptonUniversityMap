@@ -19,25 +19,43 @@
 
 package net.cbaines.suma;
 
+import java.util.HashSet;
+
 import org.osmdroid.util.GeoPoint;
 
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
+/**
+ * Represents a physical bus stop on the map,
+ * 
+ * @author Christopher Baines <cbaines8@gmail.com>
+ * 
+ */
 @DatabaseTable(tableName = "busstops")
 public class BusStop extends POI {
     public static final String DESCRIPTION_FIELD_NAME = "description";
     public static final String BAY_FIELD_NAME = "bay";
     public static final String ROUTES_FIELD_NAME = "bay";
 
+    /**
+     * Description e.g. "Bournemouth Rd os Asda S"
+     */
     @DatabaseField(canBeNull = true)
     public String description;
+
+    /**
+     * Unknown, "" for all UniLink stops
+     */
     @DatabaseField(canBeNull = true)
     public String bay;
 
-    // Used to speed up accessing the relevent uni link routes for a bus stop, if == 0, this is not a uni link stop
-    @DatabaseField(canBeNull = false)
-    public byte routes;
+    /**
+     * Used to speed up accessing the relevent uni link routes for a bus stop, this is not a uni link stop
+     */
+    @ForeignCollectionField(eager = false)
+    public HashSet<BusRoute> routes;
 
     public BusStop(String location, String description, String bay, GeoPoint point) {
 	this.id = location;

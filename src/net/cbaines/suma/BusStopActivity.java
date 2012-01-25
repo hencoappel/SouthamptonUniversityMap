@@ -20,16 +20,11 @@
 package net.cbaines.suma;
 
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Iterator;
 
-import org.osmdroid.util.GeoPoint;
-
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -68,6 +63,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     private LinearLayout busTimeContentLayout;
 
     protected Timetable timetable;
+    private Timetable visibleTimetable;
 
     protected String busStopID;
     private String busStopName;
@@ -309,6 +305,23 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	// Handle item selection
 	switch (item.getItemId()) {
 	case R.id.menu_previous_stop:
+	    if (visibleTimetable.size() != 0) {
+		HashSet<BusRoute> routes = new HashSet<BusRoute>();
+
+		for (Stop stop : visibleTimetable) {
+		    routes.add(stop.bus.route);
+		}
+
+		// TODO: Most of the following
+
+		if (routes.size() == 1) {
+		    try {
+			routes.iterator().next().moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), new Direction(), 1);
+		    } catch (SQLException e) {
+			e.printStackTrace();
+		    }
+		}
+	    }
 	    break;
 	case R.id.menu_next_stop:
 	    break;
@@ -331,9 +344,9 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     }
 
     private void displayTimetable(Timetable timetable) {
-	Timetable timetableToDisplay = (Timetable) timetable.clone();
+	visibleTimetable = (Timetable) timetable.clone();
 
-	Log.i(TAG, "It contains " + timetableToDisplay.size() + " stops");
+	Log.i(TAG, "It contains " + visibleTimetable.size() + " stops");
 
 	if (timetable.size() == 0) {
 	    busStopMessage.setText("No Busses");
@@ -341,33 +354,33 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	    busTimeContentLayout.setGravity(Gravity.CENTER);
 	} else {
 
-	    for (Iterator<Stop> stopIter = timetableToDisplay.iterator(); stopIter.hasNext();) {
+	    for (Iterator<Stop> stopIter = visibleTimetable.iterator(); stopIter.hasNext();) {
 		Stop stop = stopIter.next();
-		Log.i(TAG, "Begin filtering, looking at " + stop + " with route " + stop.route.code);
-		if (stop.route.code.equals("U1")) {
+		Log.i(TAG, "Begin filtering, looking at " + stop + " with route " + stop.bus.route.code);
+		if (stop.bus.route.code.equals("U1")) {
 		    if (!U1RouteRadioButton.isChecked()) {
 			stopIter.remove();
 		    }
-		} else if (stop.route.code.equals("U1N")) {
+		} else if (stop.bus.route.code.equals("U1N")) {
 		    if (!U1NRouteRadioButton.isChecked()) {
 			stopIter.remove();
 		    }
-		} else if (stop.route.code.equals("U2")) {
+		} else if (stop.bus.route.code.equals("U2")) {
 		    if (!U2RouteRadioButton.isChecked()) {
 			stopIter.remove();
 		    }
-		} else if (stop.route.code.equals("U6")) {
+		} else if (stop.bus.route.code.equals("U6")) {
 		    if (!U6RouteRadioButton.isChecked()) {
 			stopIter.remove();
 		    }
-		} else if (stop.route.code.equals("U9")) {
+		} else if (stop.bus.route.code.equals("U9")) {
 		    if (!U9RouteRadioButton.isChecked()) {
 			stopIter.remove();
 		    }
 		}
 	    }
 
-	    if (timetableToDisplay.size() == 0) {
+	    if (visibleTimetable.size() == 0) {
 		busTimeContentLayout.setGravity(Gravity.CENTER);
 		busStopMessage.setText("No Busses (With the current enabled routes)");
 		busStopMessage.setVisibility(View.VISIBLE);
@@ -377,9 +390,9 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		busStopMessage.setVisibility(View.GONE);
 		TimetableAdapter adapter;
 		if ((adapter = (TimetableAdapter) busTimeList.getAdapter()) != null) {
-		    adapter.updateTimetable(timetableToDisplay);
+		    adapter.updateTimetable(visibleTimetable);
 		} else {
-		    adapter = new TimetableAdapter(this, timetableToDisplay);
+		    adapter = new TimetableAdapter(this, visibleTimetable);
 		    busTimeList.setAdapter(adapter);
 		}
 		busTimeContentLayout.setGravity(Gravity.TOP);

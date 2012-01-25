@@ -40,7 +40,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final String DATABASE_PATH = "/data/data/net.cbaines.suma/databases/";
     private static final String DATABASE_NAME = "data.db";
 
-    private static final int DATABASE_VERSION = 36;
+    private static final int DATABASE_VERSION = 37;
 
     private static final String TAG = "DatabaseHelper";
 
