@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
@@ -137,6 +138,7 @@ public class BusRoute {
 	} catch (SQLException e) {
 	    e.printStackTrace();
 	}
+	Log.e("BusRoute", "Error moving in route");
 	return null;
     }
 

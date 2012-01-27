@@ -78,10 +78,10 @@ public class StopView extends LinearLayout implements OnClickListener {
 
 	    busDao.refresh(stop.bus);
 
-	    if (stop.bus != null) {
+	    if (stop.bus.id != null) {
 		onClickMessage = "Bus " + stop.bus.toString() + " at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
 	    } else {
-		onClickMessage = "Unidentified bus at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		onClickMessage = "Unidentified bus (" + stop.bus.getName() + ") at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
 	    }
 	} catch (SQLException e) {
 	    e.printStackTrace();

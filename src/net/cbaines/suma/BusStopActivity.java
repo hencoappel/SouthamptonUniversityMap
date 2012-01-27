@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -305,6 +306,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	// Handle item selection
 	switch (item.getItemId()) {
 	case R.id.menu_previous_stop:
+	    Log.v(TAG, "Got a request for the previous stop");
 	    if (visibleTimetable.size() != 0) {
 		HashSet<BusRoute> routes = new HashSet<BusRoute>();
 
@@ -312,18 +314,77 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		    routes.add(stop.bus.route);
 		}
 
-		// TODO: Most of the following
+		Log.v(TAG, routes.size() + " routes in the visible timetable");
 
 		if (routes.size() == 1) {
-		    try {
-			routes.iterator().next().moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), new Direction(), 1);
-		    } catch (SQLException e) {
-			e.printStackTrace();
+		    HashSet<Direction> directions = new HashSet<Direction>();
+
+		    for (Stop stop : visibleTimetable) {
+			directions.add(stop.bus.direction);
 		    }
+
+		    Log.v(TAG, directions.size() + " directions in the visible timetable");
+
+		    if (directions.size() == 1) {
+			try {
+			    BusStop previous = routes.iterator().next()
+				    .moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), 1);
+			    Intent i = new Intent(this, BusStopActivity.class);
+			    i.putExtra("busStopID", previous.id);
+			    i.putExtra("busStopName", previous.description);
+			    startActivity(i);
+			} catch (SQLException e) {
+			    e.printStackTrace();
+			}
+		    } else {
+			// Show dialog
+		    }
+		} else {
+		    // Show dialog
 		}
 	    }
 	    break;
 	case R.id.menu_next_stop:
+	    Log.v(TAG, "Got a request for the next stop");
+	    if (visibleTimetable.size() != 0) {
+		HashSet<BusRoute> routes = new HashSet<BusRoute>();
+
+		for (Stop stop : visibleTimetable) {
+		    routes.add(stop.bus.route);
+		}
+
+		Log.v(TAG, routes.size() + " routes in the visible timetable");
+
+		if (routes.size() == 1) {
+		    HashSet<Direction> directions = new HashSet<Direction>();
+
+		    for (Stop stop : visibleTimetable) {
+			directions.add(stop.bus.direction);
+		    }
+
+		    Log.v(TAG, directions.size() + " directions in the visible timetable");
+
+		    if (directions.size() == 1) {
+			try {
+			    BusStop next = routes.iterator().next()
+				    .moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), 1);
+			    Intent i = new Intent(this, BusStopActivity.class);
+			    if (next.id == null) {
+				Log.e(TAG, "next.id == null");
+			    }
+			    i.putExtra("busStopID", next.id);
+			    i.putExtra("busStopName", next.description);
+			    startActivity(i);
+			} catch (SQLException e) {
+			    e.printStackTrace();
+			}
+		    } else {
+			// Show dialog
+		    }
+		} else {
+		    // Show dialog
+		}
+	    }
 	    break;
 	case R.id.menu_refresh_stop:
 	    if (mHandler != null) { // BusTimes are enabled
