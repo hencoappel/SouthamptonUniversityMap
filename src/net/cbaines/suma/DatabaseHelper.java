@@ -51,7 +51,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<RouteStops, Integer> routeStopsDao = null;
     private Dao<Site, String> siteDao = null;
     private Dao<Bus, Integer> busDao = null;
-    private Dao<Direction, Integer> directionDao = null;
 
     private Context context;
 
@@ -71,7 +70,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	    TableUtils.createTable(connectionSource, RouteStops.class);
 	    TableUtils.createTable(connectionSource, Site.class);
 	    TableUtils.createTable(connectionSource, Bus.class);
-	    TableUtils.createTable(connectionSource, Direction.class);
 	} catch (SQLException e) {
 	    Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
 	    throw new RuntimeException(e);
@@ -138,16 +136,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	    siteDao = getDao(Site.class);
 	}
 	return siteDao;
-    }
-
-    /**
-     * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached value.
-     */
-    public Dao<Direction, Integer> getDirectionDao() throws SQLException {
-	if (directionDao == null) {
-	    directionDao = getDao(Direction.class);
-	}
-	return directionDao;
     }
 
     /**
@@ -267,6 +255,5 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 	routeStopsDao = null;
 	siteDao = null;
 	busDao = null;
-	directionDao = null;
     }
 }

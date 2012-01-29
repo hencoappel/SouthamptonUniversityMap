@@ -20,6 +20,7 @@
 package net.cbaines.suma;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Timetable extends ArrayList<Stop> {
 
@@ -27,6 +28,8 @@ public class Timetable extends ArrayList<Stop> {
      * 
      */
     private static final long serialVersionUID = -9021303378059511643L;
+    
+    Date fetchTime;
 
     public String toString() {
 	StringBuilder sb = new StringBuilder();

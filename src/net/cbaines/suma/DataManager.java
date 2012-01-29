@@ -65,13 +65,10 @@ public class DataManager {
 
     final static String busStopUrl = "http://data.southampton.ac.uk/bus-stop/";
 
-    private static Context context;
-
     private static DatabaseHelper helper;
     private static Dao<BusRoute, Integer> busRoutes;
     private static Dao<Bus, Integer> busDao;
     private static Dao<BusStop, String> busStopDao;
-    private static Dao<Stop, Integer> stopDao;
 
     public static void loadBuildings(Context context) throws SQLException, IOException {
 	DatabaseHelper helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
@@ -82,7 +79,6 @@ public class DataManager {
 	Log.i(TAG, "Loading buildings from csv");
 
 	HashMap<String, GeoPoint> buildingPoints = new HashMap<String, GeoPoint>();
-	HashMap<String, Polygon> buildingPolys = new HashMap<String, Polygon>();
 
 	InputStream inputStream = context.getAssets().open("buildings_points.csv");
 	BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -205,12 +201,10 @@ public class DataManager {
 	Dao<BusStop, String> busStopDao = helper.getBusStopDao();
 	Dao<BusRoute, Integer> busRouteDao = helper.getBusRouteDao();
 	Dao<RouteStops, Integer> routeStopsDao = helper.getRouteStopsDao();
-	Dao<Direction, Integer> directionDao = helper.getDirectionDao();
 
 	TableUtils.clearTable(helper.getConnectionSource(), BusStop.class);
 	TableUtils.clearTable(helper.getConnectionSource(), BusRoute.class);
 	TableUtils.clearTable(helper.getConnectionSource(), RouteStops.class);
-	TableUtils.clearTable(helper.getConnectionSource(), Direction.class);
 
 	Log.i(TAG, "Loading busstops from csv");
 
@@ -260,7 +254,12 @@ public class DataManager {
 		// Log.i(TAG, "Data: " + strLine);
 		String[] dataBits = strLine.split(",");
 
-		BusRoute route = new BusRoute(Integer.parseInt(dataBits[0]), dataBits[1], dataBits[2].replace("\"", ""));
+		BusRoute route;
+		if (dataBits.length > 3) {
+		    route = new BusRoute(Integer.parseInt(dataBits[0]), dataBits[1], dataBits[2].replace("\"", ""), dataBits[3], dataBits[4]);
+		} else {
+		    route = new BusRoute(Integer.parseInt(dataBits[0]), dataBits[1], dataBits[2].replace("\"", ""));
+		}
 		// Log.i(TAG, "Loaded route " + route.id + " " + route.code + " " + route.label);
 		busRouteDao.create(route);
 
@@ -272,14 +271,6 @@ public class DataManager {
 	    Log.e(TAG, "Line: " + strLine);
 	    e.printStackTrace();
 	}
-
-	directionDao.create(new Direction("A", busRouteDao.queryForId(326)));
-	directionDao.create(new Direction("C", busRouteDao.queryForId(326)));
-	directionDao.create(new Direction("E", busRouteDao.queryForId(326)));
-	directionDao.create(new Direction("B", busRouteDao.queryForId(329)));
-	directionDao.create(new Direction("C", busRouteDao.queryForId(329)));
-	directionDao.create(new Direction("C", busRouteDao.queryForId(327)));
-	directionDao.create(new Direction("H", busRouteDao.queryForId(327)));
 
 	Log.i(TAG, "Finished loading routes, now loading routestops");
 
@@ -457,7 +448,7 @@ public class DataManager {
 	    String name = stopObj.getString("name");
 
 	    BusRoute route;
-	    Direction dir = null;
+	    String dir = null;
 
 	    if (name.equals("U1N")) {
 		route = busRoutes.queryForId(468);
@@ -475,13 +466,11 @@ public class DataManager {
 		    return null;
 		}
 
-		for (Direction possibleDir : route.directions) {
-		    if (name.charAt(2) == possibleDir.direction.charAt(0)) {
-			dir = possibleDir;
-			break;
-		    }
-		}
-		if (dir.direction.length() == 0) {
+		if (route.forwardDirection.equals(name.substring(2))) {
+		    dir = route.forwardDirection;
+		} else if (route.reverseDirection.equals(name.substring(2))) {
+		    dir = route.reverseDirection;
+		} else {
 		    Log.e(TAG, "Error detecting direction for " + name);
 		    return null;
 		}
@@ -607,6 +596,7 @@ public class DataManager {
 	    return null;
 	}
 
+	timetable.fetchTime = new Date(System.currentTimeMillis());
 	return timetable;
     }
 

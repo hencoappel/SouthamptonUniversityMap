@@ -3,27 +3,27 @@
 
     <item
         android:id="@+id/menu_find"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_menu_search"
         android:title="@string/menu_find"/>
     <item
         android:id="@+id/menu_preferences"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/ic_menu_preferences"
         android:title="@string/menu_preferences"/>
     <item
         android:id="@+id/menu_find_my_location"
-        android:icon="@android:drawable/ic_menu_mylocation"
+        android:icon="@drawable/ic_menu_mylocation"
         android:title="@string/menu_find_my_location"/>
     <item
         android:id="@+id/menu_view"
-        android:icon="@android:drawable/ic_menu_more"
+        android:icon="@drawable/ic_menu_more"
         android:title="@string/menu_view"/>
     <item
         android:id="@+id/menu_about"
-        android:icon="@android:drawable/ic_menu_info_details"
+        android:icon="@drawable/ic_menu_info_details"
         android:title="@string/menu_about"/>
     <item
         android:id="@+id/menu_favourites"
-        android:icon="@android:drawable/star_off"
+        android:icon="@drawable/ic_menu_star"
         android:title="@string/menu_favourites"/>
 
 </menu>

@@ -53,8 +53,8 @@ public class Bus {
     /**
      * The direction which the bus is travelling.
      */
-    @DatabaseField(canBeNull = true, foreign = true)
-    Direction direction;
+    @DatabaseField(canBeNull = false)
+    String direction;
 
     /**
      * The destination the bus is travelling towards.
@@ -75,10 +75,10 @@ public class Bus {
      * @param dir
      *            The direction which the bus is travelling.
      */
-    Bus(String id, BusRoute route, Direction dir) {
+    Bus(String id, BusRoute route, String direction) {
 	this.id = id;
 	this.route = route;
-	this.direction = dir;
+	this.direction = direction;
     }
 
     /**

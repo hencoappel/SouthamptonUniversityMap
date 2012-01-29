@@ -20,7 +20,6 @@
 package net.cbaines.suma;
 
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
@@ -29,7 +28,6 @@ import android.util.Log;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.DatabaseTable;
@@ -56,19 +54,28 @@ public class BusRoute {
     @DatabaseField
     public String code;
 
-    @DatabaseField
+    @DatabaseField(canBeNull = false)
     String label;
 
-    @ForeignCollectionField(eager = false)
-    Collection<Direction> directions;
+    @DatabaseField(canBeNull = true)
+    String forwardDirection;
+
+    @DatabaseField(canBeNull = true)
+    String reverseDirection;
 
     BusRoute() {
     }
 
-    public BusRoute(Integer id, String code, String label) {
+    public BusRoute(Integer id, String code, String label, String forwardDirection, String reverseDirection) {
 	this.id = id.intValue();
 	this.code = code;
 	this.label = label;
+	this.forwardDirection = forwardDirection;
+	this.reverseDirection = reverseDirection;
+    }
+
+    public BusRoute(Integer id, String code, String label) {
+	this(id, code, label, null, null);
     }
 
     public String toString() {
@@ -82,7 +89,7 @@ public class BusRoute {
      * @param stop
      * @return
      */
-    BusStop getBusStopBefore(Context context, BusStop stop, Direction dir) {
+    BusStop getBusStopBefore(Context context, BusStop stop, String dir) {
 	return moveInRoute(context, stop, dir, -1);
     }
 
@@ -93,7 +100,7 @@ public class BusRoute {
      * @param stop
      * @return
      */
-    BusStop getStopAfter(Context context, BusStop stop, Direction dir) {
+    BusStop getStopAfter(Context context, BusStop stop, String dir) {
 	return moveInRoute(context, stop, dir, 1);
     }
 
@@ -105,8 +112,30 @@ public class BusRoute {
      * @param moveAmount
      * @return
      */
-    BusStop moveInRoute(Context context, BusStop stop, Direction dir, int moveAmount) {
+    BusStop moveInRoute(Context context, BusStop stop, String direction, int moveAmount) {
+	if (moveAmount == 0) {
+	    return stop;
+	}
+
 	DatabaseHelper helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
+
+	if (forwardDirection != null) {
+
+	    if (direction == null) {
+		return null;
+	    }
+
+	    if (forwardDirection.equals(direction)) {
+
+	    } else if (reverseDirection.equals(direction)) {
+		moveAmount = -moveAmount;
+	    } else {
+		Log.e("BusRoute", "Direction (" + direction + ") doesnt match either the forward direction (" + forwardDirection + ") or reverse direction ("
+			+ reverseDirection + ")");
+		return null;
+	    }
+
+	}
 
 	try {
 	    Dao<RouteStops, Integer> routeStopsDao = helper.getRouteStopsDao();
@@ -117,19 +146,22 @@ public class BusRoute {
 	    PreparedQuery<RouteStops> routeStopsPreparedQuery = routeStopsQueryBuilder.prepare();
 
 	    List<RouteStops> routeStopsFound = routeStopsDao.query(routeStopsPreparedQuery);
+	    Log.v("BusRoute", "Found " + routeStopsFound.size() + " stops");
 
 	    if (moveAmount > 0) {
-		for (int i = 0; i < routeStopsFound.size(); i++) {
-		    if (stop.equals(routeStopsFound.get(i))) {
-			int stopWanted = (i + moveAmount) % (routeStopsFound.size() + 1);
-			busStopDao.refresh(routeStopsFound.get(stopWanted).stop);
+		Log.v("BusRoute", "Moving forward in direction " + direction + " " + moveAmount + " stops");
 
-			return routeStopsFound.get(stopWanted).stop;
-		    }
-		}
+		int stopWanted = (routeStopsFound.indexOf(stop) + moveAmount) % (routeStopsFound.size() + 1);
+		busStopDao.refresh(routeStopsFound.get(stopWanted).stop);
+
+		return routeStopsFound.get(stopWanted).stop;
 	    } else {
-		int maxSeq = routeStopsFound.size() - 1;
-		int stopWanted = maxSeq - (Math.abs(maxSeq) % (routeStopsFound.size() + 1));
+		Log.v("BusRoute", "Moving backwards in direction " + direction + " " + moveAmount + " stops");
+
+		int stopWanted = routeStopsFound.indexOf(stop) + moveAmount;
+		if (stopWanted < 0) {
+		    stopWanted = routeStopsFound.size() - (Math.abs(stopWanted) % routeStopsFound.size());
+		}
 		busStopDao.refresh(routeStopsFound.get(stopWanted).stop);
 
 		return routeStopsFound.get(stopWanted).stop;

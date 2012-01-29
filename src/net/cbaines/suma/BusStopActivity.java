@@ -209,6 +209,9 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	    } else {
 		Log.i(TAG, "Displaying previous timetable");
 		displayTimetable(timetable);
+		if (System.currentTimeMillis() - timetable.fetchTime.getTime() > 20000) {
+		    mHandler.post(refreshData);
+		}
 	    }
 
 	} else {
@@ -304,9 +307,8 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 	// Handle item selection
-	switch (item.getItemId()) {
-	case R.id.menu_previous_stop:
-	    Log.v(TAG, "Got a request for the previous stop");
+	if (item.getItemId() == R.id.menu_previous_stop || item.getItemId() == R.id.menu_next_stop) {
+	    Log.v(TAG, "Got a request for the stop movement");
 	    if (visibleTimetable.size() != 0) {
 		HashSet<BusRoute> routes = new HashSet<BusRoute>();
 
@@ -317,7 +319,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		Log.v(TAG, routes.size() + " routes in the visible timetable");
 
 		if (routes.size() == 1) {
-		    HashSet<Direction> directions = new HashSet<Direction>();
+		    HashSet<String> directions = new HashSet<String>();
 
 		    for (Stop stop : visibleTimetable) {
 			directions.add(stop.bus.direction);
@@ -325,55 +327,22 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 		    Log.v(TAG, directions.size() + " directions in the visible timetable");
 
-		    if (directions.size() == 1) {
+		    if (directions.size() <= 1) {
 			try {
-			    BusStop previous = routes.iterator().next()
-				    .moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), 1);
+			    BusStop stop;
+			    if (item.getItemId() == R.id.menu_next_stop) {
+				stop = routes.iterator().next()
+					.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), 1);
+			    } else {
+				stop = routes.iterator().next()
+					.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), -1);
+			    }
 			    Intent i = new Intent(this, BusStopActivity.class);
-			    i.putExtra("busStopID", previous.id);
-			    i.putExtra("busStopName", previous.description);
-			    startActivity(i);
-			} catch (SQLException e) {
-			    e.printStackTrace();
-			}
-		    } else {
-			// Show dialog
-		    }
-		} else {
-		    // Show dialog
-		}
-	    }
-	    break;
-	case R.id.menu_next_stop:
-	    Log.v(TAG, "Got a request for the next stop");
-	    if (visibleTimetable.size() != 0) {
-		HashSet<BusRoute> routes = new HashSet<BusRoute>();
-
-		for (Stop stop : visibleTimetable) {
-		    routes.add(stop.bus.route);
-		}
-
-		Log.v(TAG, routes.size() + " routes in the visible timetable");
-
-		if (routes.size() == 1) {
-		    HashSet<Direction> directions = new HashSet<Direction>();
-
-		    for (Stop stop : visibleTimetable) {
-			directions.add(stop.bus.direction);
-		    }
-
-		    Log.v(TAG, directions.size() + " directions in the visible timetable");
-
-		    if (directions.size() == 1) {
-			try {
-			    BusStop next = routes.iterator().next()
-				    .moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), 1);
-			    Intent i = new Intent(this, BusStopActivity.class);
-			    if (next.id == null) {
+			    if (stop.id == null) {
 				Log.e(TAG, "next.id == null");
 			    }
-			    i.putExtra("busStopID", next.id);
-			    i.putExtra("busStopName", next.description);
+			    i.putExtra("busStopID", stop.id);
+			    i.putExtra("busStopName", stop.description);
 			    startActivity(i);
 			} catch (SQLException e) {
 			    e.printStackTrace();
@@ -382,11 +351,13 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 			// Show dialog
 		    }
 		} else {
+		    // if (all routes point to the same (next/previous) stop) {
+		    // move to that stop
+		    // else
 		    // Show dialog
 		}
 	    }
-	    break;
-	case R.id.menu_refresh_stop:
+	} else if (item.getItemId() == R.id.menu_refresh_stop) {
 	    if (mHandler != null) { // BusTimes are enabled
 		mHandler.removeCallbacks(refreshData);
 		timetableTask.cancel(true);
@@ -396,8 +367,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	    } else {
 		// TODO: Toast here...
 	    }
-	    break;
-	default:
+	} else {
 	    Log.e(TAG, "No known menu option selected");
 	    return super.onOptionsItemSelected(item);
 	}
