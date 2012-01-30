@@ -30,6 +30,7 @@ import org.json.JSONException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Path.Direction;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -327,31 +328,39 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	    Log.v(TAG, "Got a request for the stop movement");
 	    if (visibleTimetable.size() != 0) {
 		HashSet<BusRoute> routes = new HashSet<BusRoute>();
+		HashSet<String> directions = new HashSet<String>();
 
 		for (Stop stop : visibleTimetable) {
 		    routes.add(stop.bus.route);
 		}
+		Log.i(TAG, "routes " + routes);
 
 		Log.v(TAG, routes.size() + " routes in the visible timetable");
 
-		if (routes.size() == 1) {
-		    HashSet<String> directions = new HashSet<String>();
+		for (Stop stop : visibleTimetable) {
+		    directions.add(stop.bus.direction);
+		}
 
-		    for (Stop stop : visibleTimetable) {
-			directions.add(stop.bus.direction);
-		    }
+		Log.i(TAG, "directions " + directions);
+
+		if (routes.size() == 1) {
 
 		    Log.v(TAG, directions.size() + " directions in the visible timetable");
 
+		    String direction;
 		    if (directions.size() <= 1) {
+			if (directions.size() == 0) {
+			    direction = null;
+			} else {
+			    direction = directions.iterator().next();
+			}
+
 			try {
 			    BusStop stop;
 			    if (item.getItemId() == R.id.menu_next_stop) {
-				stop = routes.iterator().next()
-					.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), 1);
+				stop = routes.iterator().next().moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), direction, 1);
 			    } else {
-				stop = routes.iterator().next()
-					.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), -1);
+				stop = routes.iterator().next().moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), direction, -1);
 			    }
 			    Intent i = new Intent(this, BusStopActivity.class);
 			    if (stop.id == null) {
@@ -363,14 +372,81 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 			} catch (SQLException e) {
 			    e.printStackTrace();
 			}
-		    } else {
-			// Show dialog
+		    } else { // Same route, different directions?
+			     // ATM, this is not considered possible?
+			Log.e(TAG, "Big mistake in onOptionsItemSelected in BusStopActivity");
 		    }
 		} else {
-		    // if (all routes point to the same (next/previous) stop) {
-		    // move to that stop
-		    // else
-		    // Show dialog
+		    HashSet<BusStop> stops = new HashSet<BusStop>();
+
+		    if (directions.size() <= 1) {
+
+			for (BusRoute route : routes) {
+			    try {
+				if (item.getItemId() == R.id.menu_next_stop) {
+				    stops.add(route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), 1));
+				} else {
+				    stops.add(route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), directions.iterator().next(), -1));
+				}
+			    } catch (SQLException e) {
+				e.printStackTrace();
+			    }
+			}
+
+			Log.i(TAG, "stops " + stops);
+
+			if (stops.size() == 1) {
+			    Intent i = new Intent(this, BusStopActivity.class);
+			    BusStop stop = stops.iterator().next();
+			    if (stop.id == null) {
+				Log.e(TAG, "next.id == null");
+			    }
+			    i.putExtra("busStopID", stop.id);
+			    i.putExtra("busStopName", stop.description);
+			    startActivity(i);
+			} else {
+			    // Show dialog
+			    Log.i(TAG, "Showing dialog");
+			}
+
+		    } else {
+
+			for (String direction : directions) {
+
+			    for (BusRoute route : routes) {
+				try {
+				    BusStop stop;
+				    if (item.getItemId() == R.id.menu_next_stop) {
+					stop = route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), direction, 1);
+				    } else {
+					stop = route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), direction, -1);
+				    }
+				    if (stop != null) {
+					stops.add(stop);
+				    }
+				} catch (SQLException e) {
+				    e.printStackTrace();
+				}
+			    }
+			}
+
+			Log.i(TAG, "stops " + stops);
+
+			if (stops.size() == 1) {
+			    Intent i = new Intent(this, BusStopActivity.class);
+			    BusStop stop = stops.iterator().next();
+			    if (stop.id == null) {
+				Log.e(TAG, "next.id == null");
+			    }
+			    i.putExtra("busStopID", stop.id);
+			    i.putExtra("busStopName", stop.description);
+			    startActivity(i);
+			} else {
+			    // Show dialog
+			    Log.i(TAG, "Showing dialog");
+			}
+
+		    }
 		}
 	    }
 	} else if (item.getItemId() == R.id.menu_refresh_stop) {

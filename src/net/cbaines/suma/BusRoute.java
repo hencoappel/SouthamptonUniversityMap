@@ -147,22 +147,38 @@ public class BusRoute {
 
 	    List<RouteStops> routeStopsFound = routeStopsDao.query(routeStopsPreparedQuery);
 	    Log.v("BusRoute", "Found " + routeStopsFound.size() + " stops");
+	    
+	    int stopIndex = 0;
+	    
+	    for (RouteStops routeStop : routeStopsFound) {
+		if (routeStop.stop.id.equals(stop.id)) {
+		    stopIndex = routeStop.sequence -1;
+		}
+	    }
 
 	    if (moveAmount > 0) {
-		Log.v("BusRoute", "Moving forward in direction " + direction + " " + moveAmount + " stops");
-
-		int stopWanted = (routeStopsFound.indexOf(stop) + moveAmount) % (routeStopsFound.size() + 1);
+		Log.v("BusStop", "stopIndex " + stopIndex);
+		int stopWanted = (stopIndex + moveAmount) % (routeStopsFound.size() + 1);
+		Log.v("BusStop", "stopWanted " + stopWanted);
 		busStopDao.refresh(routeStopsFound.get(stopWanted).stop);
+
+		Log.v("BusRoute",
+			"Moving forward in direction " + direction + " " + moveAmount + " stops from " + stop + " to " + routeStopsFound.get(stopWanted).stop
+				+ " in route " + this);
 
 		return routeStopsFound.get(stopWanted).stop;
 	    } else {
-		Log.v("BusRoute", "Moving backwards in direction " + direction + " " + moveAmount + " stops");
-
-		int stopWanted = routeStopsFound.indexOf(stop) + moveAmount;
+		Log.v("BusStop", "stopIndex " + stopIndex);
+		int stopWanted = stopIndex + moveAmount;
 		if (stopWanted < 0) {
 		    stopWanted = routeStopsFound.size() - (Math.abs(stopWanted) % routeStopsFound.size());
 		}
+		Log.v("BusStop", "stopWanted " + stopWanted);
 		busStopDao.refresh(routeStopsFound.get(stopWanted).stop);
+
+		Log.v("BusRoute",
+			"Moving backwards in direction " + direction + " " + moveAmount + " stops from " + stop + " to " + routeStopsFound.get(stopWanted).stop
+				+ " in route " + this);
 
 		return routeStopsFound.get(stopWanted).stop;
 	    }
