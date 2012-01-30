@@ -19,9 +19,13 @@
 
 package net.cbaines.suma;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Iterator;
+
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
 
 import android.content.Context;
 import android.content.Intent;
@@ -267,6 +271,8 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     }
 
     private class GetTimetableTask extends AsyncTask<String, Integer, Timetable> {
+	String errorMessage;
+
 	protected void onPreExecute() {
 	    progBar.setVisibility(View.VISIBLE);
 	}
@@ -276,6 +282,16 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	    try {
 		newTimetable = DataManager.getTimetable(instance, busStopID, true);
 	    } catch (SQLException e) {
+		errorMessage = "Error message regarding SQL?";
+		e.printStackTrace();
+	    } catch (ClientProtocolException e) {
+		errorMessage = "Insert error message here!";
+		e.printStackTrace();
+	    } catch (IOException e) {
+		errorMessage = "Error fetching bus times from server, are you connected to the internet?";
+		e.printStackTrace();
+	    } catch (JSONException e) {
+		errorMessage = "Error parsing bus times";
 		e.printStackTrace();
 	    }
 	    return newTimetable;
@@ -287,7 +303,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		Log.i(TAG, "Its null");
 
 		progBar.setVisibility(View.GONE);
-		busStopMessage.setText("Error fetching bus times");
+		busStopMessage.setText(errorMessage);
 		busStopMessage.setVisibility(View.VISIBLE);
 	    } else {
 		progBar.setVisibility(View.GONE);

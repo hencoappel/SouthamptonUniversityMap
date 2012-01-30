@@ -37,6 +37,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -545,7 +546,8 @@ public class DataManager {
 
     }
 
-    public static Timetable getTimetable(Context context, String busStop, boolean onlyUniLink) throws SQLException {
+    public static Timetable getTimetable(Context context, String busStop, boolean onlyUniLink) throws SQLException, ClientProtocolException, IOException,
+	    JSONException {
 
 	if (helper == null)
 	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
@@ -558,42 +560,36 @@ public class DataManager {
 
 	String file = getFileFromServer(busStopUrl + busStop + ".json");
 
-	try {
-	    JSONObject data = new JSONObject(file);
+	JSONObject data = new JSONObject(file);
 
-	    JSONArray stopsArray = data.getJSONArray("stops");
+	JSONArray stopsArray = data.getJSONArray("stops");
 
-	    Log.i(TAG, "Number of entries " + data.length());
+	Log.i(TAG, "Number of entries " + data.length());
 
-	    Log.i(TAG, "Stops: " + data.getJSONArray("stops"));
+	Log.i(TAG, "Stops: " + data.getJSONArray("stops"));
 
-	    for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
-		JSONObject stopObj = stopsArray.getJSONObject(stopNum);
+	for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
+	    JSONObject stopObj = stopsArray.getJSONObject(stopNum);
 
-		if (onlyUniLink && !stopObj.getString("name").startsWith("U")) {
-		    continue;
-		}
-
-		BusStop busStopObj = busStopDao.queryForId(busStop);
-		if (busStopObj == null) {
-		    Log.e(TAG, "BusStopObj == null");
-		}
-
-		Stop stop = getStop(context, stopObj, busStopObj);
-
-		if (stop == null) {
-		    Log.w(TAG, "Null stop, skiping");
-		    continue;
-		}
-
-		Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
-
-		timetable.add(stop);
+	    if (onlyUniLink && !stopObj.getString("name").startsWith("U")) {
+		continue;
 	    }
-	} catch (JSONException ex) {
-	    Log.e(TAG, "", ex);
-	    Log.e(TAG, "File: " + file);
-	    return null;
+
+	    BusStop busStopObj = busStopDao.queryForId(busStop);
+	    if (busStopObj == null) {
+		Log.e(TAG, "BusStopObj == null");
+	    }
+
+	    Stop stop = getStop(context, stopObj, busStopObj);
+
+	    if (stop == null) {
+		Log.w(TAG, "Null stop, skiping");
+		continue;
+	    }
+
+	    Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
+
+	    timetable.add(stop);
 	}
 
 	timetable.fetchTime = new Date(System.currentTimeMillis());
@@ -628,28 +624,25 @@ public class DataManager {
 	return data;
     }
 
-    public static String getFileFromServer(String request) {
+    public static String getFileFromServer(String request) throws ClientProtocolException, IOException {
 	StringBuilder builder = new StringBuilder();
 	HttpClient client = new DefaultHttpClient();
 	HttpGet httpGet = new HttpGet(request);
 	Log.i("Util.getFileFromServer", "Request used: " + request);
-	try {
-	    HttpResponse response = client.execute(httpGet);
-	    StatusLine statusLine = response.getStatusLine();
-	    int statusCode = statusLine.getStatusCode();
-	    if (statusCode == 200) {
-		HttpEntity entity = response.getEntity();
-		InputStream content = entity.getContent();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(content));
-		String line;
-		while ((line = reader.readLine()) != null) {
-		    builder.append(line);
-		}
-	    } else {
-		Log.e("", "Failed to download file");
+
+	HttpResponse response = client.execute(httpGet);
+	StatusLine statusLine = response.getStatusLine();
+	int statusCode = statusLine.getStatusCode();
+	if (statusCode == 200) {
+	    HttpEntity entity = response.getEntity();
+	    InputStream content = entity.getContent();
+	    BufferedReader reader = new BufferedReader(new InputStreamReader(content));
+	    String line;
+	    while ((line = reader.readLine()) != null) {
+		builder.append(line);
 	    }
-	} catch (Exception ex) {
-	    Log.e("Util.getFileFromServer", ex.getClass().toString() + " " + ex.getMessage());
+	} else {
+	    Log.e("", "Failed to download file");
 	}
 
 	return builder.toString();
