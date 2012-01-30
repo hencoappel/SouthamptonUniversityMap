@@ -19,122 +19,65 @@
 
 package net.cbaines.suma;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.Button;
-import android.widget.ExpandableListView;
-import android.widget.TextView;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
 
-public class AboutActivity extends Activity implements OnClickListener {
+public class AboutActivity extends PreferenceActivity {
 
     static final int DONATE_DIALOG_ID = 0;
 
+    private static final String KEY_ABOUT_LICENSE = "about_license";
+    private static final String KEY_ABOUT_PROJECT = "about_project";
+    private static final String KEY_ABOUT_DEVELOPER = "about_developer";
+    private static final String KEY_ABOUT_DATA = "about_data";
+    private static final String KEY_ABOUT_ANDROID_MARKET = "about_android_market";
+    private static final String KEY_ABOUT_MAP_DATA = "about_map_data";
+    private static final String KEY_ABOUT_MAP_ICONS = "about_map_icons";
+    private static final String KEY_ABOUT_OSM_MAP = "about_osm_map";
+    private static final String KEY_ABOUT_DATABASE = "about_database";
+    private static final String KEY_ABOUT_DONATE = "about_donate";
+
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	setContentView(R.layout.about_dialog);
 
-	ExpandableListView epView = (ExpandableListView) findViewById(R.id.helpExpandableListView);
-	AboutListAdapter mAdapter = new AboutListAdapter(this);
-	epView.setAdapter(mAdapter);
-
-	Button donateButton = (Button) findViewById(R.id.donateButton);
-	donateButton.setOnClickListener(this);
-
+	addPreferencesFromResource(R.xml.about);
     }
 
-    class AboutListAdapter extends BaseExpandableListAdapter {
-	private String[] groups = { "Map", "Find", "Preferences", "Find my Location", "View", "About", "Favourites", "Licence", "Credits" };
-	private LayoutInflater inflater;
-	private Context cxt;
-
-	public AboutListAdapter(Context cxt) {
-	    inflater = LayoutInflater.from(cxt);
-	    this.cxt = cxt;
+    @Override
+    public boolean onPreferenceTreeClick(final PreferenceScreen preferenceScreen, final Preference preference) {
+	final String key = preference.getKey();
+	if (KEY_ABOUT_LICENSE.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.gnu.org/licenses/gpl-2.0.html")));
+	} else if (KEY_ABOUT_PROJECT.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/cbaines/SouthamptonUniversityMap")));
+	} else if (KEY_ABOUT_DEVELOPER.equals(key)) {
+	    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+	    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "cbaines8@gmail.com" });
+	    emailIntent.setType("text/plain");
+	    
+	    startActivity(Intent.createChooser(emailIntent, "Email the developer"));
+	} else if (KEY_ABOUT_DATA.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://data.southampton.ac.uk/bus-routes.html")));
+	} else if (KEY_ABOUT_ANDROID_MARKET.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("")));
+	} else if (KEY_ABOUT_MAP_DATA.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://data.southampton.ac.uk/places.html"))));
+	} else if (KEY_ABOUT_MAP_ICONS.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://mapicons.nicolasmollet.com/")));
+	} else if (KEY_ABOUT_OSM_MAP.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.openstreetmap.org/")));
+	} else if (KEY_ABOUT_DATABASE.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://ormlite.com/"))));
+	} else if (KEY_ABOUT_DONATE.equals(key)) {
+	    showDialog(DONATE_DIALOG_ID);
 	}
 
-	public Object getChild(int groupPos, int childPos) {
-	    if (groupPos == 0) {
-		return cxt.getResources().getString(R.string.map_help_message);
-	    } else if (groupPos == 1) {
-		return cxt.getResources().getString(R.string.find_help_message);
-	    } else if (groupPos == 1) {
-		return cxt.getResources().getString(R.string.preferences_help_message);
-	    } else if (groupPos == 2) {
-		return cxt.getResources().getString(R.string.findmylocation_help_message);
-	    } else if (groupPos == 3) {
-		return cxt.getResources().getString(R.string.view_help_message);
-	    } else if (groupPos == 4) {
-		return cxt.getResources().getString(R.string.about_help_message);
-	    } else if (groupPos == 5) {
-		return cxt.getResources().getString(R.string.favourites_help_message);
-	    } else if (groupPos == 6) {
-		return cxt.getResources().getString(R.string.favourites_help_message);
-	    } else if (groupPos == 7) {
-		return cxt.getResources().getString(R.string.licence_help_message);
-	    } else if (groupPos == 8) {
-		return cxt.getResources().getString(R.string.credits_help_message);
-	    }
-	    return null;
-	}
-
-	public long getChildId(int groupPos, int childPos) {
-	    return childPos;
-	}
-
-	public View getChildView(int groupPos, int childPos, boolean isLastChild, View convertView, ViewGroup parent) {
-	    TextView tv = new TextView(cxt);
-	    tv.setText(getChild(groupPos, childPos).toString());
-	    return tv;
-	}
-
-	public int getChildrenCount(int groupPos) {
-	    return 1;
-	}
-
-	public Object getGroup(int groupPos) {
-	    return groups[groupPos];
-	}
-
-	public int getGroupCount() {
-	    return groups.length;
-	}
-
-	public long getGroupId(int groupPos) {
-	    return groupPos;
-	}
-
-	public View getGroupView(int groupPos, boolean isExpanded, View convertView, ViewGroup parent) {
-	    View v = null;
-	    if (convertView != null)
-		v = convertView;
-	    else
-		v = inflater.inflate(R.layout.view_group_row, parent, false);
-	    String gt = (String) getGroup(groupPos);
-	    TextView colorGroup = (TextView) v.findViewById(R.id.childname);
-	    if (gt != null)
-		colorGroup.setText(gt);
-	    return v;
-	}
-
-	public boolean hasStableIds() {
-	    return true;
-	}
-
-	public boolean isChildSelectable(int groupPos, int childPos) {
-	    return true;
-	}
-
-    }
-
-    public void onClick(View arg0) {
-	showDialog(DONATE_DIALOG_ID);
+	return false;
     }
 
     protected Dialog onCreateDialog(int id) {

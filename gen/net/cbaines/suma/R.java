@@ -81,10 +81,8 @@ public final class R {
         public static final int menu_favourites=0x7f0a0028;
         public static final int menu_find=0x7f0a0023;
         public static final int menu_find_my_location=0x7f0a0025;
-        public static final int menu_next_stop=0x7f0a002b;
         public static final int menu_preferences=0x7f0a0024;
-        public static final int menu_previous_stop=0x7f0a0029;
-        public static final int menu_refresh_stop=0x7f0a002a;
+        public static final int menu_refresh_stop=0x7f0a0029;
         public static final int menu_view=0x7f0a0026;
         public static final int radio_u1=0x7f0a0006;
         public static final int radio_u1n=0x7f0a0007;
@@ -126,8 +124,33 @@ public final class R {
         public static final int U2=0x7f07000b;
         public static final int U6=0x7f07000c;
         public static final int U9=0x7f07000d;
+        public static final int about=0x7f07002a;
+        public static final int about_android_market=0x7f070037;
+        public static final int about_android_market_summary=0x7f070038;
+        public static final int about_copyright=0x7f07002d;
+        public static final int about_copyright_summary=0x7f07002e;
+        public static final int about_data=0x7f070035;
+        public static final int about_data_summary=0x7f070036;
+        public static final int about_database=0x7f07003f;
+        public static final int about_database_summary=0x7f070040;
+        public static final int about_developer=0x7f070033;
+        public static final int about_developer_summary=0x7f070034;
+        public static final int about_donate=0x7f070041;
+        public static final int about_donate_summary=0x7f070042;
         public static final int about_help_message=0x7f070015;
+        public static final int about_license=0x7f07002f;
+        public static final int about_license_summary=0x7f070030;
+        public static final int about_map_data=0x7f070039;
+        public static final int about_map_data_summary=0x7f07003a;
+        public static final int about_map_icons=0x7f07003b;
+        public static final int about_map_icons_summary=0x7f07003c;
         public static final int about_menu_instruction_text=0x7f070023;
+        public static final int about_osm_map=0x7f07003d;
+        public static final int about_osm_map_summary=0x7f07003e;
+        public static final int about_project=0x7f070031;
+        public static final int about_project_summary=0x7f070032;
+        public static final int about_version=0x7f07002b;
+        public static final int about_version_summary=0x7f07002c;
         public static final int app_name=0x7f070004;
         public static final int bitcoin_error_message=0x7f07001a;
         public static final int building_non_residential=0x7f070007;
@@ -167,6 +190,7 @@ public final class R {
         public static final int view_help_message=0x7f070014;
     }
     public static final class xml {
-        public static final int preferences=0x7f050000;
+        public static final int about=0x7f050000;
+        public static final int preferences=0x7f050001;
     }
 }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:orderingFromXml="true"
+        android:title="@string/about" >
+        <Preference
+            android:key="about_version"
+            android:summary="@string/about_version_summary"
+            android:title="@string/about_version" />
+        <Preference
+            android:key="about_copyright"
+            android:summary="@string/about_copyright_summary"
+            android:title="@string/about_copyright" />
+        <Preference
+            android:key="about_license"
+            android:summary="@string/about_license_summary"
+            android:title="@string/about_license" />
+        <Preference
+            android:key="about_project"
+            android:summary="@string/about_project_summary"
+            android:title="@string/about_project" />
+        <Preference
+            android:key="about_developer"
+            android:summary="@string/about_developer_summary"
+            android:title="@string/about_developer" />
+        <Preference
+            android:key="about_data"
+            android:summary="@string/about_data_summary"
+            android:title="@string/about_data" />
+        <Preference
+            android:key="about_android_market"
+            android:summary="@string/about_android_market_summary"
+            android:title="@string/about_android_market" />
+        <Preference
+            android:key="about_map_data"
+            android:summary="@string/about_map_data_summary"
+            android:title="@string/about_map_data" />
+        <Preference
+            android:key="about_map_icons"
+            android:summary="@string/about_map_icons_summary"
+            android:title="@string/about_map_icons" />
+        <Preference
+            android:key="about_osm_map"
+            android:summary="@string/about_osm_map_summary"
+            android:title="@string/about_osm_map" />
+        <Preference
+            android:key="about_database"
+            android:summary="@string/about_database_summary"
+            android:title="@string/about_database" />
+        <Preference
+            android:key="about_donate"
+            android:summary="@string/about_donate_summary"
+            android:title="@string/about_donate" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

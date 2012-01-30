@@ -41,7 +41,7 @@ GNU General Public License for more details.\n
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.</string>
-    <string name="credits_help_message">Software Design: Christopher Banines cbaines8@gmail.com Live Bus Data: provided under the Open Government License by the Southampton City Council ROMANSE office through the University of Southampton Open Data Service. Data: From the OpenStreetMap project, exported and used from the University of Southampton Open Data Service. Map Icons: From the "Map Icons Collection" (http://mapicons.nicolasmollet.com). Map Tiles: From the Mapnik project, through the OSMDroid libary. Database: Using the ORMLite libary.</string>
+    <string name="credits_help_message">Data:  Map Icons: From the "Map Icons Collection" (http://mapicons.nicolasmollet.com). Map Tiles: From the Mapnik project, through the OSMDroid libary. Database: Using the ORMLite libary.</string>
     <string name="donate_button">Donate</string>
     <string name="bitcoin_error_message">You appear to have no bitcoin client installed, or at least none that listen for bitcoin uri\'s. Either install such a client, or just send coins via any method from any device to the address below.</string>
     <string name="preferences">Preferences</string>
@@ -84,5 +84,30 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="menu_previous_stop">Previous</string>
     <string name="menu_next_stop">Next</string>
     <string name="menu_refresh_stop">Refresh</string>
+    <string name="about">About</string>
+    <string name="about_version">Version</string>
+    <string name="about_version_summary">0.15 (alpha)</string>
+    <string name="about_copyright">Copyright</string>
+    <string name="about_copyright_summary">© 2012, Christopher Baines</string>
+    <string name="about_license">License</string>
+    <string name="about_license_summary">GNU Public Licence v2</string>
+    <string name="about_project">Project Home</string>
+    <string name="about_project_summary">Source and Issue Tracker at GitHub</string>
+    <string name="about_developer">Developer</string>
+    <string name="about_developer_summary">Christopher Baines</string>
+    <string name="about_data">Life Bus Data</string>
+    <string name="about_data_summary">Provided under the Open Government License by the Southampton City Council ROMANSE office through the University of Southampton Open Data Service.</string>
+    <string name="about_android_market">Android Market App Page</string>
+    <string name="about_android_market_summary">insert link</string>
+    <string name="about_map_data">Map Data</string>
+    <string name="about_map_data_summary">From the OpenStreetMap project, exported and used from the University of Southampton Open Data Service.</string>
+    <string name="about_map_icons">Map Icons</string>
+    <string name="about_map_icons_summary">From the "Map Icons Collection"</string>
+    <string name="about_osm_map">Map</string>
+    <string name="about_osm_map_summary">Using the OSMDroid Library</string>
+    <string name="about_database">Database</string>
+    <string name="about_database_summary">Using the ORMLite library.</string>
+    <string name="about_donate">Donate</string>
+    <string name="about_donate_summary">Make a personal donation to the developer through Bitcoin.</string>
 
 </resources>
