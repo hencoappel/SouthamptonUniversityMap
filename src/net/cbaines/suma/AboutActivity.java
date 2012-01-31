@@ -65,7 +65,7 @@ public class AboutActivity extends PreferenceActivity {
 	} else if (KEY_ABOUT_DATA.equals(key)) {
 	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://data.southampton.ac.uk/bus-routes.html")));
 	} else if (KEY_ABOUT_ANDROID_MARKET.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("")));
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://market.android.com/details?id=net.cbaines.suma")));
 	} else if (KEY_ABOUT_MAP_DATA.equals(key)) {
 	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://data.southampton.ac.uk/places.html"))));
 	} else if (KEY_ABOUT_MAP_ICONS.equals(key)) {
