@@ -86,7 +86,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="menu_refresh_stop">Refresh</string>
     <string name="about">About</string>
     <string name="about_version">Version</string>
-    <string name="about_version_summary">0.15 (alpha)</string>
+    <string name="about_version_summary">0.2.1 (alpha)</string>
     <string name="about_copyright">Copyright</string>
     <string name="about_copyright_summary">© 2012, Christopher Baines</string>
     <string name="about_license">License</string>
