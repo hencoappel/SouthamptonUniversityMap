@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-
 import org.osmdroid.util.GeoPoint;
 
 import android.content.Context;
@@ -278,7 +277,11 @@ public class FindActivity extends OrmLiteBaseActivity<DatabaseHelper> implements
 	}
 	// Register the listener with the Location Manager to receive location updates
 	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, this);
-	locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, this);
+	try {
+	    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 10, this);
+	} catch (Exception e) {
+	    // Ignore anything that goes wrong here...
+	}
 
 	// SotonBusData.getTimetable("SN120128");
 
