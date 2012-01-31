@@ -39,6 +39,7 @@ public class AboutActivity extends PreferenceActivity {
     private static final String KEY_ABOUT_MAP_DATA = "about_map_data";
     private static final String KEY_ABOUT_MAP_ICONS = "about_map_icons";
     private static final String KEY_ABOUT_OSM_MAP = "about_osm_map";
+    private static final String KEY_ABOUT_MAP_TILES = "about_map_tiles";
     private static final String KEY_ABOUT_DATABASE = "about_database";
     private static final String KEY_ABOUT_DONATE = "about_donate";
 
@@ -71,6 +72,8 @@ public class AboutActivity extends PreferenceActivity {
 	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://mapicons.nicolasmollet.com/")));
 	} else if (KEY_ABOUT_OSM_MAP.equals(key)) {
 	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.openstreetmap.org/")));
+	} else if (KEY_ABOUT_MAP_TILES.equals(key)) {
+	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.mapquest.com/")));
 	} else if (KEY_ABOUT_DATABASE.equals(key)) {
 	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://ormlite.com/"))));
 	} else if (KEY_ABOUT_DONATE.equals(key)) {

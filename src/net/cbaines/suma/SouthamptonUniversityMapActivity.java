@@ -131,7 +131,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	Log.i(TAG, "Finished setting content view " + (System.currentTimeMillis() - startTime));
 
 	mapView = (MapView) this.findViewById(R.id.mapview);
-	mapView.setTileSource(TileSourceFactory.MAPNIK);
+	mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 	mapView.setBuiltInZoomControls(true);
 	mapView.setMultiTouchControls(true);
 

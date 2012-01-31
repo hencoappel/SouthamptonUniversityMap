@@ -45,6 +45,10 @@
             android:summary="@string/about_osm_map_summary"
             android:title="@string/about_osm_map" />
         <Preference
+            android:key="about_map_tiles"
+            android:summary="@string/about_map_tiles_summary"
+            android:title="@string/about_map_tiles" />
+        <Preference
             android:key="about_database"
             android:summary="@string/about_database_summary"
             android:title="@string/about_database" />

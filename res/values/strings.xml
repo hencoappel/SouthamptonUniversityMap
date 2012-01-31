@@ -105,6 +105,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="about_map_icons_summary">From the "Map Icons Collection"</string>
     <string name="about_osm_map">Map</string>
     <string name="about_osm_map_summary">Using the OSMDroid Library</string>
+    <string name="about_map_tiles">Map Tiles</string>
+    <string name="about_map_tiles_summary">Tiles Courtesy of MapQuest</string>
     <string name="about_database">Database</string>
     <string name="about_database_summary">Using the ORMLite library.</string>
     <string name="about_donate">Donate</string>

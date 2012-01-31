@@ -131,12 +131,12 @@ public final class R {
         public static final int about_copyright_summary=0x7f07002e;
         public static final int about_data=0x7f070035;
         public static final int about_data_summary=0x7f070036;
-        public static final int about_database=0x7f07003f;
-        public static final int about_database_summary=0x7f070040;
+        public static final int about_database=0x7f070041;
+        public static final int about_database_summary=0x7f070042;
         public static final int about_developer=0x7f070033;
         public static final int about_developer_summary=0x7f070034;
-        public static final int about_donate=0x7f070041;
-        public static final int about_donate_summary=0x7f070042;
+        public static final int about_donate=0x7f070043;
+        public static final int about_donate_summary=0x7f070044;
         public static final int about_help_message=0x7f070015;
         public static final int about_license=0x7f07002f;
         public static final int about_license_summary=0x7f070030;
@@ -144,6 +144,8 @@ public final class R {
         public static final int about_map_data_summary=0x7f07003a;
         public static final int about_map_icons=0x7f07003b;
         public static final int about_map_icons_summary=0x7f07003c;
+        public static final int about_map_tiles=0x7f07003f;
+        public static final int about_map_tiles_summary=0x7f070040;
         public static final int about_menu_instruction_text=0x7f070023;
         public static final int about_osm_map=0x7f07003d;
         public static final int about_osm_map_summary=0x7f07003e;
