@@ -186,11 +186,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     public void copyDataBase() throws IOException {
 	Log.i(TAG, "Begining copy database");
 
-	// By calling this method and empty database will be created into the default system path
-	// of your application so we are gonna be able to overwrite that database with our database.
-	Log.i(TAG, "GetReadableDatabase");
-	this.getWritableDatabase().close();
-
 	InputStream myInput = context.getAssets().open(DATABASE_NAME);
 
 	// Path to the just created empty db
