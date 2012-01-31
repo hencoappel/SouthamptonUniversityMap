@@ -34,21 +34,22 @@ public final class R {
         public static final int ic_menu_refresh=0x7f02000b;
         public static final int ic_menu_search=0x7f02000c;
         public static final int ic_menu_star=0x7f02000d;
-        public static final int u1_back=0x7f02000e;
-        public static final int u1_back_selected=0x7f02000f;
-        public static final int u1_radio_button=0x7f020010;
-        public static final int u1n_back=0x7f020011;
-        public static final int u1n_back_selected=0x7f020012;
-        public static final int u1n_radio_button=0x7f020013;
-        public static final int u2_back=0x7f020014;
-        public static final int u2_back_selected=0x7f020015;
-        public static final int u2_radio_button=0x7f020016;
-        public static final int u6_back=0x7f020017;
-        public static final int u6_back_selected=0x7f020018;
-        public static final int u6_radio_button=0x7f020019;
-        public static final int u9_back=0x7f02001a;
-        public static final int u9_back_selected=0x7f02001b;
-        public static final int u9_radio_button=0x7f02001c;
+        public static final int icon=0x7f02000e;
+        public static final int u1_back=0x7f02000f;
+        public static final int u1_back_selected=0x7f020010;
+        public static final int u1_radio_button=0x7f020011;
+        public static final int u1n_back=0x7f020012;
+        public static final int u1n_back_selected=0x7f020013;
+        public static final int u1n_radio_button=0x7f020014;
+        public static final int u2_back=0x7f020015;
+        public static final int u2_back_selected=0x7f020016;
+        public static final int u2_radio_button=0x7f020017;
+        public static final int u6_back=0x7f020018;
+        public static final int u6_back_selected=0x7f020019;
+        public static final int u6_radio_button=0x7f02001a;
+        public static final int u9_back=0x7f02001b;
+        public static final int u9_back_selected=0x7f02001c;
+        public static final int u9_radio_button=0x7f02001d;
     }
     public static final class id {
         public static final int busStopID=0x7f0a000c;
