@@ -31,6 +31,8 @@
         </activity>
         <activity android:name="AboutActivity" >
         </activity>
+        <activity android:name="BuildingActivity" >
+        </activity>
         <activity
             android:name=".PreferencesActivity"
             android:label="@string/preferences" >

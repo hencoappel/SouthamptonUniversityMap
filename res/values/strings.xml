@@ -104,7 +104,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="about_data">Live Bus Data</string>
     <string name="about_data_summary">Provided under the Open Government License by the Southampton City Council ROMANSE office through the University of Southampton Open Data Service.</string>
     <string name="about_android_market">Android Market App Page</string>
-    <string name="about_android_market_summary">insert link</string>
+    <string name="about_android_market_summary">market://details?id=net.cbaines.suma</string>
     <string name="about_map_data">Map Data</string>
     <string name="about_map_data_summary">From the OpenStreetMap project, exported and used from the University of Southampton Open Data Service.</string>
     <string name="about_map_icons">Map Icons</string>

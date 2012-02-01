@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 
 public class AboutActivity extends PreferenceActivity {
 
@@ -43,6 +44,8 @@ public class AboutActivity extends PreferenceActivity {
     private static final String KEY_ABOUT_DATABASE = "about_database";
     private static final String KEY_ABOUT_DONATE = "about_donate";
 
+    private static final String TAG = "AboutActivity";
+
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 
@@ -51,35 +54,38 @@ public class AboutActivity extends PreferenceActivity {
 
     @Override
     public boolean onPreferenceTreeClick(final PreferenceScreen preferenceScreen, final Preference preference) {
-	final String key = preference.getKey();
-	if (KEY_ABOUT_LICENSE.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.gnu.org/licenses/gpl-2.0.html")));
-	} else if (KEY_ABOUT_PROJECT.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/cbaines/SouthamptonUniversityMap")));
-	} else if (KEY_ABOUT_DEVELOPER.equals(key)) {
-	    Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-	    emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "cbaines8@gmail.com" });
-	    emailIntent.setType("text/plain");
-	    
-	    startActivity(Intent.createChooser(emailIntent, "Email the developer"));
-	} else if (KEY_ABOUT_DATA.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://data.southampton.ac.uk/bus-routes.html")));
-	} else if (KEY_ABOUT_ANDROID_MARKET.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://market.android.com/details?id=net.cbaines.suma")));
-	} else if (KEY_ABOUT_MAP_DATA.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://data.southampton.ac.uk/places.html"))));
-	} else if (KEY_ABOUT_MAP_ICONS.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://mapicons.nicolasmollet.com/")));
-	} else if (KEY_ABOUT_OSM_MAP.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.openstreetmap.org/")));
-	} else if (KEY_ABOUT_MAP_TILES.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.mapquest.com/")));
-	} else if (KEY_ABOUT_DATABASE.equals(key)) {
-	    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://ormlite.com/"))));
-	} else if (KEY_ABOUT_DONATE.equals(key)) {
-	    showDialog(DONATE_DIALOG_ID);
-	}
+	try {
+	    final String key = preference.getKey();
+	    if (KEY_ABOUT_LICENSE.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.gnu.org/licenses/gpl-2.0.html")));
+	    } else if (KEY_ABOUT_PROJECT.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/cbaines/SouthamptonUniversityMap")));
+	    } else if (KEY_ABOUT_DEVELOPER.equals(key)) {
+		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+		emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "cbaines8@gmail.com" });
+		emailIntent.setType("text/plain");
 
+		startActivity(Intent.createChooser(emailIntent, "Email the developer"));
+	    } else if (KEY_ABOUT_DATA.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://data.southampton.ac.uk/bus-routes.html")));
+	    } else if (KEY_ABOUT_ANDROID_MARKET.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=net.cbaines.suma")));
+	    } else if (KEY_ABOUT_MAP_DATA.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://data.southampton.ac.uk/places.html"))));
+	    } else if (KEY_ABOUT_MAP_ICONS.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://mapicons.nicolasmollet.com/")));
+	    } else if (KEY_ABOUT_OSM_MAP.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.openstreetmap.org/")));
+	    } else if (KEY_ABOUT_MAP_TILES.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.mapquest.com/")));
+	    } else if (KEY_ABOUT_DATABASE.equals(key)) {
+		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("http://ormlite.com/"))));
+	    } else if (KEY_ABOUT_DONATE.equals(key)) {
+		showDialog(DONATE_DIALOG_ID);
+	    }
+	} catch (Exception e) {
+	    Log.e("Error opening one of the icons", TAG, e);
+	}
 	return false;
     }
 

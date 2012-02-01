@@ -113,13 +113,14 @@ public final class R {
         public static final int stop_menu=0x7f090001;
     }
     public static final class raw {
-        public static final int ormlite_config=0x7f060000;
-        public static final int u1=0x7f060001;
-        public static final int u1e=0x7f060002;
-        public static final int u1n=0x7f060003;
-        public static final int u2=0x7f060004;
-        public static final int u6=0x7f060005;
-        public static final int u9=0x7f060006;
+        public static final int org=0x7f060000;
+        public static final int ormlite_config=0x7f060001;
+        public static final int u1=0x7f060002;
+        public static final int u1e=0x7f060003;
+        public static final int u1n=0x7f060004;
+        public static final int u2=0x7f060005;
+        public static final int u6=0x7f060006;
+        public static final int u9=0x7f060007;
     }
     public static final class string {
         public static final int U1=0x7f070009;

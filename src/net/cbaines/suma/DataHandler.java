@@ -81,7 +81,7 @@ public class DataHandler extends DefaultHandler {
     @Override
     public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
 	if (localName.equals("trkpt")) {
-	    Log.v("DataHandler", "Adding point to route overlay " + atts.getValue("lat") + " " + atts.getValue("lon"));
+	    // Log.v("DataHandler", "Adding point to route overlay " + atts.getValue("lat") + " " + atts.getValue("lon"));
 	    _data.addPoint(Util.csLatLongToGeoPoint(atts.getValue("lat"), atts.getValue("lon")));
 	}
     }
