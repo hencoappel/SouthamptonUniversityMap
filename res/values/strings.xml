@@ -18,7 +18,7 @@
     <string name="menu_about">About</string>
     <string name="menu_favourites">Favourites</string>
 
-    <!-- Preferences Messages -->
+    <!-- Help Messages -->
     <string name="map_help_message">You can drag the map to move it, you can use pinch motions to zoom in and out, this can also be done with the buttons at the bottom of the screen. Taping the building markers will show you there full name, and tapping the bus stop markers will show the live times at that stop. Presing and holding a marker, will add the item to the favourites list.</string>
     <string name="find_help_message">The Find screen allows you to search for buildings, bus stops and sites. You can search by description and id. If your location is known, the results will be sorted by distance from your current location.</string>
     <string name="preferences_help_message">You can disable and enable the apps use of live bus times and gps positioning from the preferences screen.</string>
@@ -47,6 +47,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="preferences">Preferences</string>
     <string name="favourites_dialog_message">No Favourite\'s. To add a building or bus stop to the favourites list, just press and hold it on the map.</string>
 
+    <!-- View Strings -->
     <string-array name="uniLinkBusRoutes">
         <item>U1</item>
         <item>U1N</item>
@@ -71,10 +72,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
         <item>Other</item>
     </string-array>
 
+    <!-- Preferences Messages -->
     <string name="preferences_catagory_positioning">Positioning</string>
+    <string name="preferences_gps">GPS</string>
     <string name="preferences_gps_enabled">GPS Enabled</string>
     <string name="preferences_gps_disabled">GPS Disabled</string>
     <string name="preferences_catagory_bus_times">Bus Times</string>
+    <string name="preferences_live_bus_times">Live Bus Times</string>
     <string name="preferences_live_bus_times_enabled">Live Bus Times Enabled</string>
     <string name="preferences_live_bus_times_disabled">Live Bus Times Disabled</string>
     <string name="about_menu_instruction_text">Expand the items below to learn more about each feature of the application.</string>
@@ -84,6 +88,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="menu_previous_stop">Previous</string>
     <string name="menu_next_stop">Next</string>
     <string name="menu_refresh_stop">Refresh</string>
+    
+     <!-- About Strings -->
     <string name="about">About</string>
     <string name="about_version">Version</string>
     <string name="about_version_summary">0.2.1 (alpha)</string>
