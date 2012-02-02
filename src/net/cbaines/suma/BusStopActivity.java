@@ -53,7 +53,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 
-public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> implements OnCheckedChangeListener {
+public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> implements OnCheckedChangeListener, Preferences {
 
     final static String TAG = "BusTimeActivity";
 
@@ -199,7 +199,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	super.onResume();
 
 	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-	if (sharedPrefs.getBoolean("liveBusTimesEnabled", false)) {
+	if (sharedPrefs.getBoolean(UNI_LINK_BUS_TIMES, false) || sharedPrefs.getBoolean(NON_UNI_LINK_BUS_TIMES, false)) {
 	    Log.i(TAG, "Live Times enabled");
 	    timetable = (Timetable) getLastNonConfigurationInstance();
 
@@ -287,7 +287,11 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	protected Timetable doInBackground(String... activity) {
 	    Timetable newTimetable = null;
 	    try {
-		newTimetable = DataManager.getTimetable(instance, busStopID, true);
+		final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(instance);
+
+		newTimetable = DataManager.getTimetable(instance, busStopID, sharedPrefs.getBoolean(SouthamptonUniversityMapActivity.UNI_LINK_BUS_TIMES,
+			SouthamptonUniversityMapActivity.UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT), sharedPrefs.getBoolean(
+			SouthamptonUniversityMapActivity.NON_UNI_LINK_BUS_TIMES, SouthamptonUniversityMapActivity.NON_UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT));
 	    } catch (SQLException e) {
 		errorMessage = "Error message regarding SQL?";
 		e.printStackTrace();

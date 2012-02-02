@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
@@ -73,7 +74,7 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 import com.j256.ormlite.dao.Dao;
 
 public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<DatabaseHelper> implements MapViewConstants, Runnable, RouteColorConstants,
-	OnChildClickListener, OnItemClickListener, OnItemLongClickListener, OnSharedPreferenceChangeListener {
+	OnChildClickListener, OnItemClickListener, OnItemLongClickListener, OnSharedPreferenceChangeListener, Preferences {
 
     private boolean useBundledDatabase = true;
 
@@ -90,18 +91,18 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
     private HashMap<String, Overlay> pastOverlays;
 
     private ScaleBarOverlay scaleBarOverlay;
-    private final boolean SCALE_BAR_OVERLAY_ENABLED_BY_DEFAULT = true;
+    private static final boolean SCALE_BAR_OVERLAY_ENABLED_BY_DEFAULT = true;
     private MyLocationOverlay myLocationOverlay;
     private BuildingNumOverlay residentialBuildingOverlay;
-    private final boolean NON_RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
+    private static final boolean NON_RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
     private BuildingNumOverlay nonResidentialBuildingOverlay;
-    private final boolean RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
+    private static final boolean RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
     private BusStopOverlay busStopOverlay;
-    private final boolean BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT = true;
+    private static final boolean BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT = true;
     private HashMap<Site, PathOverlay> siteOverlays = new HashMap<Site, PathOverlay>(21);
-    private final boolean SITE_OVERLAY_ENABLED_BY_DEFAULT = false;
+    private static final boolean SITE_OVERLAY_ENABLED_BY_DEFAULT = false;
     private HashMap<BusRoute, PathOverlay> routeOverlays = new HashMap<BusRoute, PathOverlay>(5);
-    private final boolean ROUTE_OVERLAY_ENABLED_BY_DEFAULT = true;
+    private static final boolean ROUTE_OVERLAY_ENABLED_BY_DEFAULT = true;
 
     private String[] busRoutes;
     private String[] buildingTypes;
@@ -686,7 +687,16 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			Log.i(TAG, "Restored bus stop overlays");
 		    } else {
 			try {
-			    busStopOverlay = new BusStopOverlay(instance);
+			    List<BusStop> busStops;
+			    Log.v(TAG, "Begin fetching BusStops at " + (System.currentTimeMillis() - startTime));
+			    if (activityPrefs.getBoolean(NON_UNI_LINK_BUS_STOPS, NON_UNI_LINK_BUS_STOPS_ENABLED_BY_DEFAULT)) {
+				busStops = getHelper().getBusStopDao().queryForAll();
+			    } else {
+				busStops = getHelper().getBusStopDao().queryForEq(BusStop.UNI_LINK_FIELD_NAME, true);
+			    }
+			    Log.v(TAG, "Finished fetching BusStops at " + (System.currentTimeMillis() - startTime));
+
+			    busStopOverlay = new BusStopOverlay(instance, busStops);
 			} catch (SQLException e) {
 			    e.printStackTrace();
 			}
@@ -1084,6 +1094,22 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		}
 	    } else {
 		Log.e(TAG, "Unhandled preference key " + key);
+	    }
+	} else if (key.equals(NON_UNI_LINK_BUS_STOPS)) {
+
+	    Log.v(TAG, "Begin fetching BusStops at " + (System.currentTimeMillis() - startTime));
+	    try {
+		if (prefs.getBoolean(NON_UNI_LINK_BUS_STOPS, NON_UNI_LINK_BUS_STOPS_ENABLED_BY_DEFAULT)) {
+		    busStopOverlay.busStops = getHelper().getBusStopDao().queryForAll();
+		} else {
+		    busStopOverlay.busStops = getHelper().getBusStopDao().queryForEq(BusStop.UNI_LINK_FIELD_NAME, true);
+		}
+
+		Log.v(TAG, "Finished fetching BusStops at " + (System.currentTimeMillis() - startTime));
+
+		busStopOverlay.refresh();
+	    } catch (SQLException e) {
+		e.printStackTrace();
 	    }
 	} else {
 	    Log.e(TAG, "Unhandled preference key " + key);

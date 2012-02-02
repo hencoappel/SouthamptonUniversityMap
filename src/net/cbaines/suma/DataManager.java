@@ -331,42 +331,42 @@ public class DataManager {
 	    e.printStackTrace();
 	}
 
-	// TODO: Seperate non unilink stuff in to a different table
-	if (onlyUniLink) {
+	long sizeBeforeRemoval = busStopDao.countOf();
 
-	    long sizeBeforeRemoval = busStopDao.countOf();
+	// Removing busstops not used by unilink busses
+	for (Iterator<BusStop> busStopIter = busStopDao.iterator(); busStopIter.hasNext();) {
+	    BusStop stop = busStopIter.next();
+	    // Log.i(TAG, "Looking at stop " + stop.id);
 
-	    // Removing busstops not used by unilink busses
-	    for (Iterator<BusStop> busStopIter = busStopDao.iterator(); busStopIter.hasNext();) {
-		BusStop stop = busStopIter.next();
-		// Log.i(TAG, "Looking at stop " + stop.id);
+	    /*
+	     * QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder(); routeStopsQueryBuilder.where().eq(columnName, value)
+	     * 
+	     * DeleteBuilder<BusStop, String> deleteBuilder = busStopDao.deleteBuilder(); // only delete the rows where password is null
+	     * deleteBuilder.where().in(RouteStops.STOP_ID_FIELD_NAME, objects) accountDao.delete(deleteBuilder.prepare());
+	     */
 
-		/*
-		 * QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder(); routeStopsQueryBuilder.where().eq(columnName, value)
-		 * 
-		 * DeleteBuilder<BusStop, String> deleteBuilder = busStopDao.deleteBuilder(); // only delete the rows where password is null
-		 * deleteBuilder.where().in(RouteStops.STOP_ID_FIELD_NAME, objects) accountDao.delete(deleteBuilder.prepare());
-		 */
+	    QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder();
+	    routeStopsQueryBuilder.setCountOf(true);
+	    routeStopsQueryBuilder.where().eq(RouteStops.STOP_ID_FIELD_NAME, stop);
 
-		QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder();
-		routeStopsQueryBuilder.setCountOf(true);
-		routeStopsQueryBuilder.where().eq(RouteStops.STOP_ID_FIELD_NAME, stop);
-
-		PreparedQuery<RouteStops> routeStopsPreparedQuery = routeStopsQueryBuilder.prepare();
-		long num = routeStopsDao.countOf(routeStopsPreparedQuery);
-		// long num = routeStopsDao.query(routeStopsPreparedQuery).size();
-		// Log.i(TAG, "Number is " + num);
-		if (num == 0) {
-		    // Log.i(TAG, "Removing " + stop.id);
+	    PreparedQuery<RouteStops> routeStopsPreparedQuery = routeStopsQueryBuilder.prepare();
+	    long num = routeStopsDao.countOf(routeStopsPreparedQuery);
+	    // long num = routeStopsDao.query(routeStopsPreparedQuery).size();
+	    // Log.i(TAG, "Number is " + num);
+	    if (num == 0) {
+		// Log.i(TAG, "Removing " + stop.id);
+		stop.uniLink = false;
+		if (onlyUniLink) {
 		    busStopIter.remove();
 		}
+	    } else {
+		stop.uniLink = true;
 	    }
-
-	    long sizeAfterRemoval = busStopDao.countOf();
-
-	    Log.i(TAG, "Removed " + (sizeBeforeRemoval - sizeAfterRemoval) + " stops (from " + sizeBeforeRemoval + ") now have " + sizeAfterRemoval);
-
 	}
+
+	long sizeAfterRemoval = busStopDao.countOf();
+
+	Log.i(TAG, "Removed " + (sizeBeforeRemoval - sizeAfterRemoval) + " stops (from " + sizeBeforeRemoval + ") now have " + sizeAfterRemoval);
 
 	Log.i(TAG, "Finished loading bus data");
     }
@@ -546,8 +546,8 @@ public class DataManager {
 
     }
 
-    public static Timetable getTimetable(Context context, String busStop, boolean onlyUniLink) throws SQLException, ClientProtocolException, IOException,
-	    JSONException {
+    public static Timetable getTimetable(Context context, String busStop, boolean keepUniLink, boolean keepNonUniLink) throws SQLException,
+	    ClientProtocolException, IOException, JSONException {
 
 	if (helper == null)
 	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
@@ -571,7 +571,11 @@ public class DataManager {
 	for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
 	    JSONObject stopObj = stopsArray.getJSONObject(stopNum);
 
-	    if (onlyUniLink && !stopObj.getString("name").startsWith("U")) {
+	    if (!keepNonUniLink && !stopObj.getString("name").startsWith("U")) {
+		continue;
+	    }
+	    
+	    if (!keepUniLink && stopObj.getString("name").startsWith("U")) {
 		continue;
 	    }
 

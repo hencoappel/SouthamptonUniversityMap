@@ -19,15 +19,34 @@
 
 package net.cbaines.suma;
 
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
-public class PreferencesActivity extends PreferenceActivity {
+public class PreferencesActivity extends PreferenceActivity implements Preferences {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
+
+	final SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+	final Editor editor = sharedPrefs.edit();
+	if (!sharedPrefs.contains(GPS_ENABLED)) {
+	    editor.putBoolean(GPS_ENABLED, GPS_ENABLED_BY_DEFAULT);
+	}
+	if (!sharedPrefs.contains(UNI_LINK_BUS_TIMES)) {
+	    editor.putBoolean(UNI_LINK_BUS_TIMES, UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT);
+	}
+	if (!sharedPrefs.contains(NON_UNI_LINK_BUS_TIMES)) {
+	    editor.putBoolean(NON_UNI_LINK_BUS_TIMES, NON_UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT);
+	}
+	if (!sharedPrefs.contains(NON_UNI_LINK_BUS_STOPS)) {
+	    editor.putBoolean(NON_UNI_LINK_BUS_STOPS, NON_UNI_LINK_BUS_STOPS_ENABLED_BY_DEFAULT);
+	}
+	editor.commit();
+
 	addPreferencesFromResource(R.xml.preferences);
     }
-
 }

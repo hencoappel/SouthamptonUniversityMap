@@ -45,7 +45,7 @@ import com.j256.ormlite.dao.Dao;
 
 public class BusStopOverlay extends Overlay implements RouteColorConstants {
 
-    private List<BusStop> busStops;
+    List<BusStop> busStops;
 
     private final Point mCurScreenCoords = new Point();
     private final Point mTouchScreenPoint = new Point();
@@ -68,9 +68,8 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 
     private boolean[] routes = new boolean[5];
 
-    public BusStopOverlay(Context context) throws SQLException {
+    public BusStopOverlay(Context context, List<BusStop> busStops) throws SQLException {
 	super(context);
-	final long startTime = System.currentTimeMillis();
 
 	this.context = context;
 
@@ -84,9 +83,7 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 	paint.setStyle(Style.FILL);
 	paint.setStrokeWidth(6);
 
-	Log.i(TAG, "Begining to load bus stops in to overlay " + (System.currentTimeMillis() - startTime));
-	busStops = busStopDao.queryForAll();
-	Log.i(TAG, "Finished loading bus stops in to overlay " + (System.currentTimeMillis() - startTime));
+	this.busStops = busStops;
     }
 
     void setRoutes(int route, boolean visible) {

@@ -35,6 +35,7 @@ public class BusStop extends POI {
     public static final String DESCRIPTION_FIELD_NAME = "description";
     public static final String BAY_FIELD_NAME = "bay";
     public static final String ROUTES_FIELD_NAME = "bay";
+    public static final String UNI_LINK_FIELD_NAME = "uniLink";
 
     /**
      * Description e.g. "Bournemouth Rd os Asda S"
@@ -52,7 +53,10 @@ public class BusStop extends POI {
      * Used to speed up accessing the relevent uni link routes for a bus stop, this is not a uni link stop
      */
     @DatabaseField(canBeNull = false)
-    public byte routes;
+    byte routes;
+
+    @DatabaseField(canBeNull = false)
+    boolean uniLink;
 
     public BusStop(String location, String description, String bay, GeoPoint point) {
 	this.id = location;
