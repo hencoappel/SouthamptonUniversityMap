@@ -77,10 +77,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="preferences_gps">GPS</string>
     <string name="preferences_gps_enabled">GPS Enabled</string>
     <string name="preferences_gps_disabled">GPS Disabled</string>
-    <string name="preferences_catagory_bus_times">Bus Times</string>
-    <string name="preferences_live_bus_times">Live Bus Times</string>
-    <string name="preferences_live_bus_times_enabled">Live Bus Times Enabled</string>
-    <string name="preferences_live_bus_times_disabled">Live Bus Times Disabled</string>
+    <string name="preferences_catagory_live_bus_times">Live Bus Times</string>
+    <string name="preferences_uni_link_live_bus_times">Uni-Link</string>
+    <string name="preferences_uni_link_live_bus_times_enabled">Uni-Link Enabled</string>
+    <string name="preferences_uni_link_live_bus_times_disabled">Uni-Link Disabled</string>
+    <string name="preferences_non_uni_link_live_bus_times">Non Uni-Link</string>
+    <string name="preferences_non_uni_link_live_bus_times_enabled">Non Uni-Link Enabled</string>
+    <string name="preferences_non_uni_link_live_bus_times_disabled">Non Uni-Link Disabled</string>
+    <string name="preferences_catagory_data">Data</string>
+    <string name="preferences_non_uni_link">Non Uni-Link Bus Stops</string>
+    <string name="preferences_non_uni_link_enabled">Non Uni-Link Bus Stops Enabled</string>
+    <string name="preferences_non_uni_link_disabled">Non Uni-Link Bus Stops Disabled</string>
+
+    <!-- About Messages -->
     <string name="about_menu_instruction_text">Expand the items below to learn more about each feature of the application.</string>
     <string name="bustimes_favourite_checkbox_label">Favourite</string>
     <string name="donate_dialog_message">Loading bitcoin client</string>
@@ -88,8 +97,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.<
     <string name="menu_previous_stop">Previous</string>
     <string name="menu_next_stop">Next</string>
     <string name="menu_refresh_stop">Refresh</string>
-    
-     <!-- About Strings -->
+
+    <!-- About Strings -->
     <string name="about">About</string>
     <string name="about_version">Version</string>
     <string name="about_version_summary">0.2.2 (alpha)</string>

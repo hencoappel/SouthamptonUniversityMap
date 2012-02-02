@@ -12,12 +12,26 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:orderingFromXml="true"
-        android:title="@string/preferences_catagory_bus_times" >
+        android:title="@string/preferences_catagory_live_bus_times" >
         <CheckBoxPreference
             android:key="liveBusTimesEnabled"
-            android:summaryOff="@string/preferences_live_bus_times_disabled"
-            android:summaryOn="@string/preferences_live_bus_times_enabled"
-            android:title="@string/preferences_live_bus_times" />
+            android:summaryOff="@string/preferences_uni_link_live_bus_times_disabled"
+            android:summaryOn="@string/preferences_uni_link_live_bus_times_enabled"
+            android:title="@string/preferences_uni_link_live_bus_times" />
+        <CheckBoxPreference
+            android:key="nonUniLinkLiveBusTimesEnabled"
+            android:summaryOff="@string/preferences_non_uni_link_live_bus_times_disabled"
+            android:summaryOn="@string/preferences_non_uni_link_live_bus_times_enabled"
+            android:title="@string/preferences_non_uni_link_live_bus_times" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:orderingFromXml="true"
+        android:title="@string/preferences_catagory_data" >
+        <CheckBoxPreference
+            android:key="NonUniLinkBusStop"
+            android:summaryOff="@string/preferences_non_uni_link_disabled"
+            android:summaryOn="@string/preferences_non_uni_link_enabled"
+            android:title="@string/preferences_non_uni_link" />
     </PreferenceCategory>
 
 </PreferenceScreen>
