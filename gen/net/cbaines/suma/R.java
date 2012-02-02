@@ -130,44 +130,46 @@ public final class R {
         public static final int U9=0x7f07000d;
         /**  About Strings 
          */
-        public static final int about=0x7f07002c;
-        public static final int about_android_market=0x7f070039;
-        public static final int about_android_market_summary=0x7f07003a;
-        public static final int about_copyright=0x7f07002f;
-        public static final int about_copyright_summary=0x7f070030;
-        public static final int about_data=0x7f070037;
-        public static final int about_data_summary=0x7f070038;
-        public static final int about_database=0x7f070043;
-        public static final int about_database_summary=0x7f070044;
-        public static final int about_developer=0x7f070035;
-        public static final int about_developer_summary=0x7f070036;
-        public static final int about_donate=0x7f070045;
-        public static final int about_donate_summary=0x7f070046;
+        public static final int about=0x7f070033;
+        public static final int about_android_market=0x7f070040;
+        public static final int about_android_market_summary=0x7f070041;
+        public static final int about_copyright=0x7f070036;
+        public static final int about_copyright_summary=0x7f070037;
+        public static final int about_data=0x7f07003e;
+        public static final int about_data_summary=0x7f07003f;
+        public static final int about_database=0x7f07004a;
+        public static final int about_database_summary=0x7f07004b;
+        public static final int about_developer=0x7f07003c;
+        public static final int about_developer_summary=0x7f07003d;
+        public static final int about_donate=0x7f07004c;
+        public static final int about_donate_summary=0x7f07004d;
         public static final int about_help_message=0x7f070015;
-        public static final int about_license=0x7f070031;
-        public static final int about_license_summary=0x7f070032;
-        public static final int about_map_data=0x7f07003b;
-        public static final int about_map_data_summary=0x7f07003c;
-        public static final int about_map_icons=0x7f07003d;
-        public static final int about_map_icons_summary=0x7f07003e;
-        public static final int about_map_tiles=0x7f070041;
-        public static final int about_map_tiles_summary=0x7f070042;
-        public static final int about_menu_instruction_text=0x7f070025;
-        public static final int about_osm_map=0x7f07003f;
-        public static final int about_osm_map_summary=0x7f070040;
-        public static final int about_project=0x7f070033;
-        public static final int about_project_summary=0x7f070034;
-        public static final int about_version=0x7f07002d;
-        public static final int about_version_summary=0x7f07002e;
+        public static final int about_license=0x7f070038;
+        public static final int about_license_summary=0x7f070039;
+        public static final int about_map_data=0x7f070042;
+        public static final int about_map_data_summary=0x7f070043;
+        public static final int about_map_icons=0x7f070044;
+        public static final int about_map_icons_summary=0x7f070045;
+        public static final int about_map_tiles=0x7f070048;
+        public static final int about_map_tiles_summary=0x7f070049;
+        /**  About Messages 
+         */
+        public static final int about_menu_instruction_text=0x7f07002c;
+        public static final int about_osm_map=0x7f070046;
+        public static final int about_osm_map_summary=0x7f070047;
+        public static final int about_project=0x7f07003a;
+        public static final int about_project_summary=0x7f07003b;
+        public static final int about_version=0x7f070034;
+        public static final int about_version_summary=0x7f070035;
         public static final int app_name=0x7f070004;
         public static final int bitcoin_error_message=0x7f07001a;
         public static final int building_non_residential=0x7f070007;
         public static final int building_residential=0x7f070006;
-        public static final int bustimes_favourite_checkbox_label=0x7f070026;
+        public static final int bustimes_favourite_checkbox_label=0x7f07002d;
         public static final int credits_help_message=0x7f070018;
         public static final int donate_button=0x7f070019;
-        public static final int donate_dialog_error_title=0x7f070028;
-        public static final int donate_dialog_message=0x7f070027;
+        public static final int donate_dialog_error_title=0x7f07002f;
+        public static final int donate_dialog_message=0x7f07002e;
         public static final int favourites_dialog_message=0x7f07001c;
         public static final int favourites_help_message=0x7f070016;
         public static final int find_help_message=0x7f070011;
@@ -181,14 +183,15 @@ public final class R {
         public static final int menu_favourites=0x7f07000f;
         public static final int menu_find=0x7f070000;
         public static final int menu_find_my_location=0x7f070003;
-        public static final int menu_next_stop=0x7f07002a;
+        public static final int menu_next_stop=0x7f070031;
         public static final int menu_preferences=0x7f070001;
-        public static final int menu_previous_stop=0x7f070029;
-        public static final int menu_refresh_stop=0x7f07002b;
+        public static final int menu_previous_stop=0x7f070030;
+        public static final int menu_refresh_stop=0x7f070032;
         public static final int menu_view=0x7f070002;
         public static final int pref_bus_stop=0x7f070008;
         public static final int preferences=0x7f07001b;
-        public static final int preferences_catagory_bus_times=0x7f070021;
+        public static final int preferences_catagory_data=0x7f070028;
+        public static final int preferences_catagory_live_bus_times=0x7f070021;
         /**  Preferences Messages 
          */
         public static final int preferences_catagory_positioning=0x7f07001d;
@@ -196,9 +199,15 @@ public final class R {
         public static final int preferences_gps_disabled=0x7f070020;
         public static final int preferences_gps_enabled=0x7f07001f;
         public static final int preferences_help_message=0x7f070012;
-        public static final int preferences_live_bus_times=0x7f070022;
-        public static final int preferences_live_bus_times_disabled=0x7f070024;
-        public static final int preferences_live_bus_times_enabled=0x7f070023;
+        public static final int preferences_non_uni_link=0x7f070029;
+        public static final int preferences_non_uni_link_disabled=0x7f07002b;
+        public static final int preferences_non_uni_link_enabled=0x7f07002a;
+        public static final int preferences_non_uni_link_live_bus_times=0x7f070025;
+        public static final int preferences_non_uni_link_live_bus_times_disabled=0x7f070027;
+        public static final int preferences_non_uni_link_live_bus_times_enabled=0x7f070026;
+        public static final int preferences_uni_link_live_bus_times=0x7f070022;
+        public static final int preferences_uni_link_live_bus_times_disabled=0x7f070024;
+        public static final int preferences_uni_link_live_bus_times_enabled=0x7f070023;
         public static final int view_help_message=0x7f070014;
     }
     public static final class xml {

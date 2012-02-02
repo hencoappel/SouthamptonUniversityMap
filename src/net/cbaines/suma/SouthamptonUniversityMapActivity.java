@@ -138,8 +138,10 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	pastOverlays = (HashMap<String, Overlay>) getLastNonConfigurationInstance();
 
 	// SensorManager mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE); This code in the following constructor causes problems in
-	// some emulators, disable there sensors to fix.
+	// some emulators, disable sensors to fix.
+	Log.i(TAG, "Starting creating myLocationOverlay");
 	myLocationOverlay = new MyLocationOverlay(instance, mapView);
+	Log.i(TAG, "Finished creating myLocationOverlay");
 
 	while (databaseThread.isAlive()) {
 	    Thread.yield();
@@ -241,7 +243,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		    // of your application so we are gonna be able to overwrite that database with our database.
 		    Log.i(TAG, "GetReadableDatabase");
 		    helper.getWritableDatabase().close();
-		    
+
 		    helper.copyDataBase();
 		    Log.i(TAG, "Out of copy database");
 		} catch (IOException ioe) {

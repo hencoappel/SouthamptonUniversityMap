@@ -1,0 +1,337 @@
+Name,ID,Site,Residential
+Building 1,1,1,NR
+Building 2,2,1,NR
+Law,4,1,NR
+Eustice,5,1,NR
+Nuffield Theatre,6,1,NR
+Lanchester,7,1,NR
+A B Woods Laboratory,8,1,NR
+Engineering Workshops,9,1,NR
+Energy Centre (CHP),11,1,NR
+Tizard,13,1,NR
+Workshop adjacent to B13,13A,1,NR
+Wolfson/Rayleigh,15,1,NR
+Building 16,16,1,NR
+R J Mitchell Wind Tunnel,17,1,NR
+Jubilee Sports Complex,18,1,NR
+ISVR,19,1,NR
+High Voltage Laboratory,20,1,NR
+Faraday,21,1,NR
+Civil Eng Temp Accommodation,22,1,NR
+EScience Building,25,1,NR
+Building 26,26,1,NR
+Chemistry,27,1,NR
+Froude,28,1,NR
+Graham Hills,29,1,NR
+Synthetic Chemistry,30,1,NR
+Combinatorial Chemistry,30A,1,NR
+Hartley Store,31,1,NR
+EEE Building,32,1,NR
+Estates (Maintenance),33,1,NR
+Education,34,1,NR
+David Kiddle,35,1,NR
+Library (inc. blds 10 12 & 14),36,1,NR
+George Thomas,37,1,NR
+George Thomas Building Exten,37A,1,NR
+Staff Social Centre,38,1,NR
+Soton Stat Sci Res Institute,39,1,NR
+West Bld & Staff Social Centre,40,1,NR
+Day Nursery,41,1,NR
+Students' Union/Refectory,42,1,NR
+Shackleton,44,1,NR
+Geodata Institute,44A,1,NR
+Potting Shed behind B44,44B,1,NR
+Health Profs & Rehab Sciences,45,1,NR
+Physics,46,1,NR
+University Health Centre,48,1,NR
+John Hansard Gallery,50,1,NR
+Turner Sims Concert Hall,52,1,NR
+New Mountbatten,53,1,NR
+Mathematics,54,1,NR
+Human Performance Laboratory,56,1,NR
+Students' Union Retail Centre,57,1,NR
+Murray,58,1,NR
+Building 58A,58A,1,NR
+New Zepler,59,1,NR
+Gower,60,1,NR
+Ship Science Store,61,1,NR
+Nightingale,67,1,NR
+Life Sciences,85,1,NR
+Portacabin by Gower Building,86,1,NR
+Interchange Kiosk,115,1,NR
+26 University Road,1050,1,NR
+28 University Road,1051,1,NR
+31 University Road,1101,1,NR
+39 University Road,1102,1,NR
+41 University Rd - Chaplaincy,1104,1,NR
+43 University Road,1105,1,NR
+45 University Road,1106,1,NR
+47 University Road,1107,1,NR
+130 Burgess Road,1220,1,NR
+134 Burgess Road,1221,1,NR
+136 Burgess Road,1222,1,NR
+44 Chamberlain Road,1419,1,NR
+46 Chamberlain Road S/Union,1420,1,NR
+P/kabin Occ Health rr 26/28 UR,9014,1,NR
+Plumbers' Store behind B35,9019,1,NR
+8 Chamberlain Road,1401,1,R
+10 Chamberlain Road,1402,1,R
+12 Chamberlain Road,1403,1,R
+14 Chamberlain Road,1404,1,R
+16 Chamberlain Road,1405,1,R
+18 Chamberlain Road,1406,1,R
+20 Chamberlain Road,1407,1,R
+22 Chamberlain Road,1408,1,R
+24 Chamberlain Road,1409,1,R
+26 Chamberlain Road,1410,1,R
+28 Chamberlain Road,1411,1,R
+30 Chamberlain Road,1412,1,R
+32 Chamberlain Road,1413,1,R
+34 Chamberlain Road,1414,1,R
+36 Chamberlain Road,1415,1,R
+38 Chamberlain Road,1416,1,R
+40 Chamberlain Road,1417,1,R
+42 Chamberlain Road,1418,1,R
+48 Chamberlain Road,1421,1,R
+50 Chamberlain Road,1422,1,R
+52 Chamberlain Road,1423,1,R
+54 Chamberlain Road,1424,1,R
+56 Chamberlain Road,1425,1,R
+58 Chamberlain Road,1426,1,R
+17 Hartley Avenue,1501,1,R
+19 Hartley Avenue,1502,1,R
+21 Hartley Avenue,1503,1,R
+23 Hartley Avenue,1504,1,R
+25 Hartley Avenue,1505,1,R
+27 Hartley Avenue,1506,1,R
+29 Hartley Avenue,1507,1,R
+31 Hartley Avenue,1508,1,R
+65 Heatherdeane Road,1580,1,R
+62 Granby Grove,1601,1,R
+64 Granby Grove,1602,1,R
+Bassett House,1604,40,R
+Birchwood,1620,37,R
+158 Mayfield Road,1622,1,R
+185 Broadlands Road,1630,1,R
+10 Orchards Way,1640,1,R
+Oakhurst Road,73,1,R
+Boldrewood,62,2,NR
+34 Bassett Crescent East,1603,2,NR
+17 Oaklands Way,1395,2,R
+Parkes Bldg,65,3,NR
+Archaelogy (ex-Crawford),65A,3,NR
+Burgess,65B,3,NR
+16 Highfield Road,1310,3,NR
+East Site,63A,4,NR
+Terrapin,63C,4,NR
+Adminstration,63F,4,NR
+Textile Conservation Cnt,63G,4,NR
+West Site,63K,4,NR
+Students' Union,63L,4,NR
+Chilworth Estate,71,5,NR
+Chilworth Laboratories,89,5,NR
+Alpha House,92,5,NR
+3 Venture Road,96,5,NR
+Epsilon House,97,5,NR
+2 Venture Road,99,5,NR
+National Oceanography Centre,68,6,NR
+National Oceanography Centre - Block A1,68-A1,6,NR
+National Oceanography Centre - Block A6,68-A6,6,NR
+National Oceanography Centre - Block N9,68-N9,6,NR
+72 Mead Crescent,1612,8,R
+South Academic Block,9500,18,NR
+Lab & Path Block,9510,18,NR
+West Wing,9520,18,NR
+Centre Block,9530,18,NR
+P/Anne Maternity Unit,9550,18,NR
+IDS,9555,18,NR
+Duthie,9560,18,NR
+Duthie/Tenovus Link,9561,18,NR
+Tenovus,9570,18,NR
+Somers Cancer Research,9580,18,NR
+MRC Building,9581,18,NR
+Royal South Hants,9585,20,NR
+Aldermoor Health Centre,9590,19,NR
+"North Hampshire Hospital, Basingstoke",9591,21,NR
+"Royal Hampshire County Hospital, Winchester",9592,22,NR
+"St. Mary's Hospital, Portsmouth",9593,23,NR
+"St Mary's Hospital, Isle of Wight",9594,24,NR
+"Nurses' accommodation, Portsmouth",9595,25,NR
+New Sports Pavilion Wide Lane,93,39,NR
+Boat House 1,94A,8,NR
+Boat House 2,94B,8,NR
+Westsuit Drying/Store,94C,8,NR
+Store 1,94D,8,NR
+Boat House Changing Rooms,94F,8,NR
+Workshop,94G,8,NR
+Classroom,94H,8,NR
+Store 2,94J,8,NR
+Old Sports Pavilion Wide Lane,95,39,NR
+Staff P/kabin 1 Wide Lane,9001,39,NR
+P/kabin 2 rear Bld 35,9002,1,NR
+"Boiler House, Wide Lane",9003,39,NR
+Gardening Shed Wide Lane,9004,39,NR
+Changing Room 1 Wide Lane,9011,39,NR
+Changing Room 2 Wide Lane,9012,39,NR
+Unit 6 Store,150,45,NR
+Unit 12 Bindery,151,45,NR
+Unit 13 Print Centre,152,45,NR
+Highfield Hall Aubrey House,75A,56,R
+Highfield Hall Laundry,75B,56,R
+Highfield Hall Wolfe House,75C,56,R
+Glen Eyre Hall Block A Richard Newitt,73A,57,R
+Glen Eyre Hall Block B Richard Newitt,73B,57,R
+Glen Eyre Hall Bungalow 1,73B1,57,R
+Glen Eyre Bungalow 2,73B2,57,R
+Glen Eyre Bungalow 3,73B3,57,R
+Glen Eyre Hall Bungalow 4,73B4,57,R
+Glen Eyre Hall Block C Richard Newitt,73C,57,R
+Glen Eyre Hall Block D Richard Newitt,73D,57,R
+Glen Eyre Hall Block E Richard Newitt,73E,57,R
+Glen Eyre Hall Block F Richard Newitt,73F,57,R
+Glen Eyre Hall Block G Richard Newitt,73G,57,R
+Glen Eyre Hall Block H Richard Newitt,73H,57,R
+Glen Eyre Hall Block J,73J,57,R
+"Glen Eyre Hall, Chancellor's Court, Selbourne",73K,57,R
+"Glen Eyre Hall, Chancellor's Court, Jellicoe",73L,57,R
+"Glen Eyre Hall, Chancellor's Court, Roll",73M,57,R
+Block A Glen Eyre Hall Old Terrace,73N-A,57,R
+Block B Glen Eyre Hall Old Terrace,73N-B,57,R
+Block C Glen Eyre Hall Old Terrace,73N-C,57,R
+Block D Glen Eyre Hall Old Terrace,73N-D,57,R
+Block E Glen Eyre Hall Old Terrace,73N-E,57,R
+Block F Glen Eyre Hall Old Terrace,73N-F,57,R
+Block G Glen Eyre Hall Old Terrace,73N-G,57,R
+Block H Glen Eyre Hall Old Terrace,73N-H,57,R
+Block J Glen Eyre Hall Old Terrace,73N-J,57,R
+Block K Glen Eyre Hall Old Terrace,73N-K,57,R
+Glen Eyre Hall Main Building,73Q1,57,R
+Glen Eyre Hall Dining Hall,73Q2,57,R
+Glen Eyre Hall Squash Court,73S,57,R
+Glen Eyre Hall Brunei House,73T,57,R
+Glen Eyre Hall Block W,73W,57,R
+Block Q Glen Eyre Hall New Terrace,73X-Q,57,R
+Block R Glen Eyre Hall New Terrace,73X-R,57,R
+Block S Glen Eyre Hall New Terrace,73X-S,57,R
+Block T Glen Eyre Hall New Terrace,73X-T,57,R
+South Hill A,70AA,58,R
+South Hill B,70BB,58,R
+South Hill C,70CC,58,R
+Chamberlain A,70A,59,R
+Chamberlain B,70B,59,R
+Chamberlain C,70C,59,R
+Chamberlain Dining Room,70D,59,R
+Chamberlain Boiler House,70E,59,R
+Chamberlain Bin Store,70F,59,R
+50 Glen Eyre Road,1710,59,R
+Hartley Grove A,79A,60,R
+Hartley Grove B,79B,60,R
+Hartley Grove C,79C,60,R
+Beechmount House,73R,61,R
+Bencraft Court Block A,81A,62,R
+Bencraft Court Block B,81B,62,R
+Bencraft Court Block C,81C,62,R
+Bencraft Court Bar,81D,62,R
+Bencraft Court Cycle Sheds,81E,62,R
+Connaught A (Old Quad),72A1-A,63,R
+Connaught B (Old Quad),72A1-B,63,R
+Connaught C (Old Quad),72A1-C,63,R
+Connaught D (Old Quad),72A2-D,63,R
+Connaught E (Old Quad),72A2-E,63,R
+Connaught F (Old Quad),72A2-F,63,R
+Connaught G (Old Quad),72A2-G,63,R
+Connaught H (Old Quad),72A2-H,63,R
+Connaught J (New Quad),72A2-J,63,R
+Connaught K (New Quad),72A2-K,63,R
+Connaught L (New Quad),72A2-L,63,R
+Connaught Hall Squash Court,72B,63,R
+Connaught Hall Dining Room,72C,63,R
+Connaught Hall/Lobby/Laundry,72CC,63,R
+Connaught M (New Quad),72D-M,63,R
+Connaught N (New Quad),72D-N,63,R
+Connaught P (New Quad),72D-P,63,R
+Connaught Q (New Quad),72E-Q,63,R
+Connaught R (New Quad),72E-R,63,R
+Connaught S (New Quad),72F-S,63,R
+"Connaught Hall, The Bungalow",72G,63,R
+Montefiore Hall Block A,76A,64,R
+Montefiore Hall Block B,76B,64,R
+Montefiore Hall Block C,76C,64,R
+Montefiore Hall Block D,76D,64,R
+Montefiore Hall Block E,76E,64,R
+Montefiore Hall Block F,76F,64,R
+Montefiore Hall Block G,76G,64,R
+Montefiore Hall Block H,76H,64,R
+Montefiore Hall Block J,76J,64,R
+Montefiore Hall Block K,76K,64,R
+Montefiore Hall Block L,76L,64,R
+Montefiore Hall Block M,76M,64,R
+Montefiore Hall Block N,76N,64,R
+Montefiore Hall Block P,76P,64,R
+Montefiore Hall Block Q,76Q,64,R
+Montefiore Hall Block R,76R,64,R
+Montefiore Hall Block S,76S,64,R
+Montefiore Hall Social Centre,76SC,64,R
+Montefiore Hall Block T,76T,64,R
+Montefiore Hall Laundry,76U,64,R
+Montefiore Hall Block V,76V,64,R
+Montefiore Hall Block W,76W,64,R
+Montefiore Hall Block X,76X,64,R
+Montefiore Hall - Reception,76Z,64,R
+South Stoneham House,78A,65,R
+South Stoneham Tower,78B,65,R
+South Stoneham Dining Room,78C,65,R
+South Stoneham Staff Block,78D,65,R
+South Stoneham Warden's Lodge,78E,65,R
+St Margaret's Hall,77,66,R
+Gateley Hall,82A,67,R
+Romero Hall,82B,68,R
+13 Chestnut Lodge,1626,69,R
+Erasmus Park,1730,70,R
+Erasmus - House 01,1730-01,70,R
+Erasmus - House 02,1730-02,70,R
+Erasmus - House 03,1730-03,70,R
+Erasmus - House 04,1730-04,70,R
+Erasmus - House 05,1730-05,70,R
+Erasmus - House 06,1730-06,70,R
+Erasmus - House 07,1730-07,70,R
+Erasmus - House 08,1730-08,70,R
+Erasmus - House 09,1730-09,70,R
+Erasmus - House 10,1730-10,70,R
+Erasmus - House 11,1730-11,70,R
+Erasmus - House 12,1730-12,70,R
+Erasmus - House 13,1730-13,70,R
+Erasmus - House 14,1730-14,70,R
+Erasmus - House 15,1730-15,70,R
+Erasmus - House 16,1730-16,70,R
+Erasmus - House 17,1730-17,70,R
+Erasmus - House 18,1730-18,70,R
+Erasmus - Flat 19,1730-19,70,R
+Erasmus - Flat 20,1730-20,70,R
+Erasmus - Flat 21,1730-21,70,R
+Erasmus - Flat 22,1730-22,70,R
+Erasmus - Flat 23,1730-23,70,R
+Erasmus - Flat 24,1730-24,70,R
+Erasmus - Flat 25,1730-25,70,R
+Erasmus - Flat 26,1730-26,70,R
+Erasmus - Flat 27,1730-27,70,R
+Erasmus - Flat 28,1730-28,70,R
+Erasmus - Flat 29,1730-29,70,R
+Erasmus - Flat 30,1730-30,70,R
+Erasmus - Flat 31,1730-31,70,R
+Erasmus - Flat 32,1730-32,70,R
+Erasmus - Flat 33,1730-33,70,R
+Erasmus - Flat 34,1730-34,70,R
+Erasmus - Flat 35,1730-35,70,R
+Erasmus - Flat 36,1730-36,70,R
+Erasmus - Flat 37,1730-37,70,R
+Erasmus - Flat 38,1730-38,70,R
+Erasmus - Flat 39,1730-39,70,R
+Erasmus - Flat 40,1730-40,70,R
+Erasmus - Flat 41,1730-41,70,R
+24 Mead Crescent,1610,71,R
+1A Oakhurst Road,1390,73,R
+1B Oakhurst Road,1391,73,R
+18-20 Shaftesbury Avenue,165,77,R
+"1A Victoria Place, Portsmouth",166,78,R
+College Keep,123,79,NR

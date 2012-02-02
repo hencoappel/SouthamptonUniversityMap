@@ -23,12 +23,6 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
 public class PreferencesActivity extends PreferenceActivity {
-    boolean CheckboxPreference;
-    String ListPreference;
-    String editTextPreference;
-    String ringtonePreference;
-    String secondEditTextPreference;
-    String customPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
