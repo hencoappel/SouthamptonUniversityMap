@@ -237,7 +237,8 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     public void onPause() {
 	if (mHandler != null) { // BusTimes are enabled
 	    mHandler.removeCallbacks(refreshData);
-	    timetableTask.cancel(true);
+	    if (timetableTask != null) // Could happen if the handler has not created the timetableTask yet
+		timetableTask.cancel(true);
 	    Log.i(TAG, "Stoping refreshing timetable data");
 	}
 
