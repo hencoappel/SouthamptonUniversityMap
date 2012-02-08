@@ -25,9 +25,6 @@ import java.util.HashSet;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.util.FileManager;
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 
 public class BuildingActivity extends OrmLiteBaseActivity<DatabaseHelper> {
@@ -47,7 +44,7 @@ public class BuildingActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	final DatabaseHelper helper = getHelper();
 
 	// create an empty model
-	Model model = ModelFactory.createDefaultModel();
+	// Model model = ModelFactory.createDefaultModel();
 
 	// use the FileManager to find the input file
 	InputStream in = getResources().openRawResource(R.raw.u9);
@@ -56,7 +53,7 @@ public class BuildingActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	}
 
 	// read the RDF/XML file
-	model.read(in, null);
+	// model.read(in, null);
 	
 	
 
