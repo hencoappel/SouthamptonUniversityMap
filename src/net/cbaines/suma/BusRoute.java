@@ -121,20 +121,18 @@ public class BusRoute {
 
 	if (forwardDirection != null) {
 
-	    if (direction == null) {
-		return null;
+	    if (direction != null) {
+
+		if (forwardDirection.equals(direction)) {
+
+		} else if (reverseDirection.equals(direction)) {
+		    moveAmount = -moveAmount;
+		} else {
+		    Log.e("BusRoute", "Direction (" + direction + ") doesnt match either the forward direction (" + forwardDirection
+			    + ") or reverse direction (" + reverseDirection + ")");
+		    return null;
+		}
 	    }
-
-	    if (forwardDirection.equals(direction)) {
-
-	    } else if (reverseDirection.equals(direction)) {
-		moveAmount = -moveAmount;
-	    } else {
-		Log.e("BusRoute", "Direction (" + direction + ") doesnt match either the forward direction (" + forwardDirection + ") or reverse direction ("
-			+ reverseDirection + ")");
-		return null;
-	    }
-
 	}
 
 	try {
@@ -147,12 +145,12 @@ public class BusRoute {
 
 	    List<RouteStops> routeStopsFound = routeStopsDao.query(routeStopsPreparedQuery);
 	    Log.v("BusRoute", "Found " + routeStopsFound.size() + " stops");
-	    
+
 	    int stopIndex = 0;
-	    
+
 	    for (RouteStops routeStop : routeStopsFound) {
 		if (routeStop.stop.id.equals(stop.id)) {
-		    stopIndex = routeStop.sequence -1;
+		    stopIndex = routeStop.sequence - 1;
 		}
 	    }
 

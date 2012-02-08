@@ -334,7 +334,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 	// Handle item selection
-	if (false) { // (item.getItemId() == R.id.menu_previous_stop || item.getItemId() == R.id.menu_next_stop) {
+	if (item.getItemId() == R.id.menu_previous_stop || item.getItemId() == R.id.menu_next_stop) {
 	    Log.v(TAG, "Got a request for the stop movement");
 
 	    Log.v(TAG, routes.size() + " routes avalible from this stop");
@@ -343,7 +343,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 	    for (BusRoute route : routes) {
 		try {
-		    if (false) { // (item.getItemId() == R.id.menu_next_stop) {
+		    if (item.getItemId() == R.id.menu_next_stop) {
 			busStops.add(route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), null, 1));
 		    } else {
 			busStops.add(route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), null, -1));
