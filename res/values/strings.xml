@@ -17,6 +17,8 @@
     <string name="U9">U9</string>
     <string name="menu_about">About</string>
     <string name="menu_favourites">Favourites</string>
+    <string name="favourites_dialog_title">Favourites</string>
+    
 
     <!-- Help Messages -->
     <string name="map_help_message">You can drag the map to move it, you can use pinch motions to zoom in and out, this can also be done with the buttons at the bottom of the screen. Taping the building markers will show you there full name, and tapping the bus stop markers will show the live times at that stop. Presing and holding a marker, will add the item to the favourites list.</string>

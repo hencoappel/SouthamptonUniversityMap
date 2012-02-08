@@ -904,6 +904,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    favDialog = new POIDialog(instance);
 	    favDialog.setOnItemClickListener(this);
 	    favDialog.setOnItemLongClickListener(this);
+	    favDialog.setTitle(R.string.favourites_dialog_title);
 	    return favDialog;
 	}
 	return null;
