@@ -84,8 +84,10 @@ public final class R {
         public static final int menu_favourites=0x7f0a0028;
         public static final int menu_find=0x7f0a0023;
         public static final int menu_find_my_location=0x7f0a0025;
+        public static final int menu_next_stop=0x7f0a002b;
         public static final int menu_preferences=0x7f0a0024;
-        public static final int menu_refresh_stop=0x7f0a0029;
+        public static final int menu_previous_stop=0x7f0a0029;
+        public static final int menu_refresh_stop=0x7f0a002a;
         public static final int menu_view=0x7f0a0026;
         public static final int radio_u1=0x7f0a0006;
         public static final int radio_u1n=0x7f0a0007;
