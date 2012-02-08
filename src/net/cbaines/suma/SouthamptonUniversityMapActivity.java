@@ -114,7 +114,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
     // Uni-Link Bus Stop Overlay
     private BusStopOverlay nonUniLinkBusStopOverlay;
-    private static final boolean NON_UNI_LINK_BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT = true;
+    private static final boolean NON_UNI_LINK_BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT = false;
 
     // Site Overlays
     private HashMap<Site, PathOverlay> siteOverlays = new HashMap<Site, PathOverlay>(21);
@@ -692,6 +692,34 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 		    synchronized (mapView.getOverlays()) {
 			mapView.getOverlays().add(uniLinkBusStopOverlay);
+			Collections.sort(mapView.getOverlays(), comparator);
+		    }
+		}
+
+		if (nonUniLinkBusStopOverlay == null && activityPrefs.getBoolean(NON_UNI_LINK_BUS_STOPS, NON_UNI_LINK_BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT)) {
+		    if (pastOverlays != null && (nonUniLinkBusStopOverlay = (BusStopOverlay) pastOverlays.get("NonUniLinkBusStops")) != null) {
+			Log.i(TAG, "Restored bus stop overlays");
+		    } else {
+			try {
+			    List<BusStop> busStops;
+			    Log.v(TAG, "Begin fetching BusStops at " + (System.currentTimeMillis() - startTime));
+
+			    busStops = getHelper().getBusStopDao().queryForEq(BusStop.UNI_LINK_FIELD_NAME, false);
+
+			    Log.v(TAG, "Finished fetching BusStops at " + (System.currentTimeMillis() - startTime));
+
+			    nonUniLinkBusStopOverlay = new BusStopOverlay(instance, busStops);
+			} catch (SQLException e) {
+			    e.printStackTrace();
+			}
+		    }
+
+		    overlays.put("BusStops", nonUniLinkBusStopOverlay);
+
+		    Log.v(TAG, "Applyed the site overlay, now sorting them");
+
+		    synchronized (mapView.getOverlays()) {
+			mapView.getOverlays().add(nonUniLinkBusStopOverlay);
 			Collections.sort(mapView.getOverlays(), comparator);
 		    }
 		}

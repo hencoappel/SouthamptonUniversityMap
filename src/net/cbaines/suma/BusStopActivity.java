@@ -170,10 +170,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		    } else {
 			U9RouteRadioButton.setVisibility(View.GONE);
 		    }
-		} else {
-		    Log.e(TAG, "Error unknown route " + route.code);
-		}
-
+		} 
 	    }
 
 	    busStopDao = helper.getBusStopDao();

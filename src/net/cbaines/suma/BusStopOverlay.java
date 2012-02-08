@@ -119,20 +119,21 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 
 	    boolean drawing = false;
 
-	    for (int i = 0; i < 5; i++) {
-		if ((stopRoutes & (1 << i)) != 0) {
-		    routeNum++;
-		    if (routes[i]) {
-			drawing = true;
+	    if (stop.uniLink) {
+
+		for (int i = 0; i < 5; i++) {
+		    if ((stopRoutes & (1 << i)) != 0) {
+			routeNum++;
+			if (routes[i]) {
+			    drawing = true;
+			}
 		    }
 		}
+
+		if (!drawing)
+		    continue;
+
 	    }
-
-	    if (!drawing)
-		continue;
-
-	    int yOfsetPerMarker = (int) (10 * scale);
-	    int markerYSize = (int) (8 * scale);
 
 	    pj.toMapPixels(stop.point, mCurScreenCoords);
 
@@ -141,50 +142,53 @@ public class BusStopOverlay extends Overlay implements RouteColorConstants {
 	    } else {
 		Overlay.drawAt(canvas, marker, mCurScreenCoords.x, mCurScreenCoords.y, false);
 	    }
-	    // Log.i(TAG, "Got " + routes.size() + " routes " + routes);
 
-	    int makersPlaced = 0;
+	    if (stop.uniLink) {
 
-	    float rectLeft = mCurScreenCoords.x + (8.8f * scale);
-	    float rectRight = rectLeft + markerYSize;
+		int makersPlaced = 0;
+		int yOfsetPerMarker = (int) (10 * scale);
+		int markerYSize = (int) (8 * scale);
 
-	    if (routeNum == 5) {
-		markerYSize = (int) (5 * scale);
-		yOfsetPerMarker = (int) (7 * scale);
-	    } else if (routeNum == 4) {
-		markerYSize = (int) (6.5f * scale);
-		yOfsetPerMarker = (int) (8 * scale);
-	    }
+		float rectLeft = mCurScreenCoords.x + (8.8f * scale);
+		float rectRight = rectLeft + markerYSize;
 
-	    for (int i = 0; i < 5; i++) {
-		if ((stopRoutes & (1 << i)) != 0) {
+		if (routeNum == 5) {
+		    markerYSize = (int) (5 * scale);
+		    yOfsetPerMarker = (int) (7 * scale);
+		} else if (routeNum == 4) {
+		    markerYSize = (int) (6.5f * scale);
+		    yOfsetPerMarker = (int) (8 * scale);
+		}
 
-		    // Log.i(TAG, "Route " + route + " is " + routes.get(route));
+		for (int i = 0; i < 5; i++) {
+		    if ((stopRoutes & (1 << i)) != 0) {
 
-		    // Log.i(TAG, "Index is " + busRoutes.indexOf(route) + " busRoutes " + busRoutes);
+			// Log.i(TAG, "Route " + route + " is " + routes.get(route));
 
-		    if (i == 0) {
-			paint.setColor(U1);
-		    } else if (i == 1) {
-			paint.setColor(U1N);
-		    } else if (i == 2) {
-			paint.setColor(U2);
-		    } else if (i == 3) {
-			paint.setColor(U6);
-		    } else if (i == 4) {
-			paint.setColor(U9);
-		    } else {
-			Log.e(TAG, "Unknown route code");
+			// Log.i(TAG, "Index is " + busRoutes.indexOf(route) + " busRoutes " + busRoutes);
+
+			if (i == 0) {
+			    paint.setColor(U1);
+			} else if (i == 1) {
+			    paint.setColor(U1N);
+			} else if (i == 2) {
+			    paint.setColor(U2);
+			} else if (i == 3) {
+			    paint.setColor(U6);
+			} else if (i == 4) {
+			    paint.setColor(U9);
+			} else {
+			    Log.e(TAG, "Unknown route code");
+			}
+
+			canvas.drawRect(rectLeft, mCurScreenCoords.y + ((yOfsetPerMarker * makersPlaced) - (45 * scale)), rectRight, mCurScreenCoords.y
+				+ (yOfsetPerMarker * makersPlaced) - ((45 * scale) - markerYSize), paint);
+
+			makersPlaced++;
 		    }
-
-		    canvas.drawRect(rectLeft, mCurScreenCoords.y + ((yOfsetPerMarker * makersPlaced) - (45 * scale)), rectRight, mCurScreenCoords.y
-			    + (yOfsetPerMarker * makersPlaced) - ((45 * scale) - markerYSize), paint);
-
-		    makersPlaced++;
 		}
 	    }
 	}
-
     }
 
     @Override

@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -263,11 +264,19 @@ public class DataManager {
 		    uniLink = true;
 		}
 
-		if (dataBits.length > 3) {
-		    route = new BusRoute(id, dataBits[1], dataBits[2].replace("\"", ""), dataBits[3], dataBits[4], uniLink);
-		} else {
-		    route = new BusRoute(id, dataBits[1], dataBits[2].replace("\"", ""), uniLink);
+		route = new BusRoute(id, dataBits[1], dataBits[2].replace("\"", ""), uniLink);
+
+		if (id == 326) {
+		    route.forwardDirection = "C";
+		    route.reverseDirection = "A";
+		} else if (id == 329) {
+		    route.forwardDirection = "C";
+		    route.reverseDirection = "B";
+		} else if (id == 327) {
+		    route.forwardDirection = "H";
+		    route.reverseDirection = "C";
 		}
+
 		// Log.i(TAG, "Loaded route " + route.id + " " + route.code + " " + route.label);
 		busRouteDao.create(route);
 
@@ -338,6 +347,34 @@ public class DataManager {
 	    // TODO Auto-generated catch block
 	    Log.e(TAG, "Line: " + strLine);
 	    e.printStackTrace();
+	}
+
+	for (Iterator<BusStop> busStopIter = busStopDao.iterator(); busStopIter.hasNext();) {
+	    BusStop stop = busStopIter.next();
+	    // Log.i(TAG, "Looking at stop " + stop.id);
+
+	    /*
+	     * QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder(); routeStopsQueryBuilder.where().eq(columnName, value)
+	     * 
+	     * DeleteBuilder<BusStop, String> deleteBuilder = busStopDao.deleteBuilder(); // only delete the rows where password is null
+	     * deleteBuilder.where().in(RouteStops.STOP_ID_FIELD_NAME, objects) accountDao.delete(deleteBuilder.prepare());
+	     */
+
+	    QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder();
+	    routeStopsQueryBuilder.setCountOf(true);
+	    routeStopsQueryBuilder.where().eq(RouteStops.STOP_ID_FIELD_NAME, stop);
+
+	    PreparedQuery<RouteStops> routeStopsPreparedQuery = routeStopsQueryBuilder.prepare();
+	    long num = routeStopsDao.countOf(routeStopsPreparedQuery);
+	    // long num = routeStopsDao.query(routeStopsPreparedQuery).size();
+	    // Log.i(TAG, "Number is " + num);
+	    if (num == 0) {
+		// Log.i(TAG, "Removing " + stop.id);
+		stop.uniLink = false;
+	    } else {
+		stop.uniLink = true;
+	    }
+	    busStopDao.update(stop);
 	}
 
 	Log.i(TAG, "Finished loading bus data");
@@ -425,29 +462,48 @@ public class DataManager {
 	    BusRoute route;
 	    String dir = null;
 
-	    if (name.equals("U1N")) {
-		route = busRoutes.queryForId(468);
-	    } else if (name.startsWith("U9")) {
-		route = busRoutes.queryForId(354);
-	    } else {
-		if (name.startsWith("U1")) {
-		    route = busRoutes.queryForId(326);
-		} else if (name.startsWith("U2")) {
-		    route = busRoutes.queryForId(329);
-		} else if (name.startsWith("U6")) {
-		    route = busRoutes.queryForId(327);
+	    if (name.contains("U")) {
+		if (name.equals("U1N")) {
+		    route = busRoutes.queryForId(468);
+		} else if (name.startsWith("U9")) {
+		    route = busRoutes.queryForId(354);
 		} else {
-		    Log.e(TAG, "Error detecting route " + name);
-		    return null;
+		    if (name.startsWith("U1")) {
+			route = busRoutes.queryForId(326);
+		    } else if (name.startsWith("U2")) {
+			route = busRoutes.queryForId(329);
+		    } else if (name.startsWith("U6")) {
+			route = busRoutes.queryForId(327);
+		    } else {
+			Log.e(TAG, "Error finding Uni-Link route " + name);
+			return null;
+		    }
+
+		    if (route.forwardDirection.equals(name.substring(2))) {
+			dir = route.forwardDirection;
+		    } else if (route.reverseDirection.equals(name.substring(2))) {
+			dir = route.reverseDirection;
+		    } else {
+			Log.e(TAG, "Error detecting direction for " + name);
+			return null;
+		    }
 		}
 
-		if (route.forwardDirection.equals(name.substring(2))) {
-		    dir = route.forwardDirection;
-		} else if (route.reverseDirection.equals(name.substring(2))) {
-		    dir = route.reverseDirection;
-		} else {
-		    Log.e(TAG, "Error detecting direction for " + name);
+	    } else {
+		Log.v(TAG, "Route not Uni-Link");
+		List<BusRoute> routes = (List<BusRoute>) busRoutes.queryForEq(BusRoute.CODE_FIELD_NAME, name);
+		if (routes.size() != 1) {
+		    Log.e(TAG, "Found more than one non Uni-Link route?");
+		    for (BusRoute routeT : routes) {
+			Log.i(TAG, "Route: " + routeT);
+		    }
 		    return null;
+		} else {
+		    route = routes.get(0);
+		    if (route == null) {
+			Log.e(TAG, "Could not find database entry for " + name);
+			return null;
+		    }
 		}
 	    }
 
