@@ -31,7 +31,7 @@ import android.widget.TextView;
 
 public class POIDialog extends Dialog {
 
-    private static final String TAG = "POIDialog";
+    // private static final String TAG = "POIDialog";
     private ListView listItems;
 
     private final Context context;

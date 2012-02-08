@@ -206,7 +206,8 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	super.onResume();
 
 	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-	if (sharedPrefs.getBoolean(UNI_LINK_BUS_TIMES, false) || sharedPrefs.getBoolean(NON_UNI_LINK_BUS_TIMES, false)) {
+	if (sharedPrefs.getBoolean(UNI_LINK_BUS_TIMES, UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT)
+		|| sharedPrefs.getBoolean(NON_UNI_LINK_BUS_TIMES, NON_UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT)) {
 	    Log.i(TAG, "Live Times enabled");
 	    timetable = (Timetable) getLastNonConfigurationInstance();
 
@@ -303,7 +304,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		errorMessage = "Error message regarding SQL?";
 		e.printStackTrace();
 	    } catch (ClientProtocolException e) {
-		errorMessage = "Insert error message here!";
+		errorMessage = "ClientProtocolException!?!";
 		e.printStackTrace();
 	    } catch (IOException e) {
 		errorMessage = "Error fetching bus times from server, are you connected to the internet?";

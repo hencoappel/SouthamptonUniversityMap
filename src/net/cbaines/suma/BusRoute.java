@@ -156,7 +156,7 @@ public class BusRoute {
 
 	    if (moveAmount > 0) {
 		Log.v("BusStop", "stopIndex " + stopIndex);
-		int stopWanted = (stopIndex + moveAmount) % (routeStopsFound.size() + 1);
+		int stopWanted = (stopIndex + moveAmount) % (routeStopsFound.size());
 		Log.v("BusStop", "stopWanted " + stopWanted);
 		busStopDao.refresh(routeStopsFound.get(stopWanted).stop);
 

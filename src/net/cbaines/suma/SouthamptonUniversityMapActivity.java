@@ -76,7 +76,7 @@ import com.j256.ormlite.dao.Dao;
 public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<DatabaseHelper> implements MapViewConstants, Runnable, RouteColorConstants,
 	OnChildClickListener, OnItemClickListener, OnItemLongClickListener, OnSharedPreferenceChangeListener, Preferences {
 
-    private boolean useBundledDatabase = false;
+    private boolean useBundledDatabase = true;
 
     private MapView mapView;
     private MapController mapController;
@@ -93,32 +93,26 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
     // Overlays
 
     // Scale Bar Overlay
-    private static final String SCALE_BAR_OVERLAY = "scaleBarOverlay";
     private ScaleBarOverlay scaleBarOverlay;
     private static final boolean SCALE_BAR_OVERLAY_ENABLED_BY_DEFAULT = true;
 
     // My Location Overlay
-    private static final String MY_LOCATION_OVERLAY = "myLocationOverlay";
     private MyLocationOverlay myLocationOverlay;
     private static final boolean MY_LOCATION_OVERLAY_ENABLED_BY_DEFAULT = true;
 
     // Residential Building Overlay
-    private static final String RESIDENTIAL_BUILDINGS = "residentialBuildingOverlay";
     private BuildingNumOverlay residentialBuildingOverlay;
     private static final boolean RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
 
     // Non-Residential Building Overlay
-    private static final String NON_RESIDENTIAL_BUILDINGS = "nonResidentialBuildingOverlay";
     private BuildingNumOverlay nonResidentialBuildingOverlay;
     private static final boolean NON_RESIDENTIAL_BUILDING_OVERLAY_ENABLED_BY_DEFAULT = true;
 
     // Uni-Link Bus Stop Overlay
-    private static final String UNI_LINK_BUS_STOPS = "uniLinkBusStopOverlay";
     private BusStopOverlay uniLinkBusStopOverlay;
     private static final boolean UNI_LINK_BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT = true;
 
     // Uni-Link Bus Stop Overlay
-    private static final String NON_UNI_LINK_BUS_STOPS = "nonUniLinkBusStopOverlay";
     private BusStopOverlay nonUniLinkBusStopOverlay;
     private static final boolean NON_UNI_LINK_BUS_STOP_OVERLAY_ENABLED_BY_DEFAULT = true;
 
@@ -133,8 +127,6 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
     private static final String NON_RESIDENTIAL_BUILDING_OVERLAY = "Buildings:Non-Residential";
     private static final boolean SITE_OVERLAY_ENABLED_BY_DEFAULT = false;
     private static final boolean ROUTE_OVERLAY_ENABLED_BY_DEFAULT = true;
-
-    private static final int UNI_LINK_BUS_STOP_OVERLAY_RANK = 4;
 
     private POIDialog favDialog;
 
@@ -1230,7 +1222,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    // |_ Glen Eyre Hall
 	    // |_ South Hill Hall
 	    // |_ Chamberlain Hall
-	    // |_ Hartley Grove
+	    // |_ Hartley Grove1 (3.2%)
 	    // |_ Bencraft Hall
 	    // |_ Connaught Hall
 	    // |_ Montefiore Hall
