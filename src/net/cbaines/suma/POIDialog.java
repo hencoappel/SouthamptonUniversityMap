@@ -19,71 +19,69 @@
 
 package net.cbaines.suma;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.j256.ormlite.android.apptools.OpenHelperManager;
-import com.j256.ormlite.dao.Dao;
+public class POIDialog extends Dialog {
 
-public class BusStopDialog extends Dialog {
-
-    private static final String TAG = "BusStopDialog";
+    private static final String TAG = "POIDialog";
     private ListView listItems;
 
     private final Context context;
 
+    private final TextView message;
+
     protected POIArrayAdapter adapter;
 
-    private ArrayList<BusStop> busStops;
-
-    public BusStopDialog(Context context) {
+    public POIDialog(Context context) {
 	super(context);
 
 	this.context = context;
 
-	setContentView(R.layout.bus_stop_dialog);
-	setTitle("Favourite Items");
+	setContentView(R.layout.poi_dialog);
 
-	busStops = new ArrayList<BusStop>();
-
+	message = (TextView) findViewById(R.id.favouriteDialogMessage);
 	listItems = (ListView) findViewById(R.id.favouriteListItems);
 
-	refresh();
     }
 
-    public void refresh() {
-
-	DatabaseHelper helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
-
-	try {
-	    
-	    if (busStops.size() == 0) {
-		Log.e(TAG, "Error");
-	    } else {
-		listItems.post(new Runnable() {
-		    public void run() {
-			adapter = new POIArrayAdapter(context, busStops);
-
-			listItems.setVisibility(View.VISIBLE);
-			listItems.setAdapter(adapter);
-
-		    }
-		});
-
+    void setMessage(final String text) {
+	message.post(new Runnable() {
+	    public void run() {
+		if (text == null || text.length() == 0) {
+		    message.setVisibility(View.GONE);
+		} else {
+		    message.setText(text);
+		    message.setVisibility(View.VISIBLE);
+		}
 	    }
-	} catch (SQLException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+	});
+    }
+
+    void setItems(final List<POI> items) {
+	listItems.post(new Runnable() {
+	    public void run() {
+		if (items != null) {
+		    adapter = new POIArrayAdapter(context, items);
+
+		    listItems.setVisibility(View.VISIBLE);
+		    listItems.setAdapter(adapter);
+		} else {
+		    listItems.setVisibility(View.GONE);
+		}
+	    }
+	});
+    }
+
+    void setTitle(String title) {
+	setTitle(title);
     }
 
     void setOnItemClickListener(OnItemClickListener item) {

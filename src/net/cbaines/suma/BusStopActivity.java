@@ -21,12 +21,14 @@ package net.cbaines.suma;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,6 +42,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -53,7 +57,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 
-public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> implements OnCheckedChangeListener, Preferences {
+public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> implements OnCheckedChangeListener, Preferences, OnItemClickListener {
 
     final static String TAG = "BusTimeActivity";
 
@@ -89,6 +93,9 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     private CheckBox U2RouteRadioButton;
     private CheckBox U6RouteRadioButton;
     private CheckBox U9RouteRadioButton;
+
+    private static final int POI_DIALOG_ID = 0;
+    private POIDialog busDialog;
 
     private HashSet<BusRoute> routes = new HashSet<BusRoute>();
 
@@ -339,7 +346,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 	    Log.v(TAG, routes.size() + " routes avalible from this stop");
 
-	    HashSet<BusStop> busStops = new HashSet<BusStop>();
+	    ArrayList<POI> busStops = new ArrayList<POI>();
 
 	    for (BusRoute route : routes) {
 		try {
@@ -357,7 +364,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 	    if (busStops.size() == 1) {
 		Intent i = new Intent(this, BusStopActivity.class);
-		BusStop stop = busStops.iterator().next();
+		BusStop stop = (BusStop) busStops.iterator().next();
 		if (stop == null) {
 		    Log.e(TAG, "stop == null");
 		}
@@ -368,7 +375,16 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		i.putExtra("busStopName", stop.description);
 		startActivity(i);
 	    } else {
-		// Show dialog
+		showDialog(POI_DIALOG_ID);
+		if (busDialog == null) {
+		    Log.e(TAG, "Very wierd, just tried to launch the favourite's dialog, but its null?");
+		    return false;
+		}
+
+		busDialog.setMessage("");
+		busDialog.setItems(busStops);
+		busDialog.setTitle("Choose Bus Stop");
+
 		Log.i(TAG, "Showing dialog");
 	    }
 
@@ -444,5 +460,22 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		busTimeContentLayout.setGravity(Gravity.TOP);
 	    }
 	}
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+	switch (id) {
+	case POI_DIALOG_ID:
+	    busDialog = new POIDialog(instance);
+	    busDialog.setOnItemClickListener(this);
+	    return busDialog;
+	}
+	return null;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+	// TODO Auto-generated method stub
+
     }
 }

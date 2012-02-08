@@ -136,7 +136,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
     private static final int UNI_LINK_BUS_STOP_OVERLAY_RANK = 4;
 
-    private FavouriteDialog favDialog;
+    private POIDialog favDialog;
 
     private SouthamptonUniversityMapActivity instance;
 
@@ -771,14 +771,15 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    return false;
 	case R.id.menu_favourites:
 	    Log.i(TAG, "Showing favourite dialog");
-	    boolean refreshNeeded = favDialog != null;
+
 	    showDialog(FAVOURITE_DIALOG_ID);
-	    if (favDialog != null) {
-		if (refreshNeeded)
-		    favDialog.refresh();
-	    } else {
+	    if (favDialog == null) {
 		Log.e(TAG, "Very wierd, just tried to launch the favourite's dialog, but its null?");
+		return false;
 	    }
+
+	    refreshFavouriteDialog();
+
 	    return false;
 	case R.id.menu_about:
 	    Intent aboutIntent = new Intent(SouthamptonUniversityMapActivity.this, AboutActivity.class);
@@ -787,6 +788,30 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	default:
 	    Log.e(TAG, "No known menu option selected");
 	    return super.onOptionsItemSelected(item);
+	}
+    }
+
+    private void refreshFavouriteDialog() {
+	ArrayList<POI> newFavouriteItems = new ArrayList<POI>();
+
+	try {
+	    Dao<Building, String> buildingDao = getHelper().getBuildingDao();
+	    Dao<BusStop, String> busStopDao = getHelper().getBusStopDao();
+
+	    newFavouriteItems.addAll(buildingDao.queryForEq(POI.FAVOURITE_FIELD_NAME, true));
+	    newFavouriteItems.addAll(busStopDao.queryForEq(POI.FAVOURITE_FIELD_NAME, true));
+	} catch (SQLException e) {
+	    e.printStackTrace();
+	}
+
+	Log.i(TAG, "There are " + newFavouriteItems.size() + " favourites");
+	if (newFavouriteItems.size() == 0) {
+	    Log.i(TAG, "Favourite dialog has no favourites, displaying message");
+	    favDialog.setMessage(getResources().getString(R.string.favourites_dialog_message));
+	    favDialog.setItems(null);
+	} else {
+	    favDialog.setMessage("");
+	    favDialog.setItems(newFavouriteItems);
 	}
     }
 
@@ -850,7 +875,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 		}
 
 		if (favDialog != null) {
-		    favDialog.refresh();
+		    refreshFavouriteDialog();
 		}
 	    }
 	}
@@ -876,11 +901,10 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	    viewDialog.setOnItemClickListener(this);
 	    return viewDialog;
 	case FAVOURITE_DIALOG_ID:
-	    favDialog = new FavouriteDialog(instance);
+	    favDialog = new POIDialog(instance);
 	    favDialog.setOnItemClickListener(this);
 	    favDialog.setOnItemLongClickListener(this);
 	    return favDialog;
-
 	}
 	return null;
     }
