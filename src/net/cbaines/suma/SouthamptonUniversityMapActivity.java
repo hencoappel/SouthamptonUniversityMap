@@ -76,7 +76,7 @@ import com.j256.ormlite.dao.Dao;
 public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<DatabaseHelper> implements MapViewConstants, Runnable, RouteColorConstants,
 	OnChildClickListener, OnItemClickListener, OnItemLongClickListener, OnSharedPreferenceChangeListener, Preferences {
 
-    private boolean useBundledDatabase = true;
+    private boolean useBundledDatabase = false;
 
     private MapView mapView;
     private MapController mapController;
@@ -689,7 +689,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			try {
 			    List<BusStop> busStops;
 			    Log.v(TAG, "Begin fetching BusStops at " + (System.currentTimeMillis() - startTime));
-			    if (activityPrefs.getBoolean(NON_UNI_LINK_BUS_STOPS, NON_UNI_LINK_BUS_STOPS_ENABLED_BY_DEFAULT)) {
+			    if (activityPrefs.getBoolean(UNI_LINK_BUS_STOPS, UNI_LINK_BUS_STOPS_ENABLED_BY_DEFAULT)) {
 				busStops = getHelper().getBusStopDao().queryForAll();
 			    } else {
 				busStops = getHelper().getBusStopDao().queryForEq(BusStop.UNI_LINK_FIELD_NAME, true);
