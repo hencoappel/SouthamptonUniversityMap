@@ -76,7 +76,7 @@ import com.j256.ormlite.dao.Dao;
 public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<DatabaseHelper> implements MapViewConstants, Runnable, RouteColorConstants,
 	OnChildClickListener, OnItemClickListener, OnItemLongClickListener, OnSharedPreferenceChangeListener, Preferences {
 
-    private boolean useBundledDatabase = true;
+    private boolean useBundledDatabase = false;
 
     private MapView mapView;
     private MapController mapController;

@@ -265,11 +265,10 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		e.printStackTrace();
 	    }
 	} else {
-
 	    Log.i(TAG, "Route radio button made " + checked);
-
-	    displayTimetable(timetable);
-
+	    if (timetable != null) { // If there is a timetable to display
+		displayTimetable(timetable);
+	    }
 	}
     }
 
