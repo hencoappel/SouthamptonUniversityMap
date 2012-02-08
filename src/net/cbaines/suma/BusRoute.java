@@ -63,10 +63,13 @@ public class BusRoute {
     @DatabaseField(canBeNull = true)
     String reverseDirection;
 
+    @DatabaseField(canBeNull = false)
+    boolean uniLink;
+
     BusRoute() {
     }
 
-    public BusRoute(Integer id, String code, String label, String forwardDirection, String reverseDirection) {
+    public BusRoute(Integer id, String code, String label, String forwardDirection, String reverseDirection, boolean uniLink) {
 	this.id = id.intValue();
 	this.code = code;
 	this.label = label;
@@ -74,8 +77,8 @@ public class BusRoute {
 	this.reverseDirection = reverseDirection;
     }
 
-    public BusRoute(Integer id, String code, String label) {
-	this(id, code, label, null, null);
+    public BusRoute(Integer id, String code, String label, boolean uniLink) {
+	this(id, code, label, null, null, uniLink);
     }
 
     public String toString() {

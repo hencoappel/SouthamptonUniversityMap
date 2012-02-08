@@ -76,7 +76,7 @@ import com.j256.ormlite.dao.Dao;
 public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<DatabaseHelper> implements MapViewConstants, Runnable, RouteColorConstants,
 	OnChildClickListener, OnItemClickListener, OnItemLongClickListener, OnSharedPreferenceChangeListener, Preferences {
 
-    private boolean useBundledDatabase = true;
+    private boolean useBundledDatabase = false;
 
     private MapView mapView;
     private MapController mapController;
@@ -384,6 +384,9 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 
 	Log.i(TAG, "Begining to show the route overlays at " + (System.currentTimeMillis() - startTime));
 	for (BusRoute busRoute : getHelper().getBusRouteDao()) {
+	    if (!busRoute.uniLink) {
+		continue;
+	    }
 	    Log.v(TAG, "Looking at showing " + busRoute.code + " route overlay");
 	    if (activityPrefs.getBoolean("Bus Routes:" + busRoute.code, ROUTE_OVERLAY_ENABLED_BY_DEFAULT)) {
 		showRouteOverlay(busRoute);
@@ -476,7 +479,7 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 			    routeOverlayU1E.getPaint().setPathEffect(new DashPathEffect(new float[] { 20, 16 }, 0));
 			    routeOverlayU1E.setEnabled(activityPrefs.getBoolean("Bus Routes:" + route.code, true));
 
-			    routeOverlays.put(new BusRoute(1000, "U1E", "U1e Route Label"), routeOverlayU1E);
+			    routeOverlays.put(new BusRoute(1000, "U1E", "U1e Route Label", true), routeOverlayU1E);
 			    overlays.put("Bus Routes:" + route.code + "E", routeOverlayU1E);
 			} else if (route.code.equals("U1N")) {
 			    resource = getResources().openRawResource(R.raw.u1n);

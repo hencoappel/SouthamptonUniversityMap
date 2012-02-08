@@ -62,9 +62,9 @@ import com.j256.ormlite.table.TableUtils;
 
 public class DataManager {
 
-    final static String TAG = "DataManager";
+    private final static String TAG = "DataManager";
 
-    final static String busStopUrl = "http://data.southampton.ac.uk/bus-stop/";
+    private final static String busStopUrl = "http://data.southampton.ac.uk/bus-stop/";
 
     private static DatabaseHelper helper;
     private static Dao<BusRoute, Integer> busRoutes;
@@ -256,10 +256,17 @@ public class DataManager {
 		String[] dataBits = strLine.split(",");
 
 		BusRoute route;
+
+		boolean uniLink = false;
+		int id = Integer.parseInt(dataBits[0]);
+		if (id == 326 || id == 468 || id == 327 || id == 329 || id == 354) {
+		    uniLink = true;
+		}
+
 		if (dataBits.length > 3) {
-		    route = new BusRoute(Integer.parseInt(dataBits[0]), dataBits[1], dataBits[2].replace("\"", ""), dataBits[3], dataBits[4]);
+		    route = new BusRoute(id, dataBits[1], dataBits[2].replace("\"", ""), dataBits[3], dataBits[4], uniLink);
 		} else {
-		    route = new BusRoute(Integer.parseInt(dataBits[0]), dataBits[1], dataBits[2].replace("\"", ""));
+		    route = new BusRoute(id, dataBits[1], dataBits[2].replace("\"", ""), uniLink);
 		}
 		// Log.i(TAG, "Loaded route " + route.id + " " + route.code + " " + route.label);
 		busRouteDao.create(route);
@@ -317,6 +324,8 @@ public class DataManager {
 		    stop.routes = (byte) (stop.routes | (1 << 3));
 		} else if (route.id == 354) { // U9
 		    stop.routes = (byte) (stop.routes | (1 << 4));
+		} else {
+		    stop.routes = 0;
 		}
 
 		Log.v(TAG, "Stop routes " + stop.routes);
@@ -330,43 +339,6 @@ public class DataManager {
 	    Log.e(TAG, "Line: " + strLine);
 	    e.printStackTrace();
 	}
-
-	long sizeBeforeRemoval = busStopDao.countOf();
-
-	// Removing busstops not used by unilink busses
-	for (Iterator<BusStop> busStopIter = busStopDao.iterator(); busStopIter.hasNext();) {
-	    BusStop stop = busStopIter.next();
-	    // Log.i(TAG, "Looking at stop " + stop.id);
-
-	    /*
-	     * QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder(); routeStopsQueryBuilder.where().eq(columnName, value)
-	     * 
-	     * DeleteBuilder<BusStop, String> deleteBuilder = busStopDao.deleteBuilder(); // only delete the rows where password is null
-	     * deleteBuilder.where().in(RouteStops.STOP_ID_FIELD_NAME, objects) accountDao.delete(deleteBuilder.prepare());
-	     */
-
-	    QueryBuilder<RouteStops, Integer> routeStopsQueryBuilder = routeStopsDao.queryBuilder();
-	    routeStopsQueryBuilder.setCountOf(true);
-	    routeStopsQueryBuilder.where().eq(RouteStops.STOP_ID_FIELD_NAME, stop);
-
-	    PreparedQuery<RouteStops> routeStopsPreparedQuery = routeStopsQueryBuilder.prepare();
-	    long num = routeStopsDao.countOf(routeStopsPreparedQuery);
-	    // long num = routeStopsDao.query(routeStopsPreparedQuery).size();
-	    // Log.i(TAG, "Number is " + num);
-	    if (num == 0) {
-		// Log.i(TAG, "Removing " + stop.id);
-		stop.uniLink = false;
-		if (onlyUniLink) {
-		    busStopIter.remove();
-		}
-	    } else {
-		stop.uniLink = true;
-	    }
-	}
-
-	long sizeAfterRemoval = busStopDao.countOf();
-
-	Log.i(TAG, "Removed " + (sizeBeforeRemoval - sizeAfterRemoval) + " stops (from " + sizeBeforeRemoval + ") now have " + sizeAfterRemoval);
 
 	Log.i(TAG, "Finished loading bus data");
     }
