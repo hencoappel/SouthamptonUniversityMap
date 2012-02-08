@@ -80,10 +80,6 @@ public class POIDialog extends Dialog {
 	});
     }
 
-    void setTitle(String title) {
-	setTitle(title);
-    }
-
     void setOnItemClickListener(OnItemClickListener item) {
 	listItems.setOnItemClickListener(item);
 

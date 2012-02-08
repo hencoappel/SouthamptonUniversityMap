@@ -350,10 +350,14 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 
 	    for (BusRoute route : routes) {
 		try {
+		    BusStop tmpStop;
 		    if (item.getItemId() == R.id.menu_next_stop) {
-			busStops.add(route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), null, 1));
+			tmpStop = route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), null, 1);
 		    } else {
-			busStops.add(route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), null, -1));
+			tmpStop = route.moveInRoute(this, getHelper().getBusStopDao().queryForId(busStopID), null, -1);
+		    }
+		    if (!busStops.contains(tmpStop)) {
+			busStops.add(tmpStop);
 		    }
 		} catch (SQLException e) {
 		    e.printStackTrace();
@@ -474,8 +478,29 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
     }
 
     @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-	// TODO Auto-generated method stub
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+	Log.i(TAG, "OnItemClick pos " + position + " id " + id);
+
+	String poiId = busDialog.adapter.getItemStringId(position);
+
+	Log.i(TAG, "POI " + poiId + " selected");
+
+	Intent i = new Intent(this, BusStopActivity.class);
+	try {
+	    busStop = busStopDao.queryForId(poiId);
+
+	    if (busStop == null) {
+		Log.e(TAG, "stop == null");
+	    }
+	    if (busStop.id == null) {
+		Log.e(TAG, "stop.id == null");
+	    }
+	    i.putExtra("busStopID", busStop.id);
+	    i.putExtra("busStopName", busStop.description);
+	    startActivity(i);
+	} catch (SQLException e) {
+	    e.printStackTrace();
+	}
 
     }
 }
