@@ -1,4 +1,5 @@
 /*
+
  * Southampton University Map App
  * Copyright (C) 2011  Christopher Baines
  * 
@@ -57,8 +58,6 @@ public class BuildingActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
 	// read the RDF/XML file
 	model.read(in, null);
-	
-	
 
 	instance = this;
 

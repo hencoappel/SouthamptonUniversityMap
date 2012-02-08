@@ -63,17 +63,23 @@ public class Stop {
     Date timeOfFetch;
 
     /**
+     * Is the time live, or just expected
+     */
+    boolean live;
+
+    /**
      * 
      * @param bus
      * @param busStop
      * @param arivalTime
      * @param timeOfFetch
      */
-    public Stop(Bus bus, BusStop busStop, Date arivalTime, Date timeOfFetch) {
+    public Stop(Bus bus, BusStop busStop, Date arivalTime, Date timeOfFetch, boolean live) {
 	this.busStop = busStop;
 	this.bus = bus;
 	this.arivalTime = arivalTime;
 	this.timeOfFetch = timeOfFetch;
+	this.live = live;
     }
 
     /**

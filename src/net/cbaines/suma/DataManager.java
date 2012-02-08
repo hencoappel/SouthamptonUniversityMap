@@ -430,6 +430,7 @@ public class DataManager {
 	    String time = stopObj.getString("time");
 
 	    GregorianCalendar calender = new GregorianCalendar();
+	    boolean live = true;
 	    if (!time.equals("Due")) {
 
 		Log.v(TAG, "Time: " + time + " current time " + calender.getTime());
@@ -438,6 +439,7 @@ public class DataManager {
 		    String[] minAndHour = time.split(":");
 		    calender.set(Calendar.HOUR_OF_DAY, Integer.parseInt(minAndHour[0]));
 		    calender.set(Calendar.MINUTE, Integer.parseInt(minAndHour[1]));
+		    live = false;
 		} else {
 		    // Log.i(TAG, "Parsing " + time.substring(0, time.length() - 1) + " for min");
 		    calender.add(Calendar.MINUTE, Integer.parseInt(time.substring(0, time.length() - 1)));
@@ -534,7 +536,7 @@ public class DataManager {
 
 	    busDao.update(bus);
 
-	    stop = new Stop(bus, busStop, calender.getTime(), now);
+	    stop = new Stop(bus, busStop, calender.getTime(), now, live);
 
 	    return stop;
 
@@ -574,7 +576,7 @@ public class DataManager {
 	    if (!keepNonUniLink && !stopObj.getString("name").startsWith("U")) {
 		continue;
 	    }
-	    
+
 	    if (!keepUniLink && stopObj.getString("name").startsWith("U")) {
 		continue;
 	    }
