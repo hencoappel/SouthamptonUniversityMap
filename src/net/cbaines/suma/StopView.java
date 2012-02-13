@@ -88,7 +88,7 @@ public class StopView extends LinearLayout implements OnClickListener {
 		if (stop.live) {
 		    onClickMessage = "Unidentified bus (" + stop.bus.getName() + ") at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
 		} else {
-		    onClickMessage = "Timetabled unidentified bus (" + stop.bus.getName() + ") at "
+		    onClickMessage = "Timetabled bus (" + stop.bus.getName() + ") at "
 			    + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
 		}
 	    }
