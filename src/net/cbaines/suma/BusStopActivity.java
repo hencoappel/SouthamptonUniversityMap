@@ -170,7 +170,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		    } else {
 			U9RouteRadioButton.setVisibility(View.GONE);
 		    }
-		} 
+		}
 	    }
 
 	    busStopDao = helper.getBusStopDao();
@@ -309,6 +309,12 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 	    } catch (JSONException e) {
 		errorMessage = "Error parsing bus times";
 		e.printStackTrace();
+	    } catch (Exception e) {
+		if (THROW_ERROR_ON_EXCEPTION) {
+		    throw new RuntimeException(e.getMessage());
+		} else {
+		    Log.e(TAG, e.getMessage());
+		}
 	    }
 	    return newTimetable;
 	}

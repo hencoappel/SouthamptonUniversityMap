@@ -424,7 +424,7 @@ public class DataManager {
 	Log.i(TAG, "Loaded sites from csv");
     }
 
-    private static Stop getStop(Context context, JSONObject stopObj, BusStop busStop) throws SQLException {
+    private static Stop getStop(Context context, JSONObject stopObj, BusStop busStop) throws SQLException, JSONException {
 
 	if (helper == null)
 	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
@@ -435,145 +435,135 @@ public class DataManager {
 	if (busStopDao == null)
 	    busStopDao = helper.getBusStopDao();
 
-	try {
-	    String time = stopObj.getString("time");
+	String time = stopObj.getString("time");
 
-	    GregorianCalendar calender = new GregorianCalendar();
-	    boolean live = true;
-	    if (!time.equals("Due")) {
+	GregorianCalendar calender = new GregorianCalendar();
+	boolean live = true;
+	if (!time.equals("Due")) {
 
-		Log.v(TAG, "Time: " + time + " current time " + calender.getTime());
+	    Log.v(TAG, "Time: " + time + " current time " + calender.getTime());
 
-		if (time.contains(":")) {
-		    String[] minAndHour = time.split(":");
-		    calender.set(Calendar.HOUR_OF_DAY, Integer.parseInt(minAndHour[0]));
-		    calender.set(Calendar.MINUTE, Integer.parseInt(minAndHour[1]));
-		    live = false;
-		} else {
-		    // Log.i(TAG, "Parsing " + time.substring(0, time.length() - 1) + " for min");
-		    calender.add(Calendar.MINUTE, Integer.parseInt(time.substring(0, time.length() - 1)));
-		}
-
-		Log.v(TAG, "Date: " + calender.getTime());
-	    }
-
-	    String name = stopObj.getString("name");
-
-	    BusRoute route;
-	    String dir = null;
-
-	    if (name.contains("U")) {
-		if (name.equals("U1N")) {
-		    route = busRoutes.queryForId(468);
-		} else if (name.startsWith("U9")) {
-		    route = busRoutes.queryForId(354);
-		} else {
-		    if (name.startsWith("U1")) {
-			route = busRoutes.queryForId(326);
-		    } else if (name.startsWith("U2")) {
-			route = busRoutes.queryForId(329);
-		    } else if (name.startsWith("U6")) {
-			route = busRoutes.queryForId(327);
-		    } else {
-			Log.e(TAG, "Error finding Uni-Link route " + name);
-			return null;
-		    }
-
-		    if (route.forwardDirection.equals(name.substring(2))) {
-			dir = route.forwardDirection;
-		    } else if (route.reverseDirection.equals(name.substring(2))) {
-			dir = route.reverseDirection;
-		    } else {
-			Log.e(TAG, "Error detecting direction for " + name);
-			return null;
-		    }
-		}
-
+	    if (time.contains(":")) {
+		String[] minAndHour = time.split(":");
+		calender.set(Calendar.HOUR_OF_DAY, Integer.parseInt(minAndHour[0]));
+		calender.set(Calendar.MINUTE, Integer.parseInt(minAndHour[1]));
+		live = false;
 	    } else {
-		Log.v(TAG, "Route not Uni-Link");
-		List<BusRoute> routes = (List<BusRoute>) busRoutes.queryForEq(BusRoute.CODE_FIELD_NAME, name);
-		if (routes.size() != 1) {
-		    Log.e(TAG, "Found more than one non Uni-Link route?");
-		    for (BusRoute routeT : routes) {
-			Log.i(TAG, "Route: " + routeT);
-		    }
-		    return null;
-		} else {
-		    route = routes.get(0);
-		    if (route == null) {
-			Log.e(TAG, "Could not find database entry for " + name);
-			return null;
-		    }
-		}
+		// Log.i(TAG, "Parsing " + time.substring(0, time.length() - 1) + " for min");
+		calender.add(Calendar.MINUTE, Integer.parseInt(time.substring(0, time.length() - 1)));
 	    }
 
-	    String destString = stopObj.getString("dest");
-	    BusStop destStop;
-
-	    if (destString.equals("Central Station")) {
-		destStop = busStopDao.queryForId("SNA19709");
-	    } else if (destString.equals("Civic Centre")) {
-		destStop = busStopDao.queryForId("SN120527");
-	    } else if (destString.equals("City DG4")) {
-		destStop = busStopDao.queryForId("HAA13579");
-	    } else if (destString.equals("Central Station")) {
-		destStop = busStopDao.queryForId("SN120520");
-	    } else if (destString.equals("Airport")) {
-		destStop = busStopDao.queryForId("HA030184");
-	    } else if (destString.equals("City, Town Quay")) {
-		destStop = busStopDao.queryForId("SNA13766");
-	    } else if (destString.equals("Dock Gate 4")) {
-		destStop = busStopDao.queryForId("MG1031");
-	    } else if (destString.equals("Eastleigh")) {
-		destStop = busStopDao.queryForId("HA030212");
-	    } else if (destString.equals("Crematorium")) {
-		destStop = busStopDao.queryForId("SN121009");
-	    } else if (destString.equals("General Hosp")) {
-		destStop = busStopDao.queryForId("SNA19482");
-	    } else {
-		Log.e(TAG, "Unknown end dest " + destString + " for route " + route.code);
-		return null;
-	    }
-
-	    Date now = new Date(System.currentTimeMillis());
-
-	    String busID = null;
-	    Stop stop;
-	    Bus bus;
-	    if (stopObj.has("vehicle")) {
-		busID = stopObj.getString("vehicle");
-
-		QueryBuilder<Bus, Integer> busQueryBuilder = busDao.queryBuilder();
-		busQueryBuilder.where().eq(Bus.ID_FIELD_NAME, busID);
-		PreparedQuery<Bus> busPreparedQuery = busQueryBuilder.prepare();
-
-		bus = busDao.queryForFirst(busPreparedQuery);
-
-		if (bus == null) {
-		    bus = new Bus(busID, route, dir);
-		    bus.destination = destStop;
-		} else {
-		    bus.destination = destStop;
-		    bus.route = route;
-		    bus.direction = dir;
-		}
-
-	    } else {
-		bus = new Bus(null, route, dir);
-	    }
-
-	    busDao.update(bus);
-
-	    stop = new Stop(bus, busStop, calender.getTime(), now, live);
-
-	    return stop;
-
-	} catch (Exception e) {
-	    // TODO Auto-generated catch block
-	    Log.e(TAG, "Error parsing stop " + stopObj, e);
-	    return null;
+	    Log.v(TAG, "Date: " + calender.getTime());
 	}
 
+	String name = stopObj.getString("name");
+
+	BusRoute route;
+	String dir = null;
+
+	if (name.contains("U")) {
+	    if (name.equals("U1N")) {
+		route = busRoutes.queryForId(468);
+	    } else if (name.startsWith("U9")) {
+		route = busRoutes.queryForId(354);
+	    } else {
+		if (name.startsWith("U1")) {
+		    route = busRoutes.queryForId(326);
+		} else if (name.startsWith("U2")) {
+		    route = busRoutes.queryForId(329);
+		} else if (name.startsWith("U6")) {
+		    route = busRoutes.queryForId(327);
+		} else {
+		    throw new RuntimeException("Error finding Uni-Link route " + name);
+		}
+
+		if (route.forwardDirection.equals(name.substring(2))) {
+		    dir = route.forwardDirection;
+		} else if (route.reverseDirection.equals(name.substring(2))) {
+		    dir = route.reverseDirection;
+		} else {
+		    throw new RuntimeException("Error detecting direction for " + name);
+		}
+	    }
+
+	} else {
+	    Log.v(TAG, "Route not Uni-Link");
+	    List<BusRoute> routes = (List<BusRoute>) busRoutes.queryForEq(BusRoute.CODE_FIELD_NAME, name);
+	    if (routes.size() != 1) {
+		Log.e(TAG, "Found more than one non Uni-Link route?");
+		for (BusRoute routeT : routes) {
+		    Log.i(TAG, "Route: " + routeT);
+		}
+		throw new RuntimeException("Found more than one non Uni-Link route?");
+	    } else {
+		route = routes.get(0);
+		if (route == null) {
+		    throw new RuntimeException("Could not find database entry for " + name);
+		}
+	    }
+	}
+
+	String destString = stopObj.getString("dest");
+	BusStop destStop;
+
+	if (destString.equals("Central Station")) {
+	    destStop = busStopDao.queryForId("SNA19709");
+	} else if (destString.equals("Civic Centre")) {
+	    destStop = busStopDao.queryForId("SN120527");
+	} else if (destString.equals("City DG4")) {
+	    destStop = busStopDao.queryForId("HAA13579");
+	} else if (destString.equals("Central Station")) {
+	    destStop = busStopDao.queryForId("SN120520");
+	} else if (destString.equals("Airport")) {
+	    destStop = busStopDao.queryForId("HA030184");
+	} else if (destString.equals("City, Town Quay")) {
+	    destStop = busStopDao.queryForId("SNA13766");
+	} else if (destString.equals("City Centre")) {
+	    destStop = busStopDao.queryForId("SNA13766");
+	} else if (destString.equals("Dock Gate 4")) {
+	    destStop = busStopDao.queryForId("MG1031");
+	} else if (destString.equals("Eastleigh")) {
+	    destStop = busStopDao.queryForId("HA030212");
+	} else if (destString.equals("Crematorium")) {
+	    destStop = busStopDao.queryForId("SN121009");
+	} else if (destString.equals("General Hosp")) {
+	    destStop = busStopDao.queryForId("SNA19482");
+	} else {
+	    throw new RuntimeException("Unknown end dest " + destString + " for route " + route.code);
+	}
+
+	Date now = new Date(System.currentTimeMillis());
+
+	String busID = null;
+	Stop stop;
+	Bus bus;
+	if (stopObj.has("vehicle")) {
+	    busID = stopObj.getString("vehicle");
+
+	    QueryBuilder<Bus, Integer> busQueryBuilder = busDao.queryBuilder();
+	    busQueryBuilder.where().eq(Bus.ID_FIELD_NAME, busID);
+	    PreparedQuery<Bus> busPreparedQuery = busQueryBuilder.prepare();
+
+	    bus = busDao.queryForFirst(busPreparedQuery);
+
+	    if (bus == null) {
+		bus = new Bus(busID, route, dir);
+		bus.destination = destStop;
+	    } else {
+		bus.destination = destStop;
+		bus.route = route;
+		bus.direction = dir;
+	    }
+
+	} else {
+	    bus = new Bus(null, route, dir);
+	}
+
+	busDao.update(bus);
+
+	stop = new Stop(bus, busStop, calender.getTime(), now, live);
+
+	return stop;
     }
 
     public static Timetable getTimetable(Context context, String busStop, boolean keepUniLink, boolean keepNonUniLink) throws SQLException,

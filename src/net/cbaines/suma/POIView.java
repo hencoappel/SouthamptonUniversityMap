@@ -23,6 +23,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,6 +34,12 @@ public class POIView extends LinearLayout {
 
     private final TextView name;
     private final TextView dist;
+
+    private TextView u1;
+    private TextView u1n;
+    private TextView u2;
+    private TextView u6;
+    private TextView u9;
 
     private LayoutParams textLayoutParams;
 
@@ -52,17 +59,66 @@ public class POIView extends LinearLayout {
 	this.setOrientation(HORIZONTAL);
 
 	name = new TextView(context);
-	name.setTextSize(22f);
+	name.setTextSize(16f);
 	name.setGravity(Gravity.LEFT);
 
 	dist = new TextView(context);
-	dist.setTextSize(22f);
+	dist.setTextSize(16f);
 	dist.setGravity(Gravity.RIGHT);
+
+	u1 = new TextView(context);
+	u1.setText(R.string.U1);
+	u1.setBackgroundResource(R.drawable.u1_back_selected);
+	u1n = new TextView(context);
+	u1n.setText(R.string.U1N);
+	u1n.setBackgroundResource(R.drawable.u1n_back_selected);
+	u2 = new TextView(context);
+	u2.setText(R.string.U2);
+	u2.setBackgroundResource(R.drawable.u2_back_selected);
+	u6 = new TextView(context);
+	u6.setText(R.string.U6);
+	u6.setBackgroundResource(R.drawable.u6_back_selected);
+	u9 = new TextView(context);
+	u9.setText(R.string.U9);
+	u9.setBackgroundResource(R.drawable.u9_back_selected);
 
 	textLayoutParams = new LayoutParams(width - (width / 4), LayoutParams.WRAP_CONTENT);
 	LayoutParams distLayoutParams = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
 
 	setPOIAndDist(poi, distInM);
+
+	LayoutParams busRouteLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+	addView(u1, busRouteLayoutParams);
+	addView(u1n, busRouteLayoutParams);
+	addView(u2, busRouteLayoutParams);
+	addView(u6, busRouteLayoutParams);
+	addView(u9, busRouteLayoutParams);
+
+	u1.setVisibility(View.GONE);
+	u1n.setVisibility(View.GONE);
+	u2.setVisibility(View.GONE);
+	u6.setVisibility(View.GONE);
+	u9.setVisibility(View.GONE);
+
+	if (poi.type == POI.BUS_STOP) {
+	    BusStop busStop = (BusStop) poi;
+
+	    if ((busStop.routes & (1 << 0)) != 0) {
+		u1.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 1)) != 0) {
+		u1n.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 2)) != 0) {
+		u2.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 3)) != 0) {
+		u6.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 4)) != 0) {
+		u9.setVisibility(View.VISIBLE);
+	    }
+	}
 
 	addView(name, textLayoutParams);
 	addView(dist, distLayoutParams);
@@ -76,6 +132,12 @@ public class POIView extends LinearLayout {
 
 	// Log.i(TAG, "Looking at poi " + poi.id);
 
+	u1.setVisibility(View.GONE);
+	u1n.setVisibility(View.GONE);
+	u2.setVisibility(View.GONE);
+	u6.setVisibility(View.GONE);
+	u9.setVisibility(View.GONE);
+
 	if (poi.type == POI.BUILDING) {
 	    Building building = (Building) poi;
 	    // Log.i(TAG, "Its a building of name " + building.name);
@@ -87,6 +149,23 @@ public class POIView extends LinearLayout {
 	    // Log.i(TAG, "Its a bus stop of description " + busStop.description);
 
 	    name.setText(busStop.description + " (" + busStop.id + ")");
+
+	    if ((busStop.routes & (1 << 0)) != 0) {
+		u1.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 1)) != 0) {
+		u1n.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 2)) != 0) {
+		u2.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 3)) != 0) {
+		u6.setVisibility(View.VISIBLE);
+	    }
+	    if ((busStop.routes & (1 << 4)) != 0) {
+		u9.setVisibility(View.VISIBLE);
+	    }
+
 	} else if (poi.type == POI.SITE) {
 
 	    Site site = (Site) poi;
