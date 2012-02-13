@@ -98,7 +98,11 @@ public class Bus {
     }
 
     String getName() {
-	return route.code + direction;
+	if (direction != null) {
+	    return route.code + direction;
+	} else {
+	    return route.code;
+	}
     }
 
     @Override

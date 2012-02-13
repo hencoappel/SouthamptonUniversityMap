@@ -31,16 +31,10 @@ import android.text.format.DateUtils;
  */
 public class Stop {
 
-    public static final String ID_FIELD_NAME = "id";
-    public static final String BUS_FIELD_NAME = "bus";
-    public static final String BUS_STOP_FIELD_NAME = "busStop";
-    public static final String ARIVAL_TIME_FIELD_NAME = "arivalTime";
-    public static final String FETCH_TIME_FIELD_NAME = "timeOfFetch";
-
-    /**
-     * A generated id for the bus
-     */
-    int id;
+    // public static final String BUS_FIELD_NAME = "bus";
+    // public static final String BUS_STOP_FIELD_NAME = "busStop";
+    // public static final String ARIVAL_TIME_FIELD_NAME = "arivalTime";
+    // public static final String FETCH_TIME_FIELD_NAME = "timeOfFetch";
 
     /**
      * The Bus stopping at the stop
@@ -66,6 +60,11 @@ public class Stop {
      * Is the time live, or just expected
      */
     boolean live;
+
+    /**
+     * Assumed to be the number of seconds since this data was fetched from the ROMANSE system?
+     */
+    int age;
 
     /**
      * 
@@ -101,7 +100,6 @@ public class Stop {
 	result = prime * result + ((arivalTime == null) ? 0 : arivalTime.hashCode());
 	result = prime * result + ((bus == null) ? 0 : bus.hashCode());
 	result = prime * result + ((busStop == null) ? 0 : busStop.hashCode());
-	result = prime * result + id;
 	return result;
     }
 
@@ -137,8 +135,6 @@ public class Stop {
 	    if (other.busStop != null)
 		return false;
 	} else if (!busStop.equals(other.busStop))
-	    return false;
-	if (id != other.id)
 	    return false;
 	return true;
     }

@@ -1,11 +1,8 @@
 package net.cbaines.suma;
 
-import android.R.color;
 import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 public class BusRoutesView extends LinearLayout {
@@ -25,27 +22,27 @@ public class BusRoutesView extends LinearLayout {
 	u1 = new TextView(context);
 	u1.setText(R.string.U1);
 	u1.setBackgroundResource(R.drawable.u1_back_selected);
-	u1.setPadding(1, 1, 1, 1);
+	u1.setPadding(5, 1, 5, 1);
 
 	u1n = new TextView(context);
 	u1n.setText(R.string.U1N);
 	u1n.setBackgroundResource(R.drawable.u1n_back_selected);
-	u1n.setPadding(1, 1, 1, 1);
+	u1n.setPadding(5, 1, 5, 1);
 
 	u2 = new TextView(context);
 	u2.setText(R.string.U2);
 	u2.setBackgroundResource(R.drawable.u2_back_selected);
-	u2.setPadding(1, 1, 1, 1);
+	u2.setPadding(5, 1, 5, 1);
 
 	u6 = new TextView(context);
 	u6.setText(R.string.U6);
 	u6.setBackgroundResource(R.drawable.u6_back_selected);
-	u6.setPadding(1, 1, 1, 1);
+	u6.setPadding(5, 1, 5, 1);
 
 	u9 = new TextView(context);
 	u9.setText(R.string.U9);
 	u9.setBackgroundResource(R.drawable.u9_back_selected);
-	u9.setPadding(1, 1, 1, 1);
+	u9.setPadding(5, 1, 5, 1);
 
 	this.setOrientation(LinearLayout.VERTICAL);
 

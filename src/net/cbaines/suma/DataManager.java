@@ -28,8 +28,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -68,7 +70,7 @@ public class DataManager {
     private final static String busStopUrl = "http://data.southampton.ac.uk/bus-stop/";
 
     private static DatabaseHelper helper;
-    private static Dao<BusRoute, Integer> busRoutes;
+    private static Dao<BusRoute, Integer> busRouteDao;
     private static Dao<Bus, Integer> busDao;
     private static Dao<BusStop, String> busStopDao;
 
@@ -424,12 +426,12 @@ public class DataManager {
 	Log.i(TAG, "Loaded sites from csv");
     }
 
-    private static Stop getStop(Context context, JSONObject stopObj, BusStop busStop) throws SQLException, JSONException {
+    private static Stop getStop(Context context, JSONObject stopObj, Set<BusRoute> routes, BusStop busStop) throws SQLException, JSONException {
 
 	if (helper == null)
 	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
-	if (busRoutes == null)
-	    busRoutes = helper.getBusRouteDao();
+	if (busRouteDao == null)
+	    busRouteDao = helper.getBusRouteDao();
 	if (busDao == null)
 	    busDao = helper.getBusDao();
 	if (busStopDao == null)
@@ -458,53 +460,50 @@ public class DataManager {
 
 	String name = stopObj.getString("name");
 
-	BusRoute route;
-	String dir = null;
+	BusRoute route = null;
+	String dir = "";
 
-	if (name.contains("U")) {
-	    if (name.equals("U1N")) {
-		route = busRoutes.queryForId(468);
-	    } else if (name.startsWith("U9")) {
-		route = busRoutes.queryForId(354);
-	    } else {
-		if (name.startsWith("U1")) {
-		    route = busRoutes.queryForId(326);
-		} else if (name.startsWith("U2")) {
-		    route = busRoutes.queryForId(329);
-		} else if (name.startsWith("U6")) {
-		    route = busRoutes.queryForId(327);
+	for (BusRoute tempRoute : routes) {
+	    if (name.contains("U")) {
+		if (name.equals("U1N")) {
+		    if (tempRoute.code.equals(name)) {
+			route = tempRoute;
+			dir = null;
+		    }
 		} else {
-		    throw new RuntimeException("Error finding Uni-Link route " + name);
+		    if (tempRoute.code.equals(name.substring(0, 2))) {
+			route = tempRoute;
+			if (route.forwardDirection.equals(name.substring(2))) {
+			    dir = route.forwardDirection;
+			} else if (route.reverseDirection.equals(name.substring(2))) {
+			    dir = route.reverseDirection;
+			} else {
+			    Log.e(TAG, "Error detecting direction for " + name);
+			    dir = null;
+			    return null;
+			}
+		    }
 		}
-
-		if (route.forwardDirection.equals(name.substring(2))) {
-		    dir = route.forwardDirection;
-		} else if (route.reverseDirection.equals(name.substring(2))) {
-		    dir = route.reverseDirection;
-		} else {
-		    throw new RuntimeException("Error detecting direction for " + name);
-		}
-	    }
-
-	} else {
-	    Log.v(TAG, "Route not Uni-Link");
-	    List<BusRoute> routes = (List<BusRoute>) busRoutes.queryForEq(BusRoute.CODE_FIELD_NAME, name);
-	    if (routes.size() != 1) {
-		Log.e(TAG, "Found more than one non Uni-Link route?");
-		for (BusRoute routeT : routes) {
-		    Log.i(TAG, "Route: " + routeT);
-		}
-		throw new RuntimeException("Found more than one non Uni-Link route?");
 	    } else {
-		route = routes.get(0);
-		if (route == null) {
-		    throw new RuntimeException("Could not find database entry for " + name);
+		if (tempRoute.code.equals(name)) {
+		    route = tempRoute;
+		    dir = null;
 		}
 	    }
 	}
 
+	if (route == null) {
+	    Log.e(TAG, "Route not found (route == null) " + name);
+	    return null;
+	}
+
+	if (dir != null && dir.equals("")) {
+	    Log.e(TAG, "Error detecting direction for " + name);
+	    return null;
+	}
+
 	String destString = stopObj.getString("dest");
-	BusStop destStop;
+	BusStop destStop = null;
 
 	if (destString.equals("Central Station")) {
 	    destStop = busStopDao.queryForId("SNA19709");
@@ -528,8 +527,10 @@ public class DataManager {
 	    destStop = busStopDao.queryForId("SN121009");
 	} else if (destString.equals("General Hosp")) {
 	    destStop = busStopDao.queryForId("SNA19482");
+	} else if (destString.equals("Wessex Lane")) {
+	    destStop = busStopDao.queryForId("SNA19780");
 	} else {
-	    throw new RuntimeException("Unknown end dest " + destString + " for route " + route.code);
+	    Log.e(TAG, "Unknown end dest " + destString + " for route " + route.code);
 	}
 
 	Date now = new Date(System.currentTimeMillis());
@@ -571,8 +572,8 @@ public class DataManager {
 
 	if (helper == null)
 	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
-	if (busRoutes == null)
-	    busRoutes = helper.getBusRouteDao();
+	if (busRouteDao == null)
+	    busRouteDao = helper.getBusRouteDao();
 	if (busStopDao == null)
 	    busStopDao = helper.getBusStopDao();
 
@@ -581,8 +582,23 @@ public class DataManager {
 	String file = getFileFromServer(busStopUrl + busStop + ".json");
 
 	JSONObject data = new JSONObject(file);
-
 	JSONArray stopsArray = data.getJSONArray("stops");
+	JSONObject routesObject = data.getJSONObject("routes");
+
+	HashSet<BusRoute> busRoutes = new HashSet<BusRoute>();
+	for (Iterator<String> keyIter = routesObject.keys(); keyIter.hasNext();) {
+	    String key = keyIter.next();
+
+	    Log.i(TAG, "Route Key: " + key);
+
+	    BusRoute route = busRouteDao.queryForId(Integer.parseInt(key.substring(key.length() - 3, key.length())));
+
+	    if (route != null) {
+		busRoutes.add(route);
+	    } else {
+		throw new RuntimeException("Route not found " + key.substring(key.length() - 3, key.length()) + " " + key);
+	    }
+	}
 
 	Log.i(TAG, "Number of entries " + data.length());
 
@@ -604,7 +620,7 @@ public class DataManager {
 		Log.e(TAG, "BusStopObj == null");
 	    }
 
-	    Stop stop = getStop(context, stopObj, busStopObj);
+	    Stop stop = getStop(context, stopObj, busRoutes, busStopObj);
 
 	    if (stop == null) {
 		Log.w(TAG, "Null stop, skiping");

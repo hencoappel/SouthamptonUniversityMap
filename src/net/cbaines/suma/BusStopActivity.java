@@ -313,7 +313,7 @@ public class BusStopActivity extends OrmLiteBaseActivity<DatabaseHelper> impleme
 		if (THROW_ERROR_ON_EXCEPTION) {
 		    throw new RuntimeException(e.getMessage());
 		} else {
-		    Log.e(TAG, e.getMessage());
+		    Log.e(TAG, e.getMessage(), e.getCause());
 		}
 	    }
 	    return newTimetable;
