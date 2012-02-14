@@ -2,6 +2,7 @@ package net.cbaines.suma;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,18 +13,20 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 
-public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> {
+public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements Preferences {
     final static String TAG = "BusActivity";
 
     private CheckBox U1RouteRadioButton;
@@ -31,6 +34,9 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> {
     private CheckBox U2RouteRadioButton;
     private CheckBox U6RouteRadioButton;
     private CheckBox U9RouteRadioButton;
+
+    private Handler handler;
+    private Runnable refreshData;
 
     private TextView busIDTextView;
 
@@ -43,6 +49,10 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
     protected Timetable timetable;
     private Timetable visibleTimetable;
+
+    private ListView timetableView;
+
+    private HashSet<GetTimetableStopTask> timetableStopTasks;
 
     private Context instance;
 
@@ -84,7 +94,7 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 
 	    busIDTextView = (TextView) findViewById(R.id.busActivityBusID);
 
-	    progBar = (ProgressBar) findViewById(R.id.busActivityCenterLoadBar);
+	    progBar = (ProgressBar) findViewById(R.id.busActivityLoadBar);
 	    busContentMessage = (TextView) findViewById(R.id.busActivityMessage);
 	    busActivityContentLayout = (LinearLayout) findViewById(R.id.busActivityContentLayout);
 
@@ -141,7 +151,47 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	}
     }
 
-    private class GetTimetableTask extends AsyncTask<String, Integer, Timetable> {
+    public void onResume() {
+	super.onResume();
+
+	SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+	if (sharedPrefs.getBoolean(UNI_LINK_BUS_TIMES, UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT)
+		|| sharedPrefs.getBoolean(NON_UNI_LINK_BUS_TIMES, NON_UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT)) {
+	    Log.i(TAG, "Live Times enabled");
+	    timetable = (Timetable) getLastNonConfigurationInstance();
+
+	    refreshData = new Runnable() {
+		@Override
+		public void run() {
+		    GetTimetableStopTask timetableStopTask = new GetTimetableStopTask();
+		    timetableStopTask.execute(busStopID);
+		    handler.postDelayed(refreshData, 20000);
+		}
+	    };
+
+	    handler = new Handler();
+
+	    if (timetable == null) {
+		Log.i(TAG, "No Previous timetable");
+		handler.post(refreshData);
+	    } else {
+		Log.i(TAG, "Displaying previous timetable");
+		displayTimetable(timetable);
+		if (System.currentTimeMillis() - timetable.fetchTime.getTime() > 20000) {
+		    handler.post(refreshData);
+		}
+	    }
+
+	} else {
+	    Log.i(TAG, "Live Times Disabled");
+	    progBar.setVisibility(View.GONE);
+	    busContentMessage.setText("Live bus times disabled");
+	    busContentMessage.setVisibility(View.VISIBLE);
+	}
+
+    }
+
+    private class GetTimetableStopTask extends AsyncTask<String, Integer, Timetable> {
 	String errorMessage;
 
 	protected void onPreExecute() {
@@ -198,47 +248,20 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> {
 	    busContentMessage.setVisibility(View.VISIBLE);
 	    busActivityContentLayout.setGravity(Gravity.CENTER);
 	} else {
-
-	    for (Iterator<Stop> stopIter = visibleTimetable.iterator(); stopIter.hasNext();) {
-		Stop stop = stopIter.next();
-		Log.i(TAG, "Begin filtering, looking at " + stop + " with route " + stop.bus.route.code);
-		if (stop.bus.route.code.equals("U1")) {
-		    if (!U1RouteRadioButton.isChecked()) {
-			stopIter.remove();
-		    }
-		} else if (stop.bus.route.code.equals("U1N")) {
-		    if (!U1NRouteRadioButton.isChecked()) {
-			stopIter.remove();
-		    }
-		} else if (stop.bus.route.code.equals("U2")) {
-		    if (!U2RouteRadioButton.isChecked()) {
-			stopIter.remove();
-		    }
-		} else if (stop.bus.route.code.equals("U6")) {
-		    if (!U6RouteRadioButton.isChecked()) {
-			stopIter.remove();
-		    }
-		} else if (stop.bus.route.code.equals("U9")) {
-		    if (!U9RouteRadioButton.isChecked()) {
-			stopIter.remove();
-		    }
-		}
-	    }
-
 	    if (visibleTimetable.size() == 0) {
 		busActivityContentLayout.setGravity(Gravity.CENTER);
 		busContentMessage.setText("No Busses (With the current enabled routes)");
 		busContentMessage.setVisibility(View.VISIBLE);
-		busTimeList.setVisibility(View.GONE);
+		timetableView.setVisibility(View.GONE);
 	    } else {
-		busTimeList.setVisibility(View.VISIBLE);
+		timetableView.setVisibility(View.VISIBLE);
 		busContentMessage.setVisibility(View.GONE);
-		TimetableAdapter adapter;
-		if ((adapter = (TimetableAdapter) busTimeList.getAdapter()) != null) {
+		BusSpecificTimetableAdapter adapter;
+		if ((adapter = (BusSpecificTimetableAdapter) timetableView.getAdapter()) != null) {
 		    adapter.updateTimetable(visibleTimetable);
 		} else {
-		    adapter = new TimetableAdapter(this, visibleTimetable);
-		    busTimeList.setAdapter(adapter);
+		    adapter = new BusSpecificTimetableAdapter(this, visibleTimetable);
+		    timetableView.setAdapter(adapter);
 		}
 		busActivityContentLayout.setGravity(Gravity.TOP);
 	    }

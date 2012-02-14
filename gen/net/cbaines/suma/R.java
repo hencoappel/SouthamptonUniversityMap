@@ -55,10 +55,10 @@ public final class R {
     }
     public static final class id {
         public static final int busActivityBusID=0x7f0a0005;
-        public static final int busActivityCenterLoadBar=0x7f0a000e;
         public static final int busActivityContentLayout=0x7f0a000b;
         public static final int busActivityHeaderLayout=0x7f0a0004;
         public static final int busActivityLoadBar=0x7f0a000f;
+        public static final int busActivityLoadBarLayout=0x7f0a000e;
         public static final int busActivityMessage=0x7f0a000c;
         public static final int busActivityTimes=0x7f0a000d;
         public static final int busActivityU1=0x7f0a0006;

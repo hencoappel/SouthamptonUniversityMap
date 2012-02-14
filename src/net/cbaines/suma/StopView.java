@@ -123,6 +123,7 @@ public class StopView extends LinearLayout implements OnClickListener, OnLongCli
 	    if (stop.bus.id != null) {
 		Intent i = new Intent(context, BusActivity.class);
 		i.putExtra("busID", stop.bus.id);
+		i.putExtra("busStopID", stop.busStop.id);
 		((Activity) context).startActivityForResult(i, 0);
 	    } else {
 		Toast.makeText(context, "Arival prediction not avalible for timetabled buses", Toast.LENGTH_SHORT).show();

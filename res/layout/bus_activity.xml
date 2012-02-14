@@ -97,7 +97,7 @@
 
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/busActivityCenterLoadBar"
+            android:id="@+id/busActivityLoadBarLayout"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center"

@@ -704,6 +704,49 @@ public class DataManager {
 	return timetable;
     }
 
+    public static Stop getStop(Context context, Bus bus, BusStop busStop) throws SQLException, ClientProtocolException, IOException, JSONException {
+
+	if (helper == null)
+	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
+	if (busRouteDao == null)
+	    busRouteDao = helper.getBusRouteDao();
+	if (busStopDao == null)
+	    busStopDao = helper.getBusStopDao();
+
+	String file = getFileFromServer(busStopUrl + busStop + ".json");
+
+	JSONObject data = new JSONObject(file);
+	JSONArray stopsArray = data.getJSONArray("stops");
+
+	HashSet<BusRoute> busRoutes = new HashSet<BusRoute>();
+	busRoutes.add(bus.route);
+
+	Stop stop = null;
+
+	Log.i(TAG, "Number of entries " + data.length());
+
+	Log.i(TAG, "Stops: " + data.getJSONArray("stops"));
+
+	for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
+	    JSONObject stopObj = stopsArray.getJSONObject(stopNum);
+
+	    if (stopObj.getString("vehicle").equals(bus.id)) {
+
+		stop = getStop(context, stopObj, busRoutes, busStop);
+
+		if (stop == null) {
+		    Log.w(TAG, "Null stop, skiping");
+		    continue;
+		}
+
+		Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
+
+	    }
+	}
+
+	return stop;
+    }
+
     static PathOverlay getRoutePath(InputStream routeResource, int colour, ResourceProxy resProxy) {
 	PathOverlay data = null;
 
