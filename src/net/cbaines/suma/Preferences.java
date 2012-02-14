@@ -10,7 +10,4 @@ public interface Preferences {
     static final boolean NON_UNI_LINK_BUS_TIMES_ENABLED_BY_DEFAULT = false;
     static final String NON_UNI_LINK_BUS_STOPS = "nonUniLinkBusStops";
     static final boolean NON_UNI_LINK_BUS_STOPS_ENABLED_BY_DEFAULT = false;
-
-    static final boolean THROW_ERROR_ON_EXCEPTION = false;
-
 }

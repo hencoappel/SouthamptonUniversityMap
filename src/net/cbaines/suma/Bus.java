@@ -19,6 +19,9 @@
 
 package net.cbaines.suma;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
@@ -53,13 +56,13 @@ public class Bus {
     /**
      * The direction which the bus is travelling.
      */
-    @DatabaseField(canBeNull = false)
+    @DatabaseField(canBeNull = true)
     String direction;
 
     /**
      * The destination the bus is travelling towards.
      */
-    @DatabaseField(canBeNull = false, foreign = true)
+    @DatabaseField(canBeNull = true, foreign = true)
     BusStop destination;
 
     Bus() {

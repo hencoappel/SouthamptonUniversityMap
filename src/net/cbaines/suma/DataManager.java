@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -550,17 +551,18 @@ public class DataManager {
 	    if (bus == null) {
 		bus = new Bus(busID, route, dir);
 		bus.destination = destStop;
+		busDao.create(bus);
 	    } else {
 		bus.destination = destStop;
 		bus.route = route;
 		bus.direction = dir;
+		busDao.update(bus);
 	    }
 
 	} else {
 	    bus = new Bus(null, route, dir);
+	    busDao.create(bus);
 	}
-
-	busDao.update(bus);
 
 	stop = new Stop(bus, busStop, calender.getTime(), now, live);
 
@@ -633,6 +635,72 @@ public class DataManager {
 	}
 
 	timetable.fetchTime = new Date(System.currentTimeMillis());
+	return timetable;
+    }
+
+    public static Timetable getTimetable(Context context, Bus bus, BusStop startStop, int num) throws SQLException, ClientProtocolException, IOException,
+	    JSONException {
+
+	if (helper == null)
+	    helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
+	if (busRouteDao == null)
+	    busRouteDao = helper.getBusRouteDao();
+	if (busStopDao == null)
+	    busStopDao = helper.getBusStopDao();
+
+	Timetable timetable = new Timetable();
+
+	List<BusStop> busStops = new ArrayList<BusStop>(num);
+	busStops.add(startStop);
+
+	BusRoute route = bus.route;
+
+	for (int i = 0; i < num; i++) {
+	    BusStop nextStop = route.moveInRoute(context, busStops.get(i), bus.direction, 1);
+
+	    if (nextStop != null) {
+		busStops.add(nextStop);
+	    } else {
+		Log.e(TAG, "nextStop is null");
+	    }
+	}
+
+	for (BusStop busStop : busStops) {
+
+	    String file = getFileFromServer(busStopUrl + busStop + ".json");
+
+	    JSONObject data = new JSONObject(file);
+	    JSONArray stopsArray = data.getJSONArray("stops");
+
+	    HashSet<BusRoute> busRoutes = new HashSet<BusRoute>();
+	    busRoutes.add(bus.route);
+
+	    Log.i(TAG, "Number of entries " + data.length());
+
+	    Log.i(TAG, "Stops: " + data.getJSONArray("stops"));
+
+	    for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
+		JSONObject stopObj = stopsArray.getJSONObject(stopNum);
+
+		if (stopObj.getString("vehicle").equals(bus.id)) {
+
+		    Stop stop = getStop(context, stopObj, busRoutes, busStop);
+
+		    if (stop == null) {
+			Log.w(TAG, "Null stop, skiping");
+			continue;
+		    }
+
+		    Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
+
+		    timetable.add(stop);
+
+		}
+	    }
+	}
+
+	timetable.fetchTime = new Date(System.currentTimeMillis());
+
 	return timetable;
     }
 

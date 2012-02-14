@@ -36,28 +36,28 @@ import android.widget.Toast;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 import com.j256.ormlite.dao.Dao;
 
-public class StopView extends LinearLayout implements OnClickListener, OnLongClickListener {
+public class BusSpecificStopView extends LinearLayout implements OnClickListener, OnLongClickListener {
 
     // private final ImageView icon;
 
     // private static final String TAG = "StopView";
 
-    private final TextView name;
+    private final TextView location;
     private final TextView time;
     private String onClickMessage = "";
     private final Context context;
 
     private Stop stop;
 
-    public StopView(Context context, Stop stop) {
+    public BusSpecificStopView(Context context, Stop stop) {
 	super(context);
 
 	this.context = context;
 
 	this.setOrientation(HORIZONTAL);
 
-	name = new TextView(context);
-	name.setTextSize(22f);
+	location = new TextView(context);
+	location.setTextSize(22f);
 
 	time = new TextView(context);
 	time.setTextSize(22f);
@@ -65,7 +65,7 @@ public class StopView extends LinearLayout implements OnClickListener, OnLongCli
 
 	setStop(stop);
 
-	addView(name, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+	addView(location, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 	addView(time, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
     }
 
@@ -75,7 +75,7 @@ public class StopView extends LinearLayout implements OnClickListener, OnLongCli
 
 	this.stop = stop;
 
-	name.setText(stop.bus.getName());
+	location.setText(stop.busStop.description);
 	time.setText(stop.getTimeToArival());
 
 	DatabaseHelper helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
