@@ -22,6 +22,7 @@ package net.cbaines.suma;
 import java.util.Date;
 
 import android.text.format.DateUtils;
+import android.util.Log;
 
 /**
  * Stop represents a Bus stopping at a time at a BusStop.
@@ -90,6 +91,18 @@ public class Stop {
 	    return "Due";
 	} else {
 	    return (String) DateUtils.getRelativeTimeSpanString(arivalTime.getTime(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
+	}
+    }
+
+    public String getShortTimeToArival() {
+	if (arivalTime.getTime() - System.currentTimeMillis() <= 60000) {
+	    return "Due";
+	} else {
+	    String time = (String) DateUtils.getRelativeTimeSpanString(arivalTime.getTime(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
+	    time = time.replace("in ", "");
+	    time = time.replace(" minutes", "m");
+	    Log.w("Stop", "time " + time);
+	    return time;
 	}
     }
 

@@ -194,12 +194,26 @@ public class SouthamptonUniversityMapActivity extends OrmLiteBaseActivity<Databa
 	mapController = mapView.getController();
 	mResourceProxy = new DefaultResourceProxyImpl(getApplicationContext());
 
-	GeoPoint userLocation = myLocationOverlay.getMyLocation();
-	if (userLocation == null) {
-	    userLocation = new GeoPoint(50935551, -1393488); // ECS
+	GeoPoint userLocation = null;
+
+	Bundle extras = getIntent().getExtras();
+	if (extras != null && extras.containsKey("poiPoint")) {
+	    String poiPoint = getIntent().getExtras().getString("poiPoint");
+	    Log.i(TAG, "poiPoint " + poiPoint);
+
+	    String[] bits = poiPoint.split(",");
+
+	    userLocation = new GeoPoint(Double.valueOf(bits[0]), Double.valueOf(bits[1]));
+	    mapController.setZoom(20);
+
+	} else {
+	    userLocation = myLocationOverlay.getMyLocation();
+	    if (userLocation == null) {
+		userLocation = new GeoPoint(50935551, -1393488); // ECS
+	    }
+	    mapController.setZoom(15);
 	}
 
-	mapController.setZoom(15);
 	mapController.setCenter(userLocation);
 
 	Log.i(TAG, "Finished onCreate " + (System.currentTimeMillis() - startTime));

@@ -444,7 +444,7 @@ public class DataManager {
 	boolean live = true;
 	if (!time.equals("Due")) {
 
-	    Log.v(TAG, "Time: " + time + " current time " + calender.getTime());
+	    // Log.v(TAG, "Time: " + time + " current time " + calender.getTime());
 
 	    if (time.contains(":")) {
 		String[] minAndHour = time.split(":");
@@ -456,7 +456,7 @@ public class DataManager {
 		calender.add(Calendar.MINUTE, Integer.parseInt(time.substring(0, time.length() - 1)));
 	    }
 
-	    Log.v(TAG, "Date: " + calender.getTime());
+	    // Log.v(TAG, "Date: " + calender.getTime());
 	}
 
 	String name = stopObj.getString("name");
@@ -472,6 +472,12 @@ public class DataManager {
 			dir = null;
 		    }
 		} else {
+		    if (tempRoute == null) {
+			Log.e(TAG, "tempRoute == null");
+		    }
+		    if (tempRoute.code == null) {
+			Log.e(TAG, "tempRoute.code == null");
+		    }
 		    if (tempRoute.code.equals(name.substring(0, 2))) {
 			route = tempRoute;
 			if (route.forwardDirection.equals(name.substring(2))) {
@@ -591,7 +597,7 @@ public class DataManager {
 	for (Iterator<String> keyIter = routesObject.keys(); keyIter.hasNext();) {
 	    String key = keyIter.next();
 
-	    Log.i(TAG, "Route Key: " + key);
+	    Log.v(TAG, "Route Key: " + key);
 
 	    BusRoute route = busRouteDao.queryForId(Integer.parseInt(key.substring(key.length() - 3, key.length())));
 
@@ -629,7 +635,7 @@ public class DataManager {
 		continue;
 	    }
 
-	    Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
+	    Log.v(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
 
 	    timetable.add(stop);
 	}
@@ -667,7 +673,7 @@ public class DataManager {
 
 	for (BusStop busStop : busStops) {
 
-	    String file = getFileFromServer(busStopUrl + busStop + ".json");
+	    String file = getFileFromServer(busStopUrl + busStop.id + ".json");
 
 	    JSONObject data = new JSONObject(file);
 	    JSONArray stopsArray = data.getJSONArray("stops");
@@ -675,9 +681,9 @@ public class DataManager {
 	    HashSet<BusRoute> busRoutes = new HashSet<BusRoute>();
 	    busRoutes.add(bus.route);
 
-	    Log.i(TAG, "Number of entries " + data.length());
+	    Log.v(TAG, "Number of entries " + data.length());
 
-	    Log.i(TAG, "Stops: " + data.getJSONArray("stops"));
+	    Log.v(TAG, "Stops: " + data.getJSONArray("stops"));
 
 	    for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
 		JSONObject stopObj = stopsArray.getJSONObject(stopNum);
@@ -691,7 +697,7 @@ public class DataManager {
 			continue;
 		    }
 
-		    Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
+		    Log.v(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
 
 		    timetable.add(stop);
 
@@ -713,34 +719,31 @@ public class DataManager {
 	if (busStopDao == null)
 	    busStopDao = helper.getBusStopDao();
 
-	String file = getFileFromServer(busStopUrl + busStop + ".json");
+	String file = getFileFromServer(busStopUrl + busStop.id + ".json");
 
 	JSONObject data = new JSONObject(file);
 	JSONArray stopsArray = data.getJSONArray("stops");
 
 	HashSet<BusRoute> busRoutes = new HashSet<BusRoute>();
+	busRouteDao.refresh(bus.route);
 	busRoutes.add(bus.route);
 
 	Stop stop = null;
 
-	Log.i(TAG, "Number of entries " + data.length());
+	// Log.v(TAG, "Number of entries " + data.length());
 
-	Log.i(TAG, "Stops: " + data.getJSONArray("stops"));
+	// Log.v(TAG, "Stops: " + data.getJSONArray("stops"));
 
 	for (int stopNum = 0; stopNum < stopsArray.length(); stopNum++) {
 	    JSONObject stopObj = stopsArray.getJSONObject(stopNum);
 
-	    if (stopObj.getString("vehicle").equals(bus.id)) {
+	    // Log.v(TAG, "stopObj: " + stopObj);
+	    if (stopObj.has("vehicle") && stopObj.getString("vehicle").equals(bus.id)) {
 
 		stop = getStop(context, stopObj, busRoutes, busStop);
+		break;
 
-		if (stop == null) {
-		    Log.w(TAG, "Null stop, skiping");
-		    continue;
-		}
-
-		Log.i(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
-
+		// Log.v(TAG, "Found stop for a unidentified " + stop.bus.toString() + " at " + stop.busStop.id + " at " + stop.arivalTime);
 	    }
 	}
 
@@ -779,7 +782,7 @@ public class DataManager {
 	StringBuilder builder = new StringBuilder();
 	HttpClient client = new DefaultHttpClient();
 	HttpGet httpGet = new HttpGet(request);
-	Log.i("Util.getFileFromServer", "Request used: " + request);
+	Log.v("Util.getFileFromServer", "Request used: " + request);
 
 	HttpResponse response = client.execute(httpGet);
 	StatusLine statusLine = response.getStatusLine();

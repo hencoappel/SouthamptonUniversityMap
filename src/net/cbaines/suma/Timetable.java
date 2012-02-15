@@ -28,7 +28,7 @@ public class Timetable extends ArrayList<Stop> {
      * 
      */
     private static final long serialVersionUID = -9021303378059511643L;
-    
+
     Date fetchTime;
 
     public String toString() {
@@ -40,6 +40,8 @@ public class Timetable extends ArrayList<Stop> {
     }
 
     public boolean contains(Stop otherStop, boolean toTheMinute) {
+	if (otherStop == null)
+	    return false;
 	if (toTheMinute) {
 	    for (Stop stop : this) {
 		if (otherStop.bus != null && stop.bus != null && otherStop.bus.equals(stop.bus)) {
@@ -47,8 +49,14 @@ public class Timetable extends ArrayList<Stop> {
 			return true;
 		    }
 		} else if (otherStop.busStop.equals(stop.busStop)) {
-		    if (Math.abs(otherStop.arivalTime.getTime() - stop.arivalTime.getTime()) < 60000) {
+		    if (otherStop.arivalTime == null && stop.arivalTime == null) {
 			return true;
+		    } else {
+			if (otherStop.arivalTime == null || stop.arivalTime == null) {
+			    return false;
+			} else if (Math.abs(otherStop.arivalTime.getTime() - stop.arivalTime.getTime()) < 60000) {
+			    return true;
+			}
 		    }
 		}
 	    }

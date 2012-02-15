@@ -38,8 +38,6 @@ import com.j256.ormlite.dao.Dao;
 
 public class BusSpecificStopView extends LinearLayout implements OnClickListener, OnLongClickListener {
 
-    // private final ImageView icon;
-
     // private static final String TAG = "StopView";
 
     private final TextView location;
@@ -75,8 +73,16 @@ public class BusSpecificStopView extends LinearLayout implements OnClickListener
 
 	this.stop = stop;
 
-	location.setText(stop.busStop.description);
-	time.setText(stop.getTimeToArival());
+	if (stop.busStop.description.length() > 20) {
+	    location.setText(stop.busStop.description.substring(0, 20)); // TODO
+	} else {
+	    location.setText(stop.busStop.description); // TODO
+	}
+	if (stop.arivalTime != null) {
+	    time.setText(stop.getShortTimeToArival());
+	} else {
+	    time.setText("");
+	}
 
 	DatabaseHelper helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
 
@@ -85,17 +91,37 @@ public class BusSpecificStopView extends LinearLayout implements OnClickListener
 
 	    busDao.refresh(stop.bus);
 
-	    if (stop.bus.id != null) {
-		if (stop.live) {
-		    onClickMessage = "Bus " + stop.bus.toString() + " at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+	    if (stop.arivalTime != null) {
+
+		if (stop.bus.id != null) {
+		    if (stop.live) {
+			onClickMessage = "Bus " + stop.bus.toString() + " at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		    } else {
+			onClickMessage = "Timetabled bus " + stop.bus.toString() + " at "
+				+ DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		    }
 		} else {
-		    onClickMessage = "Timetabled bus " + stop.bus.toString() + " at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		    if (stop.live) {
+			onClickMessage = "Unidentified bus (" + stop.bus.getName() + ") at "
+				+ DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		    } else {
+			onClickMessage = "Timetabled bus (" + stop.bus.getName() + ") at "
+				+ DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		    }
 		}
 	    } else {
-		if (stop.live) {
-		    onClickMessage = "Unidentified bus (" + stop.bus.getName() + ") at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		if (stop.bus.id != null) {
+		    if (stop.live) {
+			onClickMessage = "Bus " + stop.bus.toString();
+		    } else {
+			onClickMessage = "Timetabled bus " + stop.bus.toString();
+		    }
 		} else {
-		    onClickMessage = "Timetabled bus (" + stop.bus.getName() + ") at " + DateFormat.getTimeInstance(DateFormat.SHORT).format(stop.arivalTime);
+		    if (stop.live) {
+			onClickMessage = "Unidentified bus (" + stop.bus.getName() + ")";
+		    } else {
+			onClickMessage = "Timetabled bus (" + stop.bus.getName() + ")";
+		    }
 		}
 	    }
 	} catch (SQLException e) {
@@ -112,7 +138,7 @@ public class BusSpecificStopView extends LinearLayout implements OnClickListener
     }
 
     @Override
-    public boolean onLongClick(View v) {
+    public boolean onLongClick(View v) { // TODO
 	DatabaseHelper helper = OpenHelperManager.getHelper(context, DatabaseHelper.class);
 
 	try {
@@ -121,8 +147,8 @@ public class BusSpecificStopView extends LinearLayout implements OnClickListener
 	    busDao.refresh(stop.bus);
 
 	    if (stop.bus.id != null) {
-		Intent i = new Intent(context, BusActivity.class);
-		i.putExtra("busID", stop.bus.id);
+		Intent i = new Intent(context, SouthamptonUniversityMapActivity.class);
+		i.putExtra("poiPoint", stop.busStop.point.toDoubleString());
 		((Activity) context).startActivityForResult(i, 0);
 	    } else {
 		Toast.makeText(context, "Arival prediction not avalible for timetabled buses", Toast.LENGTH_SHORT).show();

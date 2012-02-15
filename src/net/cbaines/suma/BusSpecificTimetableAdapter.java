@@ -34,7 +34,7 @@ public class BusSpecificTimetableAdapter extends BaseAdapter {
     private final Animation a;
     private boolean[] changed;
 
-    private static final String TAG = "TimetableAdapter";
+    private static final String TAG = "BusSpecificTimetableAdapter";
 
     public BusSpecificTimetableAdapter(Context context, Timetable timetable) {
 	this.context = context;
@@ -43,7 +43,7 @@ public class BusSpecificTimetableAdapter extends BaseAdapter {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-	Log.i(TAG, "Returning stop " + position + " " + timetable.get(position));
+	// Log.i(TAG, "Returning stop " + position + " " + timetable.get(position));
 
 	BusSpecificStopView stopView;
 	if (convertView == null) {
@@ -56,7 +56,7 @@ public class BusSpecificTimetableAdapter extends BaseAdapter {
 	if (changed == null || changed[position]) {
 	    a.reset();
 	    stopView.startAnimation(a);
-	    Log.i(TAG, "Animating it");
+	    // Log.i(TAG, "Animating it");
 	}
 
 	return stopView;
@@ -75,15 +75,15 @@ public class BusSpecificTimetableAdapter extends BaseAdapter {
     }
 
     public void updateTimetable(Timetable newTimetable) {
-	Log.v(TAG, "Old timetable " + timetable);
-	Log.v(TAG, "Adaptor loading new timetable");
+	// Log.v(TAG, "Old timetable " + timetable);
+	// Log.v(TAG, "Adaptor loading new timetable");
 	changed = new boolean[newTimetable.size()];
 	for (int i = 0; i < newTimetable.size(); i++) {
-	    if (!timetable.contains(newTimetable.get(i), true)) {
+	    if (newTimetable.get(i).arivalTime != null && !timetable.contains(newTimetable.get(i), true)) {
 		changed[i] = true;
-		Log.i(TAG, "Old timetable does not contain: " + newTimetable.get(i));
+		// Log.i(TAG, "Old timetable does not contain: " + newTimetable.get(i));
 	    } else {
-		Log.i(TAG, "Old timetable contains: " + newTimetable.get(i));
+		// Log.i(TAG, "Old timetable contains: " + newTimetable.get(i));
 		changed[i] = false;
 	    }
 	}
