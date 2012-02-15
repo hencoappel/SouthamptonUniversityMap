@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,7 +18,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -32,11 +28,11 @@ import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
 public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements Preferences {
     final static String TAG = "BusActivity";
 
-    private TextView U1RouteRadioButton;
-    private TextView U1NRouteRadioButton;
-    private TextView U2RouteRadioButton;
-    private TextView U6RouteRadioButton;
-    private TextView U9RouteRadioButton;
+    private TextView U1RouteTextView;
+    private TextView U1NRouteTextView;
+    private TextView U2RouteTextView;
+    private TextView U6RouteTextView;
+    private TextView U9RouteTextView;
 
     private Handler handler;
     private Runnable refreshData;
@@ -83,6 +79,8 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 		Log.e(TAG, "Found more than one bus? " + busID);
 	    }
 
+	    helper.getBusRouteDao().refresh(bus.route);
+
 	    List<BusStop> busStops = helper.getBusStopDao().queryForEq(BusStop.ID_FIELD_NAME, busStopID);
 	    busStop = null;
 	    if (busStops.size() == 0) {
@@ -93,11 +91,11 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 		Log.e(TAG, "Found more than one busStop? " + busStopID);
 	    }
 
-	    U1RouteRadioButton = (TextView) findViewById(R.id.busActivityU1);
-	    U1NRouteRadioButton = (TextView) findViewById(R.id.busActivityU1N);
-	    U2RouteRadioButton = (TextView) findViewById(R.id.busActivityU2);
-	    U6RouteRadioButton = (TextView) findViewById(R.id.busActivityU6);
-	    U9RouteRadioButton = (TextView) findViewById(R.id.busActivityU9);
+	    U1RouteTextView = (TextView) findViewById(R.id.busActivityU1);
+	    U1NRouteTextView = (TextView) findViewById(R.id.busActivityU1N);
+	    U2RouteTextView = (TextView) findViewById(R.id.busActivityU2);
+	    U6RouteTextView = (TextView) findViewById(R.id.busActivityU6);
+	    U9RouteTextView = (TextView) findViewById(R.id.busActivityU9);
 
 	    busIDTextView = (TextView) findViewById(R.id.busActivityBusID);
 
@@ -108,49 +106,37 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 
 	    if (bus.id != null) {
 		Log.i(TAG, "Bus id is not null (" + bus.id + ") setting busIDTextView");
-		busIDTextView.setText(bus.id);
+		busIDTextView.setText(bus.id + " " + bus.getName());
 	    } else {
 		Log.w(TAG, "Bus id is null?");
 		// Might not ever happen
 		busIDTextView.setText("Unidentified");
 	    }
 
-	    if (bus.route.uniLink) {
-		Log.i(TAG, "Bus is uniLink");
-		if (bus.route.code.equals("U1")) {
-		    U1RouteRadioButton.setVisibility(View.VISIBLE);
-		    U1NRouteRadioButton.setVisibility(View.GONE);
-		    U2RouteRadioButton.setVisibility(View.GONE);
-		    U6RouteRadioButton.setVisibility(View.GONE);
-		    U9RouteRadioButton.setVisibility(View.GONE);
-		} else if (bus.route.code.equals("U1N")) {
-		    U1RouteRadioButton.setVisibility(View.GONE);
-		    U1NRouteRadioButton.setVisibility(View.VISIBLE);
-		    U2RouteRadioButton.setVisibility(View.GONE);
-		    U6RouteRadioButton.setVisibility(View.GONE);
-		    U9RouteRadioButton.setVisibility(View.GONE);
-		} else if (bus.route.code.equals("U2")) {
-		    U1RouteRadioButton.setVisibility(View.GONE);
-		    U1NRouteRadioButton.setVisibility(View.GONE);
-		    U2RouteRadioButton.setVisibility(View.VISIBLE);
-		    U6RouteRadioButton.setVisibility(View.GONE);
-		    U9RouteRadioButton.setVisibility(View.GONE);
-		} else if (bus.route.code.equals("U6")) {
-		    U1RouteRadioButton.setVisibility(View.GONE);
-		    U1NRouteRadioButton.setVisibility(View.GONE);
-		    U2RouteRadioButton.setVisibility(View.GONE);
-		    U6RouteRadioButton.setVisibility(View.VISIBLE);
-		    U9RouteRadioButton.setVisibility(View.GONE);
-		} else if (bus.route.code.equals("U9")) {
-		    U1RouteRadioButton.setVisibility(View.GONE);
-		    U1NRouteRadioButton.setVisibility(View.GONE);
-		    U2RouteRadioButton.setVisibility(View.GONE);
-		    U6RouteRadioButton.setVisibility(View.GONE);
-		    U9RouteRadioButton.setVisibility(View.VISIBLE);
-		} else {
-		    Log.e(TAG, "Route not found " + bus.route.code);
-		}
+	    U1RouteTextView.setVisibility(View.GONE);
+	    U1NRouteTextView.setVisibility(View.GONE);
+	    U2RouteTextView.setVisibility(View.GONE);
+	    U6RouteTextView.setVisibility(View.GONE);
+	    U9RouteTextView.setVisibility(View.GONE);
+
+	    // if (bus.route.uniLink) {
+	    Log.i(TAG, "Bus is uniLink");
+	    if (bus.route.code.equals("U1")) {
+		U1RouteTextView.setVisibility(View.VISIBLE);
+	    } else if (bus.route.code.equals("U1N")) {
+		U1NRouteTextView.setVisibility(View.VISIBLE);
+	    } else if (bus.route.code.equals("U2")) {
+		U2RouteTextView.setVisibility(View.VISIBLE);
+	    } else if (bus.route.code.equals("U6")) {
+		U6RouteTextView.setVisibility(View.VISIBLE);
+	    } else if (bus.route.code.equals("U9")) {
+		U9RouteTextView.setVisibility(View.VISIBLE);
+	    } else {
+		Log.e(TAG, "Route not found " + bus.route.code);
 	    }
+	    // } else {
+	    // Log.i(TAG, "Bus is not uniLink");
+	    // }
 
 	} catch (NumberFormatException e) {
 	    e.printStackTrace();
@@ -161,10 +147,8 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 	busStops = new ArrayList<BusStop>(num);
 	busStops.add(busStop);
 
-	BusRoute route = bus.route;
-
 	for (int i = 0; i < num; i++) {
-	    BusStop nextStop = route.moveInRoute(instance, busStops.get(i), bus.direction, 1);
+	    BusStop nextStop = bus.route.moveInRoute(instance, busStops.get(i), bus.direction, 1);
 
 	    if (nextStop != null) {
 		busStops.add(nextStop);

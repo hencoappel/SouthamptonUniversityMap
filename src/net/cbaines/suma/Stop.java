@@ -101,7 +101,6 @@ public class Stop {
 	    String time = (String) DateUtils.getRelativeTimeSpanString(arivalTime.getTime(), System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
 	    time = time.replace("in ", "");
 	    time = time.replace(" minutes", "m");
-	    Log.w("Stop", "time " + time);
 	    return time;
 	}
     }
