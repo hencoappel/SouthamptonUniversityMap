@@ -3,6 +3,7 @@ package net.cbaines.suma;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -51,13 +52,13 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 
     private ListView timetableView;
 
-    private HashSet<GetTimetableStopTask> timetableStopTasks;
+    private HashMap<BusStop, GetTimetableStopTask> timetableStopTasks = new HashMap<BusStop, GetTimetableStopTask>();
 
     private Context instance;
 
     private List<BusStop> busStops;
 
-    int num = 15;
+    int num = 20;
 
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
@@ -162,10 +163,14 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 	    public void run() {
 		for (int i = 0; i < num; i++) {
 		    if (timetable.get(i).timeOfFetch == null || (timetable.get(i).timeOfFetch.getTime() - System.currentTimeMillis()) > 20000) {
-			GetTimetableStopTask timetableStopTask = new GetTimetableStopTask();
-			BusStop[] str = { busStops.get(i) };
-			timetableStopTask.execute(str);
-			handler.postDelayed(refreshData, 20000);
+			GetTimetableStopTask previous = timetableStopTasks.get(busStops.get(i));
+			if (previous == null) {
+			    GetTimetableStopTask timetableStopTask = new GetTimetableStopTask();
+			    BusStop[] str = { busStops.get(i) };
+			    timetableStopTask.execute(str);
+			    timetableStopTasks.put(busStops.get(i), timetableStopTask);
+			    handler.postDelayed(refreshData, 20000);
+			}
 		    }
 		}
 	    }
@@ -208,7 +213,7 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 	if (handler != null) { // BusTimes are enabled
 	    handler.removeCallbacks(refreshData);
 	    if (timetableStopTasks != null) { // Could happen if the handler has not created the timetableTask yet
-		for (GetTimetableStopTask task : timetableStopTasks) {
+		for (GetTimetableStopTask task : timetableStopTasks.values()) {
 		    if (task != null) {
 			task.cancel(true);
 		    }
@@ -220,46 +225,48 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 	super.onPause();
     }
 
-    private class GetTimetableStopTask extends AsyncTask<BusStop, Integer, Timetable> {
-	String errorMessage;
+    private class GetTimetableStopTask extends AsyncTask<BusStop, Integer, Stop> {
+	private String errorMessage;
+
+	private BusStop busStop;
+
+	private int position;
 
 	protected void onPreExecute() {
 	    progBar.setVisibility(View.VISIBLE);
 	}
 
-	protected Timetable doInBackground(BusStop... busStop) {
-	    Timetable newTimetable = timetable;
+	protected Stop doInBackground(BusStop... busStopArray) {
+	    busStop = busStopArray[0];
+	    position = busStops.indexOf(busStop);
+	    Stop stop = null;
+
 	    try {
-		Log.i(TAG, "Fetching stop for busStop " + busStops.indexOf(busStop[0]));
-		Stop stop = DataManager.getStop(instance, bus, busStop[0]);
+		Log.i(TAG, "Fetching stop for busStop " + position);
+		stop = DataManager.getStop(instance, bus, busStop);
 		if (stop == null) {
-		    stop = new Stop(bus, busStop[0], null, null, false);
+		    stop = new Stop(bus, busStop, null, null, false);
 		}
-		Log.i(TAG, "Finished fetching stop for busStop " + busStops.indexOf(busStop[0]));
-		newTimetable.set(busStops.indexOf(busStop[0]), stop);
+		Log.i(TAG, "Finished fetching stop for busStop " + position);
 	    } catch (SQLException e) {
 		errorMessage = "Error message regarding SQL?";
 		e.printStackTrace();
-		newTimetable = null;
 	    } catch (ClientProtocolException e) {
 		errorMessage = "ClientProtocolException!?!";
 		e.printStackTrace();
-		newTimetable = null;
 	    } catch (IOException e) {
 		errorMessage = "Error fetching bus times from server, are you connected to the internet?";
 		e.printStackTrace();
-		newTimetable = null;
 	    } catch (JSONException e) {
 		errorMessage = "Error parsing bus times";
 		e.printStackTrace();
-		newTimetable = null;
 	    }
-	    return newTimetable;
+	    return stop;
 	}
 
-	protected void onPostExecute(Timetable newTimetable) {
+	protected void onPostExecute(Stop stop) {
 	    // Log.i(TAG, "Got timetable");
-	    if (newTimetable == null) {
+	    if (stop == null) {
 		Log.i(TAG, "Its null");
 
 		progBar.setVisibility(View.GONE);
@@ -267,8 +274,10 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 		busContentMessage.setVisibility(View.VISIBLE);
 	    } else {
 		progBar.setVisibility(View.GONE);
-		timetable = newTimetable;
-		displayTimetable(timetable);
+		synchronized (timetable) {
+		    timetable.set(position, stop);
+		    displayTimetable(timetable);
+		}
 	    }
 	}
     }
@@ -276,7 +285,7 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
     private void displayTimetable(Timetable timetable) {
 	visibleTimetable = (Timetable) timetable.clone();
 
-	Log.i(TAG, "Displaying timetable, it contains " + visibleTimetable.size() + " stops");
+	// Log.i(TAG, "Displaying timetable, it contains " + visibleTimetable.size() + " stops");
 
 	if (timetable.size() == 0) {
 	    busContentMessage.setText("No Busses");
