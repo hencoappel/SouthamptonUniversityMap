@@ -35,9 +35,6 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
     private TextView U6RouteTextView;
     private TextView U9RouteTextView;
 
-    private Handler handler;
-    private Runnable refreshData;
-
     private TextView busIDTextView;
 
     private ProgressBar progBar;
@@ -52,11 +49,11 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 
     private ListView timetableView;
 
-    private HashMap<BusStop, GetTimetableStopTask> timetableStopTasks = new HashMap<BusStop, GetTimetableStopTask>();
-
     private Context instance;
 
     private List<BusStop> busStops;
+
+    private Handler handler;
 
     int num = 20;
 
@@ -158,23 +155,6 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 	    }
 	}
 
-	refreshData = new Runnable() {
-	    @Override
-	    public void run() {
-		for (int i = 0; i < num; i++) {
-		    if (timetable.get(i).timeOfFetch == null || (timetable.get(i).timeOfFetch.getTime() - System.currentTimeMillis()) > 20000) {
-			GetTimetableStopTask previous = timetableStopTasks.get(busStops.get(i));
-			if (previous == null) {
-			    GetTimetableStopTask timetableStopTask = new GetTimetableStopTask();
-			    BusStop[] str = { busStops.get(i) };
-			    timetableStopTask.execute(str);
-			    timetableStopTasks.put(busStops.get(i), timetableStopTask);
-			    handler.postDelayed(refreshData, 20000);
-			}
-		    }
-		}
-	    }
-	};
     }
 
     public void onResume() {
@@ -198,7 +178,6 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 		Log.i(TAG, "Displaying previous timetable");
 		displayTimetable(timetable);
 	    }
-	    handler.post(refreshData);
 
 	} else {
 	    Log.i(TAG, "Live Times Disabled");
@@ -211,7 +190,7 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 
     public void onPause() {
 	if (handler != null) { // BusTimes are enabled
-	    handler.removeCallbacks(refreshData);
+	    handler.removeCallbacks(r)
 	    if (timetableStopTasks != null) { // Could happen if the handler has not created the timetableTask yet
 		for (GetTimetableStopTask task : timetableStopTasks.values()) {
 		    if (task != null) {
@@ -223,63 +202,6 @@ public class BusActivity extends OrmLiteBaseActivity<DatabaseHelper> implements 
 	}
 
 	super.onPause();
-    }
-
-    private class GetTimetableStopTask extends AsyncTask<BusStop, Integer, Stop> {
-	private String errorMessage;
-
-	private BusStop busStop;
-
-	private int position;
-
-	protected void onPreExecute() {
-	    progBar.setVisibility(View.VISIBLE);
-	}
-
-	protected Stop doInBackground(BusStop... busStopArray) {
-	    busStop = busStopArray[0];
-	    position = busStops.indexOf(busStop);
-	    Stop stop = null;
-
-	    try {
-		Log.i(TAG, "Fetching stop for busStop " + position);
-		stop = DataManager.getStop(instance, bus, busStop);
-		if (stop == null) {
-		    stop = new Stop(bus, busStop, null, null, false);
-		}
-		Log.i(TAG, "Finished fetching stop for busStop " + position);
-	    } catch (SQLException e) {
-		errorMessage = "Error message regarding SQL?";
-		e.printStackTrace();
-	    } catch (ClientProtocolException e) {
-		errorMessage = "ClientProtocolException!?!";
-		e.printStackTrace();
-	    } catch (IOException e) {
-		errorMessage = "Error fetching bus times from server, are you connected to the internet?";
-		e.printStackTrace();
-	    } catch (JSONException e) {
-		errorMessage = "Error parsing bus times";
-		e.printStackTrace();
-	    }
-	    return stop;
-	}
-
-	protected void onPostExecute(Stop stop) {
-	    // Log.i(TAG, "Got timetable");
-	    if (stop == null) {
-		Log.i(TAG, "Its null");
-
-		progBar.setVisibility(View.GONE);
-		busContentMessage.setText(errorMessage);
-		busContentMessage.setVisibility(View.VISIBLE);
-	    } else {
-		progBar.setVisibility(View.GONE);
-		synchronized (timetable) {
-		    timetable.set(position, stop);
-		    displayTimetable(timetable);
-		}
-	    }
-	}
     }
 
     private void displayTimetable(Timetable timetable) {

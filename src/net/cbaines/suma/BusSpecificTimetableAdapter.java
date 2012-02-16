@@ -20,7 +20,7 @@
 package net.cbaines.suma;
 
 import android.content.Context;
-import android.util.Log;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -33,12 +33,14 @@ public class BusSpecificTimetableAdapter extends BaseAdapter {
     private Timetable timetable;
     private final Animation a;
     private boolean[] changed;
+    private Handler handler;
 
     private static final String TAG = "BusSpecificTimetableAdapter";
 
-    public BusSpecificTimetableAdapter(Context context, Timetable timetable) {
+    public BusSpecificTimetableAdapter(Context context, Timetable timetable, Handler handler) {
 	this.context = context;
 	this.timetable = timetable;
+	this.handler = handler;
 	this.a = AnimationUtils.loadAnimation(context, R.anim.updated_stop_view);
     }
 
@@ -47,7 +49,7 @@ public class BusSpecificTimetableAdapter extends BaseAdapter {
 
 	BusSpecificStopView stopView;
 	if (convertView == null) {
-	    stopView = new BusSpecificStopView(context, timetable.get(position));
+	    stopView = new BusSpecificStopView(context, timetable.get(position), handler);
 	} else {
 	    stopView = (BusSpecificStopView) convertView;
 	    stopView.setStop(timetable.get(position));

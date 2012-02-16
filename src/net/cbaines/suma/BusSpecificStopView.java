@@ -19,12 +19,19 @@
 
 package net.cbaines.suma;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DateFormat;
+
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,6 +45,12 @@ import com.j256.ormlite.dao.Dao;
 
 public class BusSpecificStopView extends LinearLayout implements OnClickListener, OnLongClickListener {
 
+    private static final String TAG = "BusSpecificStopView";
+
+    private Handler handler;
+
+    private Runnable refreshData;
+
     // private static final String TAG = "StopView";
 
     private final TextView location;
@@ -45,12 +58,15 @@ public class BusSpecificStopView extends LinearLayout implements OnClickListener
     private String onClickMessage = "";
     private final Context context;
 
+    private GetTimetableStopTask task;
+
     private Stop stop;
 
-    public BusSpecificStopView(Context context, Stop stop) {
+    public BusSpecificStopView(Context context, Stop newStop, Handler newHandler) {
 	super(context);
 
 	this.context = context;
+	this.handler = newHandler;
 
 	this.setOrientation(HORIZONTAL);
 
@@ -65,6 +81,75 @@ public class BusSpecificStopView extends LinearLayout implements OnClickListener
 
 	addView(location, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 	addView(time, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+
+	refreshData = new Runnable() {
+	    @Override
+	    public void run() {
+		if (stop.timeOfFetch == null || (stop.timeOfFetch.getTime() - System.currentTimeMillis()) > 20000) {
+		    if (task == null) {
+			task = new GetTimetableStopTask();
+			BusStop[] str = { stop.busStop };
+			task.execute(str);
+			handler.postDelayed(refreshData, 20000);
+		    }
+		}
+
+	    }
+	};
+
+	handler.post(refreshData);
+    }
+
+    private class GetTimetableStopTask extends AsyncTask<BusStop, Integer, Stop> {
+	private String errorMessage;
+
+	private BusStop busStop;
+
+	private int position;
+
+	protected void onPreExecute() {
+	    // progBar.setVisibility(View.VISIBLE);
+	}
+
+	protected Stop doInBackground(BusStop... busStopArray) {
+	    busStop = busStopArray[0];
+	    Stop stop = null;
+
+	    try {
+		Log.i(TAG, "Fetching stop for busStop " + position);
+		stop = DataManager.getStop(context, stop.bus, busStop);
+		if (stop == null) {
+		    stop = new Stop(stop.bus, busStop, null, null, false);
+		}
+		Log.i(TAG, "Finished fetching stop for busStop " + position);
+	    } catch (SQLException e) {
+		errorMessage = "Error message regarding SQL?";
+		e.printStackTrace();
+	    } catch (ClientProtocolException e) {
+		errorMessage = "ClientProtocolException!?!";
+		e.printStackTrace();
+	    } catch (IOException e) {
+		errorMessage = "Error fetching bus times from server, are you connected to the internet?";
+		e.printStackTrace();
+	    } catch (JSONException e) {
+		errorMessage = "Error parsing bus times";
+		e.printStackTrace();
+	    }
+	    return stop;
+	}
+
+	protected void onPostExecute(Stop stop) {
+	    // Log.i(TAG, "Got timetable");
+	    if (stop == null) {
+
+		// progBar.setVisibility(View.GONE);
+		// busContentMessage.setText(errorMessage);
+		// busContentMessage.setVisibility(View.VISIBLE);
+	    } else {
+		// progBar.setVisibility(View.GONE);
+
+	    }
+	}
     }
 
     public void setStop(Stop stop) {
